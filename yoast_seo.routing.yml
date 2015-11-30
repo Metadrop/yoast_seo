@@ -1,0 +1,7 @@
+yoast_seo.content:
+  path: '/hello'
+  defaults:
+    _controller: '\Drupal\yoast_seo\Controller\YoastseoController::content'
+    _title: 'Hello World'
+  requirements:
+    _permission: 'access content'

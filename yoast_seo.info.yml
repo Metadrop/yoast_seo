@@ -1,0 +1,11 @@
+name: Yoast SEO for Drupal
+description: Adds Yoast SEO page analysis and configuration
+package: SEO
+
+type: module
+core: 8.x
+
+dependencies:
+  - metatag
+  - node
+  - path
