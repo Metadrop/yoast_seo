@@ -4,7 +4,7 @@ yoast_seo.content:
     _controller: '\Drupal\yoast_seo\Controller\YoastseoController::content'
     _title: 'Hello World'
   requirements:
-    _permission: 'access content'
+    _permission: 'use yoast seo'
 
 yoast_seo.settings:
   path: 'admin/config/yoast_seo'
@@ -12,4 +12,4 @@ yoast_seo.settings:
     _title: 'Yoast SEO settings'
     _controller: '\Drupal\yoast_seo\Controller\YoastseoController::settings'
   requirements:
-    _permission: 'access content'
+    _permission: 'administer yoast seo'
