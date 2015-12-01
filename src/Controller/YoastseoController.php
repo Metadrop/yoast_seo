@@ -15,4 +15,11 @@ class YoastseoController extends ControllerBase {
 			'#markup' => $this->t('Hello, World!'),
 		);
 	}
+
+	public function settings() {
+		return array(
+			'#type' => 'markup',
+			'#markup' => $this->t('Hello, World!'),
+		);
+	}
 }

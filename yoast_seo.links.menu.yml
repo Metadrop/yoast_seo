@@ -1,0 +1,6 @@
+yoast_seo.admin:
+  title: 'Yoast SEO Admin Settings'
+  description: 'Configure Yoast SEO for Drupal settings'
+  parent: system.admin_config_development
+  route_name: yoast_seo.settings
+  weight: 100

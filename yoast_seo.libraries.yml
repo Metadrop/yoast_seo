@@ -1,0 +1,6 @@
+yoast_seo:
+  version: 1.x
+  js:
+    js/yoast_seo.js: {}
+  dependencies:
+    - core/jquery
