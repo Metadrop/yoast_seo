@@ -1,0 +1,10 @@
+field.field_yoast_seo_status.value:
+  type: string
+  label: 'Default value'
+  string:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        value:
+          type: string
+          label: 'Value'
