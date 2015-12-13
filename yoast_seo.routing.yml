@@ -1,7 +1,7 @@
 yoast_seo.content:
   path: '/hello'
   defaults:
-    _controller: '\Drupal\yoast_seo\Controller\YoastseoController::content'
+    _controller: '\Drupal\yoast_seo\Controller\YoastSeoController::content'
     _title: 'Hello World'
   requirements:
     _permission: 'use yoast seo'
@@ -10,6 +10,6 @@ yoast_seo.settings:
   path: 'admin/config/yoast_seo'
   defaults:
     _title: 'Yoast SEO settings'
-    _controller: '\Drupal\yoast_seo\Controller\YoastseoController::settings'
+    _controller: '\Drupal\yoast_seo\Controller\YoastSeoController::settings'
   requirements:
     _permission: 'administer yoast seo'

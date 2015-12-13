@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\yoast_seo\Controller\YoastseoController.
+ * Contains \Drupal\yoast_seo\Controller\YoastSeoController.
  */
 
 namespace Drupal\yoast_seo\Controller;
@@ -9,7 +9,7 @@ namespace Drupal\yoast_seo\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 
-class YoastseoController extends ControllerBase {
+class YoastSeoController extends ControllerBase {
 
 	/**
 	 * A simple demo content page.
@@ -58,9 +58,10 @@ class YoastseoController extends ControllerBase {
 		}
 
 		$form['xmlsitemap'] = [
-			'#type' => 'item',
+      '#type' => 'details',
 			'#title' => t('XML Sitemap'),
 			'#markup' => $xmlsitemap_description,
+      '#open' => true,
 		];
 
 		// Inform the user about altering the Metatag configuration on the module
@@ -68,11 +69,11 @@ class YoastseoController extends ControllerBase {
 		// We do not check if the module is enabled since it is our dependency.
 		if (\Drupal::currentUser()->hasPermission('administer meta tags')) {
 			$metatag_description = t(
-				'You can configure and override the Metatag title & description default settings at the !url.',
+				'You can configure and override the Metatag title & description default settings at the @url.',
 				[
-					'!url' => \Drupal::l(
+					'@url' => \Drupal::l(
 						t('Metatag configuration page'),
-						Url::fromRoute('metatag.settings')
+						Url::fromRoute('entity.metatag_defaults.collection')
 					)
 				]
 			);
@@ -82,10 +83,22 @@ class YoastseoController extends ControllerBase {
 		}
 
 		$form['metatag'] = [
-			'#type' => 'item',
+      '#type' => 'details',
 			'#title' => t('Configure Metatag default templates'),
 			'#markup' => $metatag_description,
+      '#open' => true,
 		];
+
+    // Add to the page the Yoast SEO form which allows the administrator to enable/disable
+    // Yoast SEO by bundles.
+    $config_form = \Drupal::formBuilder()->getForm('Drupal\yoast_seo\Form\YoastSeoConfigForm');
+    $form['yoast_seo'] = [
+      '#type' => 'details',
+      '#title' => 'Configure Yoast SEO by bundles',
+      '#description' => 'Select the bundles Yoast SEO will be enabled for',
+      '#markup' => render($config_form),
+      '#open' => true
+    ];
 
 		return $form;
 	}

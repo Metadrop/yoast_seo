@@ -1,10 +1,15 @@
-field.field_yoast_seo_status.value:
+field.yoast_seo_status.value:
   type: string
   label: 'Default value'
-  string:
-    - type: mapping
-      label: 'Default'
-      mapping:
-        value:
-          type: string
-          label: 'Value'
+  mapping:
+    value:
+      type: string
+      label: 'Value'
+
+field.yoast_seo_focus_keyword.value:
+  type: string
+  label: 'Default value'
+  mapping:
+    value:
+      type: string
+      label: 'Value'

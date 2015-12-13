@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\yoast_seo\Plugin\Field\FieldType\YoastSeoStatusItem.
+ * Contains Drupal\yoast_seo\Plugin\Field\FieldType\YoastSeoFocusKeywordItem.
  */
 
 namespace Drupal\yoast_seo\Plugin\Field\FieldType;
@@ -13,18 +13,16 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
- * Plugin implementation of the 'yoast_seo_status' field type.
+ * Plugin implementation of the 'yoast_seo_focus_keyword' field type.
  *
  * @FieldType(
- *   id = "yoast_seo_status",
- *   label = @Translation("Yoast SEO status"),
+ *   id = "yoast_seo_focus_keyword",
+ *   label = @Translation("Yoast SEO focus keyword"),
  *   module = "yoast_seo",
- *   description = @Translation("The SEO status in points."),
- *   default_widget = "yoast_seo_widget",
- *   default_formatter = "string"
+ *   description = @Translation("The focus keyword for this entity.")
  * )
  */
-class YoastSeoStatusItem extends FieldItemBase {
+class YoastSeoFocusKeywordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
