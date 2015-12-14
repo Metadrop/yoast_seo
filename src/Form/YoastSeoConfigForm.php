@@ -155,7 +155,7 @@ class YoastSeoConfigForm extends FormBase {
 
     // Retrieve the bundles for which Yoast SEO has already been enabled for.
     foreach ($bundles as $bundle_id => $bundle_label) {
-      if ($yoast_seo_field_manager->isAttached($entity_type, $bundle_id, 'field_yoast_seo_status')) {
+      if ($yoast_seo_field_manager->isAttached($entity_type, $bundle_id, 'field_yoast_seo')) {
         $enabled_bundles[] = $bundle_id;
       }
     }

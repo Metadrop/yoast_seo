@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\yoast_seo\Plugin\Field\FieldType\YoastSeoStatusItem.
+ * Contains Drupal\yoast_seo\Plugin\Field\FieldType\YoastSeoItem.
  */
 
 namespace Drupal\yoast_seo\Plugin\Field\FieldType;
@@ -13,27 +13,33 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
- * Plugin implementation of the 'yoast_seo_status' field type.
+ * Plugin implementation of the 'yoast_seo' field type.
  *
  * @FieldType(
- *   id = "yoast_seo_status",
- *   label = @Translation("Yoast SEO status"),
+ *   id = "yoast_seo",
+ *   label = @Translation("Yoast SEO status & focused keywords"),
  *   module = "yoast_seo",
- *   description = @Translation("The SEO status in points."),
+ *   description = @Translation("The Yoast SEO status in points and the focused keywords."),
  *   default_widget = "yoast_seo_widget",
  *   default_formatter = "string"
  * )
  */
-class YoastSeoStatusItem extends FieldItemBase {
+class YoastSeoItem extends FieldItemBase {
+
   /**
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     return array(
       'columns' => array(
-        'value' => array(
-          'type' => 'text',
-          'size' => 'tiny',
+        'status' => array(
+          'type' => 'varchar',
+          'length' => 256,
+          'not null' => FALSE,
+        ),
+        'focus_keyword' => array(
+          'type' => 'varchar',
+          'length' => 256,
           'not null' => FALSE,
         ),
       ),
@@ -44,8 +50,10 @@ class YoastSeoStatusItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['value'] = DataDefinition::create('string');
+    $properties['status']        = DataDefinition::create('string');
+    $properties['focus_keyword'] = DataDefinition::create('string');
 
     return $properties;
   }
+
 }

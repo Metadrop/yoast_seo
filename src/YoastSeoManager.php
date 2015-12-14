@@ -48,20 +48,14 @@ class YoastSeoManager {
     );
     $this->yoast_seo_field_manager->attachField($entity_type, $bundle, $metatag_field);
 
-    // Attach seo fields to the target content type.
+    // Attach yoast seo field to the target content type.
     $yoast_fields = [
-      'field_yoast_seo_status' => array(
-        'field_name' => 'field_yoast_seo_status',
-        'field_label' => 'Yoast SEO status',
-        'storage_type' => 'yoast_seo_status',
+      'field_yoast_seo' => array(
+        'field_name' => 'field_yoast_seo',
+        'field_label' => 'Yoast SEO',
+        'storage_type' => 'yoast_seo',
         'translatable' => TRUE,
       ),
-      'field_yoast_seo_focus_keyword' => array(
-        'field_name' => 'field_yoast_seo_focus_keyword',
-        'field_label' => 'Yoast SEO focus keyword',
-        'storage_type' => 'yoast_seo_focus_keyword',
-        'translatable' => TRUE,
-      )
     ];
     foreach ($yoast_fields as $field) {
       $this->yoast_seo_field_manager->attachField($entity_type, $bundle, $field);
@@ -77,8 +71,7 @@ class YoastSeoManager {
   public function detachYoastSeoFields($entity_type = 'node', $bundle) {
     // Detach seo fields from the target content type.
     $yoast_fields = [
-      'field_yoast_seo_status',
-      'field_yoast_seo_focus_keyword'
+      'field_yoast_seo',
     ];
 
     foreach ($yoast_fields as $field_name) {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\yoast_seo\Plugin\Field\FieldWidget\YoastSeoStatusWidget.
+ * Contains \Drupal\yoast_seo\Plugin\Field\FieldWidget\YoastSeoWidget.
  */
 
 namespace Drupal\yoast_seo\Plugin\Field\FieldWidget;
@@ -15,17 +15,17 @@ use Drupal\yoast_seo\YoastSeoManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Advanced widget for yoast_seo_status field.
+ * Advanced widget for yoast_seo field.
  *
  * @FieldWidget(
  *   id = "yoast_seo_widget",
- *   label = @Translation("Advanced meta tags form"),
+ *   label = @Translation("Yoast SEO form"),
  *   field_types = {
- *     "yoast_seo_status"
+ *     "yoast_seo"
  *   }
  * )
  */
-class YoastSeoStatusWidget extends WidgetBase implements ContainerFactoryPluginInterface {
+class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
    * Instance of YoastSeoManager service.
@@ -58,22 +58,6 @@ class YoastSeoStatusWidget extends WidgetBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    //$item = $items[$delta];
-    //$default_tags = yoast_seo_get_default_tags();
-    //
-    //// Retrieve the values for each yoast_seo from the serialized array.
-    //$values = array();
-    //if (!empty($item->value)) {
-    //  $values = unserialize($item->value);
-    //}
-    //
-    //// Populate fields which have not been overridden in the entity.
-    //foreach ($default_tags as $tag_id => $tag_value) {
-    //  if (!isset($values[$tag_id]) && !empty($tag_value)) {
-    //    $values[$tag_id] = $tag_value;
-    //  }
-    //}
-
     // Create the form element.
     $element['yoast_seo'] = array(
       '#type' => 'details',
@@ -81,17 +65,17 @@ class YoastSeoStatusWidget extends WidgetBase implements ContainerFactoryPluginI
       '#open' => TRUE,
     );
 
-    $element['yoast_seo']['yoast_seo_status'] = array(
+    $element['yoast_seo']['status'] = array(
       '#type' => 'number',
-      '#title' => t('Yoast SEO score'),
-      '#default_value' => '0',
+      '#title' => t('Yoast SEO status'),
+      '#default_value' => isset($items[$delta]->status) ? $items[$delta]->status : NULL,
       '#description' => t("The SEO status in points.")
     );
 
-    $element['yoast_seo']['yoast_seo_focus_keyword'] = array(
+    $element['yoast_seo']['focus_keyword'] = array(
       '#type' => 'textfield',
       '#title' => t('Yoast SEO focus keyword'),
-      '#default_value' => '0',
+      '#default_value' => isset($items[$delta]->focus_keyword) ? $items[$delta]->focus_keyword : NULL,
       '#description' => t("The focus keyword for this entity.")
     );
 
@@ -102,29 +86,11 @@ class YoastSeoStatusWidget extends WidgetBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    return 'test';
-    //// Flatten the values array to remove the groups and then serialize all the
-    //// yoast_seos into one value for storage.
-    //$tag_manager = \Drupal::service('plugin.manager.yoast_seo.tag');
-    //$tags = $tag_manager->getDefinitions();
-    //foreach ($values as &$value) {
-    //  $flattened_value = array();
-    //  foreach ($value as $group) {
-    //    // Exclude the "original delta" value.
-    //    if (is_array($group)) {
-    //      foreach ($group as $tag_id => $tag_value) {
-    //        $tag = $tag_manager->createInstance($tag_id);
-    //        $tag->setValue($tag_value);
-    //        if (!empty($tag->value())) {
-    //          $flattened_value[$tag_id] = $tag->value();
-    //        }
-    //      }
-    //    }
-    //  }
-    //  $value = serialize($flattened_value);
-    //}
-    //
-    //return $values;
+    foreach ($values as &$value) {
+      $value['status'] = $value['yoast_seo']['status'];
+      $value['focus_keyword'] = $value['yoast_seo']['focus_keyword'];
+    }
+    return $values;
   }
 
 }
