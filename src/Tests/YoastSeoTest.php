@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\metatag\Tests\MetatagFieldTest.
+ * Contains \Drupal\yoast_seo\Tests\YoastSeoTest.
  *
  * Scenarios :
- * * The Yoast SEO section is only available on content type which have a field_meta_tags field.
+ * * The Yoast SEO section is only available when it has been previously enabled on the given content type.
  */
 
 namespace Drupal\yoast_seo\Tests;
@@ -89,8 +89,7 @@ class YoastSeoTest extends WebTestBase {
   }
 
   /**
-   * The Yoast SEO section is only available on content type which have
-   * a field_meta_tags field.
+   * The Yoast SEO section is only available when it has been previously enabled on the given content type.
    *
    * Given    I am logged in as admin
    * When     I am adding a content on a content type which doesn't have a Meta Tag field

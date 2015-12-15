@@ -63,13 +63,18 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       '#type' => 'details',
       '#title' => t('Yoast SEO for drupal'),
       '#open' => TRUE,
+      '#attached' => array(
+        'library' => array(
+          'yoast_seo/yoast_seo',
+        ),
+      ),
     );
 
     $element['yoast_seo']['status'] = array(
       '#type' => 'number',
       '#title' => t('Yoast SEO status'),
       '#default_value' => isset($items[$delta]->status) ? $items[$delta]->status : NULL,
-      '#description' => t("The SEO status in points.")
+      '#description' => t("The SEO status in points."),
     );
 
     $element['yoast_seo']['focus_keyword'] = array(
@@ -87,7 +92,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as &$value) {
-      $value['status'] = $value['yoast_seo']['status'];
+      $value['status']        = $value['yoast_seo']['status'];
       $value['focus_keyword'] = $value['yoast_seo']['focus_keyword'];
     }
     return $values;
