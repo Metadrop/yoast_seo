@@ -10,6 +10,8 @@ namespace Drupal\yoast_seo;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Logger\LoggerChannelFactory;
 use \Drupal\field\Entity\FieldConfig;
+use \Drupal\Component\Utility\NestedArray;
+use \Drupal\Component\Utility\Html;
 
 /**
  * Class YoastSeoFieldManager.
@@ -17,6 +19,26 @@ use \Drupal\field\Entity\FieldConfig;
  * @package Drupal\yoast_seo
  */
 class YoastSeoFieldManager {
+
+  public $fieldsConfiguration = [
+    // Paths to access the fields inside the form array.
+    'paths' => [
+      'title' => 'title',
+      'body' => 'body',
+      'focus_keyword' => 'field_yoast_seo.widget.0.yoast_seo.focus_keyword',
+      'seo_status' => 'field_yoast_seo.widget.0.yoast_seo.status',
+    ],
+
+    // Tokens for the fields.
+    'tokens' => [
+      'title' => '[current-page:title]',
+      'body' => '[current-page:body]',
+    ],
+
+    'targets' => [
+
+    ],
+  ];
 
   /**
    * Metatag logging channel.
@@ -30,6 +52,13 @@ class YoastSeoFieldManager {
    */
   public function __construct() {
     $this->entity_manager = \Drupal::entityManager();
+
+    // Get Output generated ids.
+    $this->fieldsConfiguration['targets'] = [
+      'wrapper_target_id' => Html::getUniqueId('yoast-wrapper'),
+      'snippet_target_id' => Html::getUniqueId('yoast-snippet'),
+      'output_target_id' => Html::getUniqueId('yoast-output'),
+    ];
   }
 
   /**
@@ -113,6 +142,71 @@ class YoastSeoFieldManager {
                             ->getFieldDefinitions($entity_type, $bundle);
 
     return isset($fields_config[$field_name]);
+  }
+
+
+  /**
+   * Set fields configuration from a form.
+   *
+   * Explores the field present in the form and build a setting array
+   * that will be used by yoast_seo javascript.
+   *
+   * @param $formAfterBuild
+   *   node form after build
+   *
+   * @return mixed
+   *   transformed form
+   */
+  public function setFieldsConfiguration($formAfterBuild) {
+    // Fields requested.
+
+
+    // Attach settings in drupalSettings for each required field.
+    foreach ($this->fieldsConfiguration['paths'] as $fieldName => $fieldPath) {
+      $fieldId = NestedArray::getValue($formAfterBuild, explode('.', $fieldPath . '.#id'));
+      $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields'][$fieldName] = $fieldId;
+
+    }
+
+    // Attach settings for the tokens.
+    foreach($this->fieldsConfiguration['tokens'] as $fieldName => $token) {
+      $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['tokens'][$fieldName] = $token;
+    }
+
+    // Attach settings for the targets.
+    foreach($this->fieldsConfiguration['targets'] as $targetName => $targetId) {
+      $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['targets'][$targetName] = $targetId;
+    }
+
+    return $formAfterBuild;
+  }
+
+  /**
+   * Add code for snippet.
+   * @param $form
+   */
+  public function addSnippet($form) {
+
+    // Get template for the snippet.
+    $snippetTpl = [
+      '#theme' => 'snippet',
+      '#wrapper_target_id' => $this->fieldsConfiguration['targets']['wrapper_target_id'],
+      '#snippet_target_id' => $this->fieldsConfiguration['targets']['snippet_target_id'],
+      '#output_target_id' => $this->fieldsConfiguration['targets']['output_target_id'],
+    ];
+    $output = drupal_render($snippetTpl);
+
+    // Add rendered template to the form, where we want the snippet.
+    NestedArray::setValue(
+      $form,
+      explode('.', 'field_yoast_seo.widget.0.yoast_seo.snippet_analysis'),
+      [
+        '#weight' => $form['body']['#weight'] + 1,
+        '#markup' => $output,
+
+      ]
+    );
+    return $form;
   }
 
   //public function save(array $form, FormStateInterface $form_state) {

@@ -5,3 +5,4 @@ yoast_seo:
     js/yoast_seo.js: {}
   dependencies:
     - core/jquery
+    - core/drupalSettings
