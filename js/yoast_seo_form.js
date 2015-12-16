@@ -15,7 +15,7 @@
   /**
    * @namespace
    */
-  var DrupalForm = {
+  var YoastSeoForm = {
 
     /**
      * Based on a form item HTMLElement wrapper, get the FormItem view class
@@ -24,7 +24,7 @@
      * @returns {function}
      */
     getFormItemClass: function (el_wrapper) {
-      var field_item_class = DrupalForm.views.Textfield;
+      var field_item_class = YoastSeoForm.views.Textfield;
       var field_types_map = {
         'js-form-type-textfield': 'Textfield',
         'js-form-type-textarea': 'Textarea'
@@ -33,13 +33,13 @@
       // If the element carries a CKEDITOR.
       var $textarea = $('textarea', $(el_wrapper));
       if ($textarea.length && CKEDITOR.dom.element.get($textarea[0]).getEditor()) {
-        field_item_class = DrupalForm.views.Ckeditor;
+        field_item_class = YoastSeoForm.views.Ckeditor;
       }
       else {
         // Else define the FormItem class regarding the element wrapper classes.
         for (var field_type in field_types_map) {
           if ($(el_wrapper).hasClass(field_type)) {
-            field_item_class = DrupalForm.views[field_types_map[field_type]];
+            field_item_class = YoastSeoForm.views[field_types_map[field_type]];
           }
         }
       }
@@ -55,7 +55,7 @@
      */
     getFormItemView: function (el_wrapper) {
       // Get the FormItem view class based on the HTMLElement wrapper.
-      var FormItemViewClass = DrupalForm.getFormItemClass(el_wrapper),
+      var FormItemViewClass = YoastSeoForm.getFormItemClass(el_wrapper),
       // The HTMLElement to bind the FieldItem view onto.
         el = null;
 
@@ -72,13 +72,13 @@
   /**
    * @namespace
    */
-  DrupalForm.views = {};
+  YoastSeoForm.views = {};
 
   /**
    * Abstract class (kind of) which as for aim to control Drupal Form Item field.
-   * @type {DrupalForm.views.FormItem}
+   * @type {YoastSeoForm.views.FormItem}
    */
-  DrupalForm.views.FormItem = Backbone.View.extend({
+  YoastSeoForm.views.FormItem = Backbone.View.extend({
     /**
      * {@inheritdoc}
      */
@@ -114,25 +114,25 @@
 
   /**
    * FormItem view that has for aim to control textfield form item.
-   * @type {DrupalForm.views.Textfield}
+   * @type {YoastSeoForm.views.Textfield}
    */
-  DrupalForm.views.Textfield = DrupalForm.views.FormItem.extend({}, {
+  YoastSeoForm.views.Textfield = YoastSeoForm.views.FormItem.extend({}, {
     tag: 'input'
   });
 
   /**
    * FormItem view that has for aim to control textfield form item.
-   * @type {DrupalForm.views.Textarea}
+   * @type {YoastSeoForm.views.Textarea}
    */
-  DrupalForm.views.Textarea = DrupalForm.views.FormItem.extend({}, {
+  YoastSeoForm.views.Textarea = YoastSeoForm.views.FormItem.extend({}, {
     tag: 'textarea'
   });
 
   /**
    * FormItem view that has for aim to control textarea ckeditor form item.
-   * @type {DrupalForm.views.Ckeditor}
+   * @type {YoastSeoForm.views.Ckeditor}
    */
-  DrupalForm.views.Ckeditor = DrupalForm.views.Textarea.extend({
+  YoastSeoForm.views.Ckeditor = YoastSeoForm.views.Textarea.extend({
     /**
      * {@inheritdoc}
      */
@@ -151,11 +151,11 @@
     tag: 'textarea'
   });
 
-  Drupal.behaviors.drupalForm = {
+  Drupal.behaviors.yoastSeoForm = {
     attach: function (context) {
       var $context = $(context);
       $('.js-form-item', $('#node-page-edit-form')).each(function () {
-        DrupalForm.getFormItemView(this)
+        YoastSeoForm.getFormItemView(this)
       });
     }
   };
