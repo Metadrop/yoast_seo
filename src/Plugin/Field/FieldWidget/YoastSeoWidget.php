@@ -70,18 +70,18 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       ),
     );
 
+    $element['yoast_seo']['focus_keyword'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Focus keyword'),
+      '#default_value' => isset($items[$delta]->focus_keyword) ? $items[$delta]->focus_keyword : NULL,
+      '#description' => t("Pick the main keyword or keyphrase that this post/page is about.")
+    );
+
     $element['yoast_seo']['status'] = array(
-      '#type' => 'number',
+      '#type' => 'hidden',
       '#title' => t('Yoast SEO status'),
       '#default_value' => isset($items[$delta]->status) ? $items[$delta]->status : NULL,
       '#description' => t("The SEO status in points."),
-    );
-
-    $element['yoast_seo']['focus_keyword'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Yoast SEO focus keyword'),
-      '#default_value' => isset($items[$delta]->focus_keyword) ? $items[$delta]->focus_keyword : NULL,
-      '#description' => t("The focus keyword for this entity.")
     );
 
     return $element;
