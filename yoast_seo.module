@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Implements hook_form_form_alter();
+ */
+function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['#after_build']) && !empty($form['#after_build'])) {
+    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild' ;
+  } else {
+    $form['#after_build'] = [ 'yoast_seo_form_node_afterbuild' ];
+  }
+}
+
+
+/**
+ * After build function.
+ * Reads the form, and deduct associated yoastseo configuration from it.
+ * @param $form
+ * @param $form_state
+ *
+ * @return mixed
+ */
+function yoast_seo_form_node_afterbuild(&$form, $form_state) {
+  $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
+  $form = $yoast_seo_field_manager->setFieldsConfiguration($form);
+  $form = $yoast_seo_field_manager->addSnippet($form);
+
+  return $form;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function yoast_seo_theme() {
+  $theme['snippet'] = [
+    'variables' => [
+      'wrapper_target_id' => NULL,
+      'snippet_target_id' => NULL,
+      'output_target_id' => NULL,
+    ],
+    'template' => 'snippet',
+  ];
+
+  return $theme;
+}

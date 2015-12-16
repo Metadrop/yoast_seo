@@ -10,3 +10,4 @@ yoast_seo:
     - core/backbone
     - ckeditor/drupal.ckeditor
     - ckeditor/drupal.ckeditor.admin
+    - core/drupalSettings
