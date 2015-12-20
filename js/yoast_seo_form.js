@@ -154,9 +154,6 @@
   Drupal.behaviors.yoastSeoForm = {
     attach: function (context) {
       var $context = $(context);
-      $('.js-form-item', $('#node-page-edit-form')).each(function () {
-        YoastSeoForm.getFormItemView(this)
-      });
     }
   };
 
