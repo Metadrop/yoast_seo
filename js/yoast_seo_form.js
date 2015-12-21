@@ -180,8 +180,10 @@
      */
     initialize: function () {
       var self = this;
+
       // Listen to any change on the CKEDITOR component.
       Drupal.editors.ckeditor.onChange(this.el, function (val) {
+        self.$el.val(val);
         self.change(val);
       });
     }

@@ -41,7 +41,7 @@ function yoast_seo_form_node_afterbuild(&$form, $form_state) {
 
   // FIELDS
   // Add path field id.
-  $form['#attached']['drupalSettings']['yoast_seo']['fields']['url'] =  $form['path']['#id'];
+  $form['#attached']['drupalSettings']['yoast_seo']['fields']['url'] =  $form['path']['widget'][0]['alias']['#id'];
   // Add Metatag fields
   $form['#attached']['drupalSettings']['yoast_seo']['fields']['meta_title'] = $form['field_meta_tags']['widget'][0]['basic']['title']['#id'];
   $form['#attached']['drupalSettings']['yoast_seo']['fields']['meta_description'] = $form['field_meta_tags']['widget'][0]['basic']['description']['#id'];

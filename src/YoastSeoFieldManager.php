@@ -23,8 +23,8 @@ class YoastSeoFieldManager {
   public $fieldsConfiguration = [
     // Paths to access the fields inside the form array.
     'paths' => [
-      'title' => 'title',
-      'body' => 'body',
+      'title' => 'title.widget.0.value',
+      'body' => 'body.widget.0.value',
       'focus_keyword' => 'field_yoast_seo.widget.0.yoast_seo.focus_keyword',
       'seo_status' => 'field_yoast_seo.widget.0.yoast_seo.status',
     ],
@@ -159,7 +159,6 @@ class YoastSeoFieldManager {
    */
   public function setFieldsConfiguration($formAfterBuild) {
     // Fields requested.
-
 
     // Attach settings in drupalSettings for each required field.
     foreach ($this->fieldsConfiguration['paths'] as $fieldName => $fieldPath) {

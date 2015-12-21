@@ -12,18 +12,25 @@
 
   Drupal.behaviors.yoastSeo = {
     attach: function (context, settings) {
-      var $context = $(context),
-        formItems = {};
+      var $context = $(context);
 
-      var fields = {
-        keyword: 'edit-field-yoast-seo-0-yoast-seo-focus-keyword', // or 'edit-field-meta-tags-0-basic-keywords',
-        meta: 'edit-field-meta-tags-0-basic-description',
-        text: 'edit-body-0-value',
-        pageTitle: 'edit-field-meta-tags-0-basic-title',
-        title: 'edit-field-meta-tags-0-basic-title'
-      };
+      /**
+       * Yoast SEO data manipulation stone reference.
+       * @type Object
+       */
+      var YoastSeoData = {
+        /**
+         * Map the drupal fields with the expected Yoast SEO data
+         */
+        fieldsMapping : {
+          keyword: 'focus_keyword',
+          meta: 'meta_description',
+          text: 'body',
+          pageTitle: 'meta_title',
+          title: 'title',
+          url: 'url'
+        },
 
-      YoastSeoData = {
         /**
          * This should return an object with the given properties
          *
@@ -48,8 +55,9 @@
             excerpt: ''
           };
 
+          //
           for (var fieldName in data) {
-            var formItemView = Drupal.YoastSeoForm._formItemViews[fields[fieldName]];
+            var formItemView = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields[YoastSeoData.fieldsMapping[fieldName]]];
             if (typeof formItemView !== 'undefined') {
               data[fieldName] = formItemView.value();
             }
@@ -122,6 +130,7 @@
         });
 
         $(window).on('yoast_seo-form_item-changed', function() {
+          console.log('a change occurred on the data');
           console.log(YoastSeoData.getData());
         });
 
