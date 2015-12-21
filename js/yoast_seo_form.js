@@ -18,6 +18,11 @@
   var YoastSeoForm = {
 
     /**
+     * Form item views store.
+     */
+    _formItemViews: {},
+
+    /**
      * Based on a form item HTMLElement wrapper, get the FormItem view class
      * to use to control the form item HTMLElement field.
      * @param el
@@ -57,15 +62,26 @@
       // Get the FormItem view class based on the HTMLElement wrapper.
       var FormItemViewClass = YoastSeoForm.getFormItemClass(el_wrapper),
       // The HTMLElement to bind the FieldItem view onto.
-        el = null;
+        el = null,
+      // The form item view.
+        formItem = null;
 
       // Based on the FormItem view tag, retrieve the HTMLElement to bind the View onto.
       el = $(FormItemViewClass.tag, el_wrapper);
 
-      // Instantiate the FormItem view.
-      return new FormItemViewClass({
+      // Instantiate the form item view.
+      formItem = new FormItemViewClass({
         el: el
       });
+
+      // If the element has an idea, store it.
+      var id = el.attr('id');
+      if (id) {
+        YoastSeoForm._formItemViews[id] = formItem;
+      }
+
+      // Instantiate the FormItem view.
+      return formItem;
     }
   };
 
@@ -85,25 +101,46 @@
     events: {
       'input': 'onInput'
     },
+
     /**
      * {@inheritdoc}
      */
     initialize: function () {
       // Initialize your component.
     },
+
     /**
      * Listen to the input event.
      * @param evt
      */
     onInput: function (evt) {
-      this.change($(this.el).val());
+      this.change(evt, $(this.el).val());
     },
+
     /**
      *
      * @param val
      */
-    change: function (val) {
-      console.log(val);
+    change: function (evt, val) {
+      this.$el.trigger('yoast_seo-form_item-changed')
+    },
+
+    /**
+     * Get/Set the value of the form item view component.
+     * @param val (optional) set the value of the form item view.
+     * @return The value of the component if getter or void if setter.
+     */
+    value: function (val) {
+      // No value is provided.
+      // Get the value of the component.
+      if (typeof val == 'undefined') {
+        return this.$el.val();
+      }
+      // A value is provided.
+      // Set the value of the component.
+      else {
+        this.$el.val(val);
+      }
     }
   }, {
     /**
@@ -137,6 +174,7 @@
      * {@inheritdoc}
      */
     events: {},
+
     /**
      * {@inheritdoc}
      */
@@ -156,5 +194,7 @@
       var $context = $(context);
     }
   };
+
+  Drupal.YoastSeoForm = YoastSeoForm;
 
 })(jQuery, Drupal);
