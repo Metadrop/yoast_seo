@@ -90,7 +90,7 @@
             multiKeyword: false,
             targets: {
               output: YsSettings.targets.output_target_id,
-              overall: 'yoast-seo-overall-score', // TODO : make it dynamic.
+              overall: YsSettings.targets.overall_score_target_id,
               snippet: YsSettings.targets.snippet_target_id
             },
             snippetFields: {

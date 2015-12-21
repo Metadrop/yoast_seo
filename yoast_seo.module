@@ -23,44 +23,8 @@ function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
 function yoast_seo_form_node_afterbuild(&$form, $form_state) {
   $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
   $form = $yoast_seo_field_manager->setFieldsConfiguration($form);
-  $form = $yoast_seo_field_manager->addSnippet($form);
-
-  $isDefaultMetaTitle = !empty($form['field_meta_tags']['widget'][0]['basic']['title']['#default_value']) ? TRUE : FALSE;
-  $isDefaultKeyword = !empty($form['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value']) ? TRUE : FALSE;
-  $isDefaultMetaDescription = !empty($form['field_meta_tags']['widget'][0]['basic']['description']['#default_value']) ? TRUE : FALSE;
-  $isDefaultBody = !empty($form['body']['widget'][0]['#default_value']) ? TRUE : FALSE;
-
-  // TODO : move this configuration into YoastSEOFieldManager
-  $form['#attached']['drupalSettings']['yoast_seo']['default_text'] = [
-    'url' => $form['path']['widget'][0]['alias']['#default_value'],
-    'title' => $isDefaultMetaTitle ? $form['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
-    'keyword' => $isDefaultKeyword ? $form['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
-    'meta' => $isDefaultMetaDescription ? $form['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
-    'body' => $isDefaultBody ? $form['body']['widget'][0]['#default_value'] : '',
-  ];
-
-  // FIELDS
-  // Add path field id.
-  $form['#attached']['drupalSettings']['yoast_seo']['fields']['url'] =  $form['path']['widget'][0]['alias']['#id'];
-  // Add Metatag fields
-  $form['#attached']['drupalSettings']['yoast_seo']['fields']['meta_title'] = $form['field_meta_tags']['widget'][0]['basic']['title']['#id'];
-  $form['#attached']['drupalSettings']['yoast_seo']['fields']['meta_description'] = $form['field_meta_tags']['widget'][0]['basic']['description']['#id'];
-
-  // Placeholders.
-  $form['#attached']['drupalSettings']['yoast_seo']['placeholder_text'] = [
-    'title' => t('Please click here to alter your page meta title'),
-    'description' => t('Please click here and alter your page meta description.'),
-    'url' => t('example-post'),
-  ];
-
-  global $base_root;
-  $form['#attached']['drupalSettings']['yoast_seo']['seo_title_overwritten'] = $isDefaultMetaTitle;
-  $form['#attached']['drupalSettings']['yoast_seo']['text_format'] = $form['body']['widget'][0]['#format'];
-  $form['#attached']['drupalSettings']['yoast_seo']['base_root'] = $base_root;
-
-  // Other conf
-  $form['#attached']['drupalSettings']['yoast_seo']['analyzer'] = TRUE;
-  $form['#attached']['drupalSettings']['yoast_seo']['snippet_preview'] = TRUE;
+  $form = $yoast_seo_field_manager->addSnippetEditorMarkup($form);
+  $form = $yoast_seo_field_manager->addOverallScoreMarkup($form);
 
   return $form;
 }
@@ -76,6 +40,14 @@ function yoast_seo_theme() {
       'output_target_id' => NULL,
     ],
     'template' => 'snippet',
+  ];
+
+  $theme['overall_score'] = [
+    'variables' => [
+      'overall_score_target_id' => NULL,
+      'overall_score' => NULL,
+    ],
+    'template' => 'overall_score',
   ];
 
   return $theme;
