@@ -24,6 +24,8 @@
         // Settings for Yoast SEO.
         var YsSettings = drupalSettings.yoast_seo;
 
+        console.log(YsSettings);
+
         // Load Yoast SEO with its settings.
         $('body', context).once('yoast_seo', function () {
           YoastSEO.analyzerArgs = {
@@ -38,7 +40,7 @@
             multiKeyword: false,
             targets: {
               output: YsSettings.targets.output_target_id,
-              overall: 'yoast-seo-overall-score', // TODO : make it dynamic.
+              overall: YsSettings.targets.overall_score_target_id,
               snippet: YsSettings.targets.snippet_target_id
             },
             snippetFields: {
@@ -77,7 +79,7 @@
 
         // Construct the form
         $('.js-form-item', $('#node-page-edit-form')).each(function () {
-          //YoastSeoForm.getFormItemView(this);
+          YoastSeoForm.getFormItemView(this);
         });
 
       }

@@ -29,6 +29,14 @@ class YoastSeoFieldManager {
       'seo_status' => 'field_yoast_seo.widget.0.yoast_seo.status',
     ],
 
+    // Fields to include in the field section of the configuration.
+    'fields' => [
+      'title',
+      'body',
+      'focus_keyword',
+      'seo_status'
+    ],
+
     // Tokens for the fields.
     'tokens' => [
       'title' => '[current-page:title]',
@@ -55,10 +63,46 @@ class YoastSeoFieldManager {
 
     // Get Output generated ids.
     $this->fieldsConfiguration['targets'] = [
-      'wrapper_target_id' => Html::getUniqueId('yoast-wrapper'),
-      'snippet_target_id' => Html::getUniqueId('yoast-snippet'),
-      'output_target_id' => Html::getUniqueId('yoast-output'),
+      'wrapper_target_id'       => Html::getUniqueId('yoast-wrapper'),
+      'snippet_target_id'       => Html::getUniqueId('yoast-snippet'),
+      'output_target_id'        => Html::getUniqueId('yoast-output'),
+      'overall_score_target_id' => Html::getUniqueId('yoast-overall-score'),
     ];
+  }
+
+
+  /**
+   * Our helper to insert values in a form from a given key.
+   * example : formSet($form, 'myform.#value', 'valueToInsert');
+   * TODO : move this helper somewhere else.
+   * @param $form
+   * @param $key
+   * @param $value
+   *
+   * @return mixed
+   */
+  private function formSet(&$form, $key, $value) {
+    return NestedArray::setValue(
+      $form,
+      explode('.', $key),
+      $value
+    );
+  }
+
+  /**
+   * Our helper to retrieve values in a form from a given key.
+   * example : formGet($form, 'myform.#value');
+   * TODO : move this helper somewhere else.
+   * @param $form
+   * @param $key
+   *
+   * @return mixed
+   */
+  private function formGet($form, $key) {
+    return NestedArray::getValue(
+      $form,
+      explode('.', $key)
+    );
   }
 
   /**
@@ -162,8 +206,8 @@ class YoastSeoFieldManager {
 
 
     // Attach settings in drupalSettings for each required field.
-    foreach ($this->fieldsConfiguration['paths'] as $fieldName => $fieldPath) {
-      $fieldId = NestedArray::getValue($formAfterBuild, explode('.', $fieldPath . '.#id'));
+    foreach ($this->fieldsConfiguration['fields'] as $fieldName) {
+      $fieldId = $this->formGet($formAfterBuild, $this->fieldsConfiguration['paths'][$fieldName] . '.#id');
       $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields'][$fieldName] = $fieldId;
     }
 
@@ -177,6 +221,43 @@ class YoastSeoFieldManager {
       $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['targets'][$targetName] = $targetId;
     }
 
+    $isDefaultMetaTitle = !empty($formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#default_value']) ? TRUE : FALSE;
+    $isDefaultKeyword = !empty($formAfterBuild['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value']) ? TRUE : FALSE;
+    $isDefaultMetaDescription = !empty($formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value']) ? TRUE : FALSE;
+    $isDefaultBody = !empty($formAfterBuild['body']['widget'][0]['#default_value']) ? TRUE : FALSE;
+
+    // TODO : move this configuration into YoastSEOFieldManager
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['default_text'] = [
+      'url' => $formAfterBuild['path']['widget'][0]['alias']['#default_value'],
+      'title' => $isDefaultMetaTitle ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
+      'keyword' => $isDefaultKeyword ? $formAfterBuild['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
+      'meta' => $isDefaultMetaDescription ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
+      'body' => $isDefaultBody ? $formAfterBuild['body']['widget'][0]['#default_value'] : '',
+    ];
+
+    // FIELDS
+    // Add path field id.
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['url'] =  $formAfterBuild['path']['#id'];
+    // Add Metatag fields
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['meta_title'] = $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#id'];
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['meta_description'] = $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#id'];
+
+    // Placeholders.
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['placeholder_text'] = [
+      'title' => t('Please click here to alter your page meta title'),
+      'description' => t('Please click here and alter your page meta description.'),
+      'url' => t('example-post'),
+    ];
+
+    global $base_root;
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['seo_title_overwritten'] = $isDefaultMetaTitle;
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['text_format'] = $formAfterBuild['body']['widget'][0]['#format'];
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['base_root'] = $base_root;
+
+    // Other conf
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['analyzer'] = TRUE;
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['snippet_preview'] = TRUE;
+
     return $formAfterBuild;
   }
 
@@ -184,7 +265,7 @@ class YoastSeoFieldManager {
    * Add code for snippet.
    * @param $form
    */
-  public function addSnippet($form) {
+  public function addSnippetEditorMarkup($form) {
 
     // Get template for the snippet.
     $snippetTpl = [
@@ -196,15 +277,27 @@ class YoastSeoFieldManager {
     $output = drupal_render($snippetTpl);
 
     // Add rendered template to the form, where we want the snippet.
-    NestedArray::setValue(
-      $form,
-      explode('.', 'field_yoast_seo.widget.0.yoast_seo.snippet_analysis'),
-      [
-        '#weight' => $form['body']['#weight'] + 1,
-        '#markup' => $output,
+    $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.snippet_analysis', [
+      '#weight' => $form['body']['#weight'] + 1,
+      '#markup' => $output,
 
-      ]
-    );
+    ]);
+
+    return $form;
+  }
+
+  public function addOverallScoreMarkup($form) {
+
+    // Get template for the snippet.
+    $overallScoreTpl = [
+      '#theme' => 'overall_score',
+      '#overall_score_target_id' => $this->fieldsConfiguration['targets']['overall_score_target_id'],
+      '#overall_score' => 0,
+    ];
+    $output = drupal_render($overallScoreTpl);
+
+    $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.focus_keyword.#suffix', $output);
+
     return $form;
   }
 
