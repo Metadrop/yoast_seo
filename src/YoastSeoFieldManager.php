@@ -165,7 +165,6 @@ class YoastSeoFieldManager {
     foreach ($this->fieldsConfiguration['paths'] as $fieldName => $fieldPath) {
       $fieldId = NestedArray::getValue($formAfterBuild, explode('.', $fieldPath . '.#id'));
       $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields'][$fieldName] = $fieldId;
-
     }
 
     // Attach settings for the tokens.
