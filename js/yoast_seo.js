@@ -1,9 +1,6 @@
 /**
  * @file
- * Drupal Yoast SEO form utility.
- *
- * This library will help developers to interacts with drupal form
- * on client side
+ * Drupal Yoast SEO.
  *
  * @ignore
  */
@@ -55,15 +52,53 @@
             excerpt: ''
           };
 
-          //
+          // For all data required by the Yoast SEO snippet.
+          // Retrieve the form item view relative to the data.
           for (var fieldName in data) {
             var formItemView = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields[YoastSeoData.fieldsMapping[fieldName]]];
             if (typeof formItemView !== 'undefined') {
-              data[fieldName] = formItemView.value();
+              data[fieldName] = YoastSeoData.tokenReplace(formItemView.value());
             }
           }
 
           return data;
+        },
+
+        /**
+         * Replace the tokens found in a given string by their relative values.
+         *
+         * @param {String} value
+         * @return {String}
+         */
+        tokenReplace: function(value) {
+          var tokenRegex = /(\[[^\]]*:[^\]]*\])/g,
+            match = value.match(tokenRegex);
+
+          // If the value contains tokens.
+          if (match != null) {
+            // Replace all the tokens by their relative value.
+            for (var i in match) {
+              // Check if the token is relative to a field available by javascript.
+              var tokenRelativeField = _.findKey(settings.yoast_seo.tokens, function(val) {
+                return val === match[i];
+              });
+
+              // If the token can be solved locally.
+              if (typeof tokenRelativeField != 'undefined') {
+                // Replace the token with the relative field token value.
+                var formItemView = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields[YoastSeoData.fieldsMapping[tokenRelativeField]]];
+                if (typeof formItemView !== 'undefined') {
+                  var tokenValue = YoastSeoData.tokenReplace(formItemView.value());
+                  value = value.replace(match[i], tokenValue);
+                }
+              }
+              else {
+                console.log('remote token found ' + match[i] + ' / @todo implement the server call.');
+              }
+            }
+          }
+
+          return value;
         }
       };
 

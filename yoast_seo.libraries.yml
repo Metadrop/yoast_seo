@@ -8,6 +8,7 @@ yoast_seo:
   dependencies:
     - core/jquery
     - core/backbone
+    - core/underscore
     - ckeditor/drupal.ckeditor
     - ckeditor/drupal.ckeditor.admin
     - core/drupalSettings
