@@ -8,6 +8,8 @@ namespace Drupal\yoast_seo\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class YoastSeoController extends ControllerBase {
 
@@ -21,6 +23,39 @@ class YoastSeoController extends ControllerBase {
       '#type'   => 'markup',
       '#markup' => $this->t('Hello, World!'),
     ];
+  }
+
+  /**
+   * Returns a set of tokens' values.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request of the page.
+   *   * data The context to use to retrieve the tokens value, see Drupal\Core\Utility\token::replace()
+   *   * tokens An array of tokens to get the values for
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The JSON response.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   */
+  public function tokens(Request $request) {
+    $tokenValues = array();
+    $tokens = $request->request->get('tokens');
+    $data = $request->request->get('data');
+
+    if (is_null($data)) {
+      $data = array();
+    }
+
+    // Retrieve the tokens values.
+    // Use the metatag token service, which use either core or token module
+    // regarding if this one is installed.
+    foreach ($tokens as $token) {
+      $tokenValues[$token] = \Drupal::service('metatag.token')->tokenReplace($token, $data);
+    }
+
+    return new JsonResponse($tokenValues);
   }
 
   /**

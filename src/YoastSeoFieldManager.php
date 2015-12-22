@@ -24,6 +24,7 @@ class YoastSeoFieldManager {
     // Paths to access the fields inside the form array.
     'paths' => [
       'title' => 'title.widget.0.value',
+      'summary' => 'body.widget.0.summary',
       'body' => 'body.widget.0.value',
       'focus_keyword' => 'field_yoast_seo.widget.0.yoast_seo.focus_keyword',
       'seo_status' => 'field_yoast_seo.widget.0.yoast_seo.status',
@@ -32,6 +33,7 @@ class YoastSeoFieldManager {
     // Fields to include in the field section of the configuration.
     'fields' => [
       'title',
+      'summary',
       'body',
       'focus_keyword',
       'seo_status'
@@ -39,8 +41,12 @@ class YoastSeoFieldManager {
 
     // Tokens for the fields.
     'tokens' => [
-      'title' => '[current-page:title]',
-      'body' => '[current-page:body]',
+      '[current-page:title]' => 'title',
+      '[node:title]' => 'title',
+      '[current-page:body]' => 'body',
+      '[node:body]' => 'body',
+      '[current-page:summary]' => 'summary',
+      '[node:summary]' => 'summary',
     ],
 
     'targets' => [
@@ -299,56 +305,5 @@ class YoastSeoFieldManager {
 
     return $form;
   }
-
-  //public function save(array $form, FormStateInterface $form_state) {
-  //  $metatag_defaults = $this->entity;
-  //
-  //  // Set the label on new defaults.
-  //  if ($metatag_defaults->isNew()) {
-  //    $metatag_defaults_id = $form_state->getValue('id');
-  //    list($entity_type, $entity_bundle) = explode('__', $metatag_defaults_id);
-  //    // Get the entity label.
-  //    $entity_manager = \Drupal::service('entity.manager');
-  //    $entity_info    = $entity_manager->getDefinitions();
-  //    $entity_label   = (string) $entity_info[$entity_type]->get('label');
-  //    // Get the bundle label.
-  //    $bundle_info  = $entity_manager->getBundleInfo($entity_type);
-  //    $bundle_label = $bundle_info[$entity_bundle]['label'];
-  //    // Set the label to the config entity.
-  //    $this->entity->set('label', $entity_label . ': ' . $bundle_label);
-  //  }
-  //
-  //  // Set tags within the Metatag entity.
-  //  $tag_manager = \Drupal::service('plugin.manager.metatag.tag');
-  //  $tags        = $tag_manager->getDefinitions();
-  //  $tag_values  = array();
-  //  foreach ($tags as $tag_id => $tag_definition) {
-  //    if ($form_state->hasValue($tag_id)) {
-  //      // Some plugins need to process form input before storing it.
-  //      // Hence, we set it and then get it.
-  //      $tag = $tag_manager->createInstance($tag_id);
-  //      $tag->setValue($form_state->getValue($tag_id));
-  //      if (!empty($tag->value())) {
-  //        $tag_values[$tag_id] = $tag->value();
-  //      }
-  //    }
-  //  }
-  //  $metatag_defaults->set('tags', $tag_values);
-  //  $status = $metatag_defaults->save();
-  //
-  //  switch ($status) {
-  //    case SAVED_NEW:
-  //      drupal_set_message($this->t('Created the %label Metatag defaults.', [
-  //        '%label' => $metatag_defaults->label(),
-  //      ]));
-  //      break;
-  //    default:
-  //      drupal_set_message($this->t('Saved the %label Metatag defaults.', [
-  //        '%label' => $metatag_defaults->label(),
-  //      ]));
-  //  }
-  //
-  //  $form_state->setRedirectUrl($metatag_defaults->urlInfo('collection'));
-  //}
 
 }

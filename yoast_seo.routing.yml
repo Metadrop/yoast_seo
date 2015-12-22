@@ -6,6 +6,14 @@ yoast_seo.content:
   requirements:
     _permission: 'use yoast seo'
 
+yoast_seo.tokens:
+  path: '/yoast_seo/tokens'
+  defaults:
+    _controller: '\Drupal\yoast_seo\Controller\YoastSeoController::tokens'
+    _title: 'Yoast SEO tokens'
+  requirements:
+    _permission: 'use yoast seo'
+
 yoast_seo.settings:
   path: 'admin/config/yoast_seo'
   defaults:

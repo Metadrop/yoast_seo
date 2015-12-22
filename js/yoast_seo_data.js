@@ -1,23 +1,24 @@
-YoastSeoData = function(args) {
+YoastSeoData = function (args) {
   this.config = args.settings;
   this.analyzerArgs = args.analyzerArgs;
   this.fieldsMapping = args.fieldsMapping || {
-      meta: 'meta_description',
-      text: 'body',
-      pageTitle: 'meta_title',
-      title: 'title',
-      url: 'url',
-      snippetCite: 'url',
-      snippetMeta: 'meta_description',
-      snippetTitle: 'meta_title',
-      keyword: 'focus_keyword'
+    meta: 'meta_description',
+    text: 'body',
+    pageTitle: 'meta_title',
+    title: 'title',
+    url: 'url',
+    snippetCite: 'url',
+    snippetMeta: 'meta_description',
+    snippetTitle: 'meta_title',
+    keyword: 'focus_keyword'
   };
 
+  this.tokensRemote = {};
   this.data = this.getData();
 
   var self = this;
   // Update this.data everytime the field values are modified.
-  jQuery(window).on('yoast_seo-form_item-changed', function() {
+  jQuery(window).on('yoast_seo-form_item-changed', function () {
     self.data = null;
     self.data = self.getData();
     self.refreshSnippet();
@@ -60,7 +61,6 @@ YoastSeoData.prototype.getData = function () {
     baseUrl: this.config.base_root
   };
 
-
   // For all data required by the Yoast SEO snippet.
   // Retrieve the form item view relative to the data.
   for (var fieldName in data) {
@@ -69,8 +69,6 @@ YoastSeoData.prototype.getData = function () {
       data[fieldName] = this.tokenReplace(formItemView.value());
     }
   }
-
-  console.log(this.config);
 
   if (!this.config.seo_title_overwritten) {
     data.pageTitle = data.title;
@@ -93,55 +91,83 @@ YoastSeoData.prototype.getData = function () {
   return data;
 };
 
-
-YoastSeoData.prototype.tokenReplace = function(value) {
-  var tokenRegex = /(\[[^\]]*:[^\]]*\])/g,
-    match = value.match(tokenRegex);
+YoastSeoData.prototype.tokenReplace = function (value) {
+  var self = this,
+    tokenRegex = /(\[[^\]]*:[^\]]*\])/g,
+    match = value.match(tokenRegex),
+    tokensNotFound = [];
 
   // If the value contains tokens.
   if (match != null) {
     // Replace all the tokens by their relative value.
     for (var i in match) {
-      // Check if the token is relative to a field available by javascript.
-      var tokenRelativeField = _.findKey(this.config.tokens, function(val) {
-        return val === match[i];
-      });
+      var tokenRelativeField = null;
+
+      // Check if the token is relative to a field present on the page.
+      if (typeof this.config.tokens[match[i]] != 'undefined') {
+        tokenRelativeField = this.config.tokens[match[i]];
+      }
 
       // If the token can be solved locally.
-      if (typeof tokenRelativeField != 'undefined') {
+      if (tokenRelativeField != null) {
         // Replace the token with the relative field token value.
-        var formItemView = Drupal.YoastSeoForm._formItemViews[this.config.fields[this.fieldsMapping[tokenRelativeField]]];
+        var formItemView = Drupal.YoastSeoForm._formItemViews[this.config.fields[tokenRelativeField]];
         if (typeof formItemView !== 'undefined') {
           var tokenValue = this.tokenReplace(formItemView.value());
           value = value.replace(match[i], tokenValue);
         }
       }
+      // The token value has to be found remotely.
       else {
-        console.log('remote token found ' + match[i] + ' / @todo implement the server call.');
+        // If the token value has already been resolved and stored locally.
+        if (typeof this.tokensRemote[match[i]] != 'undefined') {
+          value = value.replace(match[i], this.tokensRemote[match[i]]);
+        } else {
+          tokensNotFound.push(match[i]);
+        }
       }
+    }
+
+    // If some tokens hasn't been resolved locally.
+    // Try to solve them remotely.
+    if (tokensNotFound.length) {
+      jQuery.ajax({
+        async: false,
+        url: Drupal.url('yoast_seo/tokens'),
+        type: 'POST',
+        data: {'tokens[]': tokensNotFound},
+        dataType: 'json'
+      }).then(function (data) {
+        // Store their value locally.
+        // It will avoid an unnecessary call to the server.
+        for (var token in data) {
+          self.tokensRemote[token] = data[token];
+          value = value.replace(token, self.tokensRemote[token]);
+        }
+      });
     }
   }
 
   return value;
-}
+};
 
 YoastSeoData.prototype.refreshSnippet = function () {
   YoastSEO.app.rawData = this.getData();
   YoastSEO.app.reloadSnippetText();
-}
+};
 
 YoastSeoData.prototype.refreshAnalysis = function () {
   if (typeof YoastSEO.app.snippetPreview === "undefined") {
     YoastSEO.app.init();
   }
   YoastSEO.app.runAnalyzerCallback();
-}
+};
 
 /**
  * Initializes the snippetPreview if it isn't there.
  * If it is already initialized, it get's new values from the inputs and rerenders snippet.
  */
-YoastSeoData.prototype.getAnalyzerInput = function() {
+YoastSeoData.prototype.getAnalyzerInput = function () {
   if (typeof YoastSEO.app.snippetPreview === "undefined") {
     YoastSEO.app.init();
   }
@@ -157,7 +183,7 @@ YoastSeoData.prototype.getAnalyzerInput = function() {
  * Grabs data from the refObj and returns populated analyzerData
  * @returns analyzerData
  */
-YoastSeoData.prototype.updateRawData = function() {
+YoastSeoData.prototype.updateRawData = function () {
   YoastSEO.app.rawData = this.getData();
 };
 
@@ -167,9 +193,9 @@ YoastSeoData.prototype.updateRawData = function() {
  * @param score
  * @returns output
  */
-YoastSeoData.prototype.scoreRating = function( score ) {
+YoastSeoData.prototype.scoreRating = function (score) {
   var scoreRate;
-  switch ( score ) {
+  switch (score) {
     case 0:
       scoreRate = "na";
       break;
@@ -198,7 +224,7 @@ YoastSeoData.prototype.scoreRating = function( score ) {
  * Sets the SEO score in both the hidden input and the rating element.
  * @param score
  */
-YoastSeoData.prototype.saveScores = function ( score ) {
+YoastSeoData.prototype.saveScores = function (score) {
   // Update score text in the score box.
   jQuery('.score_value', '#' + this.config.targets.overall_score_target_id).text(this.scoreRating(score));
   // Update score in the score field.
@@ -212,7 +238,7 @@ YoastSeoData.prototype.saveScores = function ( score ) {
  * Calls the eventbinders.
  * We don't need it.
  */
-YoastSeoData.prototype.bindElementEvents = function() {
+YoastSeoData.prototype.bindElementEvents = function () {
 
 };
 
@@ -222,5 +248,5 @@ YoastSeoData.prototype.bindElementEvents = function() {
  *
  * @param {Object} ev
  */
-YoastSeoData.prototype.updateSnippetValues = function( ev ) {
+YoastSeoData.prototype.updateSnippetValues = function (ev) {
 };
