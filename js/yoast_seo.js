@@ -11,113 +11,20 @@
     attach: function (context, settings) {
       var $context = $(context);
 
-      /**
-       * Yoast SEO data manipulation stone reference.
-       * @type Object
-       */
-      var YoastSeoData = {
-        /**
-         * Map the drupal fields with the expected Yoast SEO data
-         */
-        fieldsMapping : {
-          keyword: 'focus_keyword',
-          meta: 'meta_description',
-          text: 'body',
-          pageTitle: 'meta_title',
-          title: 'title',
-          url: 'url'
-        },
-
-        /**
-         * This should return an object with the given properties
-         *
-         * @callback YoastSEO.App~getData
-         * @returns {Object} data
-         * @returns {String} data.keyword The keyword that should be used
-         * @returns {String} data.meta
-         * @returns {String} data.text The text to analyze
-         * @returns {String} data.pageTitle The text in the HTML title tag
-         * @returns {String} data.title The title to analyze
-         * @returns {String} data.url The URL for the given page
-         * @returns {String} data.excerpt Excerpt for the pages
-         */
-        getData: function () {
-          var data = {
-            keyword: '',
-            meta: '',
-            text: '',
-            pageTitle: '',
-            title: '',
-            url: '',
-            excerpt: ''
-          };
-
-          // For all data required by the Yoast SEO snippet.
-          // Retrieve the form item view relative to the data.
-          for (var fieldName in data) {
-            var formItemView = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields[YoastSeoData.fieldsMapping[fieldName]]];
-            if (typeof formItemView !== 'undefined') {
-              data[fieldName] = YoastSeoData.tokenReplace(formItemView.value());
-            }
-          }
-
-          return data;
-        },
-
-        /**
-         * Replace the tokens found in a given string by their relative values.
-         *
-         * @param {String} value
-         * @return {String}
-         */
-        tokenReplace: function(value) {
-          var tokenRegex = /(\[[^\]]*:[^\]]*\])/g,
-            match = value.match(tokenRegex);
-
-          // If the value contains tokens.
-          if (match != null) {
-            // Replace all the tokens by their relative value.
-            for (var i in match) {
-              // Check if the token is relative to a field available by javascript.
-              var tokenRelativeField = _.findKey(settings.yoast_seo.tokens, function(val) {
-                return val === match[i];
-              });
-
-              // If the token can be solved locally.
-              if (typeof tokenRelativeField != 'undefined') {
-                // Replace the token with the relative field token value.
-                var formItemView = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields[YoastSeoData.fieldsMapping[tokenRelativeField]]];
-                if (typeof formItemView !== 'undefined') {
-                  var tokenValue = YoastSeoData.tokenReplace(formItemView.value());
-                  value = value.replace(match[i], tokenValue);
-                }
-              }
-              else {
-                console.log('remote token found ' + match[i] + ' / @todo implement the server call.');
-              }
-            }
-          }
-
-          return value;
-        }
-      };
-
-
-      var init = function () {
-        if (drupalSettings.yoast_seo == undefined) {
+        if (settings.yoast_seo == undefined) {
           throw 'YoastSEO settings are not defined';
         }
 
         // Settings for Yoast SEO.
-        var YsSettings = drupalSettings.yoast_seo;
+        var YsSettings = settings.yoast_seo;
 
         // Load Yoast SEO with its settings.
-        $('body', context).once('yoast_seo', function () {
+        //$('body', context).once('yoast_seo', function () {
           YoastSEO.analyzerArgs = {
-            source: YoastSEO_DrupalSource,
+            source: YoastSeoData,
             analyzer: YsSettings.analyzer,
             snippetPreview: YsSettings.snippet_preview,
-            elementTarget: [YsSettings.wrapper_target_id],
+            elementTarget: [YsSettings.targets.wrapper_target_id],
             typeDelay: 300,
             typeDelayStep: 100,
             maxTypeDelay: 1500,
@@ -149,30 +56,40 @@
               url: YsSettings.fields.url
             },
             placeholderText: {
-              title: YsSettings.placeholderText.title,
-              description: YsSettings.placeholderText.description,
-              url: YsSettings.placeholderText.url
+              title: YsSettings.placeholder_text.title,
+              description: YsSettings.placeholder_text.description,
+              url: YsSettings.placeholder_text.url
             },
-            SEOTitleOverwritten: YsSettings.SEOTitleOverwritten,
+            SEOTitleOverwritten: YsSettings.seo_title_overwritten,
             scoreElement: YsSettings.fields.seo_status,
             baseRoot: YsSettings.base_root
           };
-        });
 
-        // Construct the form
-        $('.js-form-item', $('#node-page-form')).each(function () {
-          Drupal.YoastSeoForm.getFormItemView(this);
-        });
 
-        $(window).on('yoast_seo-form_item-changed', function() {
-          console.log('a change occurred on the data');
-          console.log(YoastSeoData.getData());
-        });
+          //// Construct the form
+          $('.js-form-item', $('#node-page-form')).each(function () {
+            Drupal.YoastSeoForm.getFormItemView(this);
+          });
 
-        console.log(YoastSeoData.getData());
-      };
+          // Init Yoast SEO.
+          var yoastSeoData = new YoastSeoData({
+            settings : settings.yoast_seo,
+            analyzerArgs: YoastSEO.analyzerArgs
+          });
 
-      init();
+          // Declaring the callback functions, for now we bind DrupalSource.
+          YoastSEO.analyzerArgs.callbacks = {
+            getData: yoastSeoData.getData.bind(yoastSeoData),
+            getAnalyzerInput: yoastSeoData.getAnalyzerInput.bind(yoastSeoData),
+            bindElementEvents: yoastSeoData.bindElementEvents.bind(yoastSeoData),
+            updateSnippetValues: yoastSeoData.updateSnippetValues.bind(yoastSeoData),
+            saveScores: yoastSeoData.saveScores.bind(yoastSeoData)
+          };
+
+          // Make it global.
+          window.YoastSEO.app = new YoastSEO.App(YoastSEO.analyzerArgs);
+
+        //});
     }
   };
 
