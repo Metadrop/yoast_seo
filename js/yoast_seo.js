@@ -64,8 +64,8 @@
       };
 
 
-      //// Construct the form
-      $('.js-form-item', $('#node-page-form')).each(function () {
+      // Construct the form
+      $('.js-form-item', $('#' + YsSettings.form_id)).each(function () {
         Drupal.YoastSeoForm.getFormItemView(this);
       });
 

@@ -266,6 +266,7 @@ class YoastSeoFieldManager {
     // Other conf
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['analyzer'] = TRUE;
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['snippet_preview'] = TRUE;
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['form_id'] = $formAfterBuild['#id'];
 
     return $formAfterBuild;
   }
