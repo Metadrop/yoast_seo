@@ -191,12 +191,6 @@
     tag: 'textarea'
   });
 
-  Drupal.behaviors.yoastSeoForm = {
-    attach: function (context) {
-      var $context = $(context);
-    }
-  };
-
   Drupal.YoastSeoForm = YoastSeoForm;
 
 })(jQuery, Drupal);

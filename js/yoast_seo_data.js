@@ -26,7 +26,6 @@ YoastSeoData = function (args) {
   });
 };
 
-
 /**
  * This should return an object with the given properties
  *
@@ -41,7 +40,6 @@ YoastSeoData = function (args) {
  * @returns {String} data.excerpt Excerpt for the pages
  */
 YoastSeoData.prototype.getData = function () {
-
   // Return the content of this.data if exist.
   if (this.data != undefined && this.data != null) {
     return this.data;
@@ -73,8 +71,6 @@ YoastSeoData.prototype.getData = function () {
   if (!this.config.seo_title_overwritten) {
     data.pageTitle = data.title;
     data.snippetTitle = data.title;
-
-    //document.getElementById(this.config.fields.title).value = data.nodeTitle;
   }
 
   // Placeholder text in snippet if nothing was found.
@@ -187,7 +183,6 @@ YoastSeoData.prototype.updateRawData = function () {
   YoastSEO.app.rawData = this.getData();
 };
 
-
 /**
  * retuns a string that is used as a CSSclass, based on the numeric score
  * @param score
@@ -195,6 +190,7 @@ YoastSeoData.prototype.updateRawData = function () {
  */
 YoastSeoData.prototype.scoreRating = function (score) {
   var scoreRate;
+
   switch (score) {
     case 0:
       scoreRate = "na";
@@ -232,7 +228,6 @@ YoastSeoData.prototype.saveScores = function (score) {
     .attr('value', score)
     .val(score);
 };
-
 
 /**
  * Calls the eventbinders.
