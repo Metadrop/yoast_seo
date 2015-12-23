@@ -75,13 +75,18 @@
         analyzerArgs: YoastSEO.analyzerArgs
       });
 
+      // Instantiate YoastSeoStatusWidget, to handle scores display.
+      var yoastSeoStatusWidget = new YoastSeoStatusWidget({
+        settings: settings.yoast_seo
+      });
+
       // Declaring the callback functions, for now we bind DrupalSource.
       YoastSEO.analyzerArgs.callbacks = {
         getData: yoastSeoData.getData.bind(yoastSeoData),
         getAnalyzerInput: yoastSeoData.getAnalyzerInput.bind(yoastSeoData),
         bindElementEvents: yoastSeoData.bindElementEvents.bind(yoastSeoData),
         updateSnippetValues: yoastSeoData.updateSnippetValues.bind(yoastSeoData),
-        saveScores: yoastSeoData.saveScores.bind(yoastSeoData)
+        saveScores: yoastSeoStatusWidget.saveScores.bind(yoastSeoStatusWidget)
       };
 
       // Make it global.

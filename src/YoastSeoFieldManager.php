@@ -220,6 +220,10 @@ class YoastSeoFieldManager {
     foreach($this->fieldsConfiguration['tokens'] as $fieldName => $token) {
       $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['tokens'][$fieldName] = $token;
     }
+    // Other tokens commonly used.
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:name]'] = \Drupal::config('system.site')->get('name');
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:slogan]'] = \Drupal::config('system.site')->get('slogan');
+
 
     // Attach settings for the targets.
     foreach($this->fieldsConfiguration['targets'] as $targetName => $targetId) {

@@ -98,10 +98,20 @@ YoastSeoData.prototype.tokenReplace = function (value) {
     // Replace all the tokens by their relative value.
     for (var i in match) {
       var tokenRelativeField = null;
+      var tokenRawValue = false;
 
       // Check if the token is relative to a field present on the page.
       if (typeof this.config.tokens[match[i]] != 'undefined') {
-        tokenRelativeField = this.config.tokens[match[i]];
+        var fieldName = this.config.tokens[match[i]];
+        var isRelativeField = this.config.fields[fieldName] != undefined;
+        // If no field exist with the same token value, we consider it's a raw value.
+        if ( ! isRelativeField) {
+          tokenRawValue = true;
+        }
+        // Else, we know it's related to a field content.
+        else {
+          tokenRelativeField = this.config.tokens[match[i]];
+        }
       }
 
       // If the token can be solved locally.
@@ -112,6 +122,9 @@ YoastSeoData.prototype.tokenReplace = function (value) {
           var tokenValue = this.tokenReplace(formItemView.value());
           value = value.replace(match[i], tokenValue);
         }
+      }
+      else if (tokenRawValue == true) {
+        value = value.replace(match[i],  this.config.tokens[match[i]]);
       }
       // The token value has to be found remotely.
       else {
@@ -183,51 +196,6 @@ YoastSeoData.prototype.updateRawData = function () {
   YoastSEO.app.rawData = this.getData();
 };
 
-/**
- * retuns a string that is used as a CSSclass, based on the numeric score
- * @param score
- * @returns output
- */
-YoastSeoData.prototype.scoreRating = function (score) {
-  var scoreRate;
-
-  switch (score) {
-    case 0:
-      scoreRate = "na";
-      break;
-    case 4:
-    case 5:
-      scoreRate = "poor";
-      break;
-    case 6:
-    case 7:
-      scoreRate = "ok";
-      break;
-    case 8:
-    case 9:
-    case 10:
-      scoreRate = "good";
-      break;
-    default:
-      scoreRate = "bad";
-      break;
-  }
-
-  return scoreRate;
-};
-
-/**
- * Sets the SEO score in both the hidden input and the rating element.
- * @param score
- */
-YoastSeoData.prototype.saveScores = function (score) {
-  // Update score text in the score box.
-  jQuery('.score_value', '#' + this.config.targets.overall_score_target_id).text(this.scoreRating(score));
-  // Update score in the score field.
-  jQuery('[data-drupal-selector="' + this.config.fields.seo_status + '"]')
-    .attr('value', score)
-    .val(score);
-};
 
 /**
  * Calls the eventbinders.
