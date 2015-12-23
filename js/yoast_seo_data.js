@@ -6,8 +6,8 @@ YoastSeoData = function (args) {
     text: 'body',
     pageTitle: 'meta_title',
     title: 'title',
-    url: 'url',
-    snippetCite: 'url',
+    url: 'path',
+    snippetCite: 'path',
     snippetMeta: 'meta_description',
     snippetTitle: 'meta_title',
     keyword: 'focus_keyword'
@@ -56,7 +56,7 @@ YoastSeoData.prototype.getData = function () {
     snippetMeta: '',
     snippetCite: '',
     snippetTitle: '',
-    baseUrl: this.config.base_root
+    baseUrl: this.config.base_root + '/'
   };
 
   // For all data required by the Yoast SEO snippet.

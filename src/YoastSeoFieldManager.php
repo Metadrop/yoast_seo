@@ -28,6 +28,7 @@ class YoastSeoFieldManager {
       'body' => 'body.widget.0.value',
       'focus_keyword' => 'field_yoast_seo.widget.0.yoast_seo.focus_keyword',
       'seo_status' => 'field_yoast_seo.widget.0.yoast_seo.status',
+      'path' => 'path.widget.0.alias',
     ],
 
     // Fields to include in the field section of the configuration.
@@ -36,7 +37,8 @@ class YoastSeoFieldManager {
       'summary',
       'body',
       'focus_keyword',
-      'seo_status'
+      'seo_status',
+      'path'
     ],
 
     // Tokens for the fields.
@@ -243,10 +245,7 @@ class YoastSeoFieldManager {
       'meta' => $isDefaultMetaDescription ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
       'body' => $isDefaultBody ? $formAfterBuild['body']['widget'][0]['#default_value'] : '',
     ];
-
     // FIELDS
-    // Add path field id.
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['url'] =  $formAfterBuild['path']['#id'];
     // Add Metatag fields
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['meta_title'] = $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#id'];
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['meta_description'] = $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#id'];

@@ -25,6 +25,7 @@
     /**
      * Based on a form item HTMLElement wrapper, get the FormItem view class
      * to use to control the form item HTMLElement field.
+     *
      * @param el
      * @returns {function}
      */
@@ -55,24 +56,27 @@
     /**
      * Factory to instantiate or retrieve a Form Item view based on a HTMLElement
      * wrapper.
-     * @param el_wrapper
+     *
+     * @param el_wrapper The HTMLElement to plug the FormItem view element on.
+     * @param options Options to pass to the form item view constructor.
      * @returns {Backbone.View}
      */
-    getFormItemView: function (el_wrapper) {
+    getFormItemView: function (el_wrapper, options) {
       // Get the FormItem view class based on the HTMLElement wrapper.
       var FormItemViewClass = YoastSeoForm.getFormItemClass(el_wrapper),
       // The HTMLElement to bind the FieldItem view onto.
         el = null,
       // The form item view.
-        formItem = null;
+        formItem = null,
+      // The options to pass to the form item class
+        options = options || {};
 
       // Based on the FormItem view tag, retrieve the HTMLElement to bind the View onto.
       el = $(FormItemViewClass.tag, el_wrapper);
+      options.el = el;
 
       // Instantiate the form item view.
-      formItem = new FormItemViewClass({
-        el: el
-      });
+      formItem = new FormItemViewClass(options);
 
       // If the element has an idea, store it.
       var id = el.attr('id');
@@ -99,30 +103,88 @@
      * {@inheritdoc}
      */
     events: {
-      'input': 'onInput'
+      'input': '_onInput',
+      'focus': '_onFocus',
+      'blur': '_onBlur'
+    },
+
+    /**
+     * The FormItem view callbacks.
+     */
+    callbacks: {
+      // When the value has changed.
+      changed: null,
+      // When the component has the focus.
+      focused: null,
+      // When the component has blured.
+      blured: null
     },
 
     /**
      * {@inheritdoc}
      */
-    initialize: function () {
-      // Initialize your component.
+    initialize: function (options) {
+      var options = options || {};
+
+      // Callbacks have been given in options.
+      if (typeof options.callbacks != 'undefined') {
+        this.callbacks = options.callbacks;
+      }
     },
 
     /**
      * Listen to the input event.
      * @param evt
      */
-    onInput: function (evt) {
-      this.change(evt, $(this.el).val());
+    _onInput: function () {
+      this._change($(this.el).val());
     },
 
     /**
-     *
+     * Listen to the focus event.
+     * @param evt
+     */
+    _onFocus: function () {
+      this._focus();
+    },
+
+    /**
+     * Listen to the blur event.
+     * @param evt
+     */
+    _onBlur: function () {
+      this._blur();
+    },
+
+    /**
+     * This function is internally called when the component value changed.
+     * @param evt
      * @param val
      */
-    change: function (evt, val) {
-      this.$el.trigger('yoast_seo-form_item-changed')
+    _change: function () {
+      if (typeof this.callbacks.changed == 'function') {
+        this.callbacks.changed(this.value());
+      }
+    },
+
+    /**
+     * This function is internally called when the component get the focus.
+     * @param evt
+     */
+    _focus: function () {
+      if (typeof this.callbacks.focused == 'function') {
+        this.callbacks.focused();
+      }
+    },
+
+    /**
+     * This function is internally called when the component has blured.
+     * @param evt
+     */
+    _blur: function () {
+      if (typeof this.callbacks.blured == 'function') {
+        this.callbacks.blured();
+      }
     },
 
     /**
@@ -158,6 +220,30 @@
   });
 
   /**
+   * FormItem view that has for aim to control html element which are editable form item.
+   * @type {YoastSeoForm.views.ContentEditableHtmlElement}
+   */
+  YoastSeoForm.views.ContentEditableHtmlElement = YoastSeoForm.views.FormItem.extend({
+    /**
+     * {@inheritdoc}
+     */
+    value: function (val) {
+      // No value is provided.
+      // Get the value of the component.
+      if (typeof val == 'undefined') {
+        return this.$el.html();
+      }
+      // A value is provided.
+      // Set the value of the component.
+      else {
+        this.$el.html(val);
+      }
+    }
+  }, {
+    tag: 'span' // Can be any editable HTMLElement.
+  });
+
+  /**
    * FormItem view that has for aim to control textfield form item.
    * @type {YoastSeoForm.views.Textarea}
    */
@@ -184,7 +270,7 @@
       // Listen to any change on the CKEDITOR component.
       Drupal.editors.ckeditor.onChange(this.el, function (val) {
         self.$el.val(val);
-        self.change(val);
+        self._change();
       });
     }
   }, {
