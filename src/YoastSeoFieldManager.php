@@ -237,14 +237,22 @@ class YoastSeoFieldManager {
     $isDefaultMetaDescription = !empty($formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value']) ? TRUE : FALSE;
     $isDefaultBody = !empty($formAfterBuild['body']['widget'][0]['#default_value']) ? TRUE : FALSE;
 
+    // The path default value.
+    // @todo Should be completed once pathauto has been released for Drupal 8.
+    $path = '';
+    if (!empty($formAfterBuild['path']['widget'][0]['source']['#value'])) {
+      $path = $formAfterBuild['path']['widget'][0]['source']['#value'];
+    }
+
     // TODO : move this configuration into YoastSEOFieldManager
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['default_text'] = [
-      'url' => $formAfterBuild['path']['widget'][0]['alias']['#default_value'],
-      'title' => $isDefaultMetaTitle ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
+      'meta_title' => $isDefaultMetaTitle ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
       'keyword' => $isDefaultKeyword ? $formAfterBuild['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
-      'meta' => $isDefaultMetaDescription ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
+      'meta_description' => $isDefaultMetaDescription ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
       'body' => $isDefaultBody ? $formAfterBuild['body']['widget'][0]['#default_value'] : '',
+      'path' => $path,
     ];
+
     // FIELDS
     // Add Metatag fields
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['meta_title'] = $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#id'];
@@ -252,9 +260,9 @@ class YoastSeoFieldManager {
 
     // Placeholders.
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['placeholder_text'] = [
-      'title' => t('Please click here to alter your page meta title'),
-      'description' => t('Please click here and alter your page meta description.'),
-      'url' => t('example-post'),
+      'snippetTitle' => t('Please click here to alter your page meta title'),
+      'snippetMeta' => t('Please click here and alter your page meta description.'),
+      'snippetCite' => t('/example-post'),
     ];
 
     global $base_root;

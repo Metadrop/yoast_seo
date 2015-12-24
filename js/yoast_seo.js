@@ -40,10 +40,10 @@
           meta: "snippet_meta"
         },
         sampleText: {
-          url: YsSettings.default_text.url,
-          title: YsSettings.default_text.title,
+          url: '',//YsSettings.default_text.url,
+          title: '',//YsSettings.default_text.title,
           keyword: YsSettings.default_text.keyword,
-          meta: YsSettings.default_text.meta,
+          meta: '',//YsSettings.default_text.meta,
           text: YsSettings.default_text.body
         },
         fields: {
@@ -107,11 +107,18 @@
           // the meta tag title field, including tokens).
           focused: function() {
             // Retrieve the Form Item view behind the meta tag title field.
-            var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['meta_title']];
+            var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['meta_title']],
+              rawValue = formItem.value();
+
+            // If the raw value is empty, check if a default value has been provided
+            if (rawValue == '' && settings.yoast_seo.default_text['meta_title'] != '') {
+              rawValue = settings.yoast_seo.default_text['meta_title'];
+            }
+
             // Display the raw value component instead of the computed value.
             snippetTitle.$el.hide();
             snippetTitleRaw.$el.show();
-            snippetTitleRaw.value(formItem.value());
+            snippetTitleRaw.value(rawValue);
             snippetTitleRaw.$el.focus();
           }
         }
@@ -148,11 +155,18 @@
           // the meta tag description field, including tokens).
           focused: function() {
             // Retrieve the Form Item view behind the meta tag summary field.
-            var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['meta_description']];
+            var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['meta_description']],
+              rawValue = formItem.value();
+
+            // If the raw value is empty, check if a default value has been provided
+            if (rawValue == '' && settings.yoast_seo.default_text['meta_description'] != '') {
+              rawValue = settings.yoast_seo.default_text['meta_description'];
+            }
+
             // Display the raw value component instead of the computed value.
             snippetSummary.$el.hide();
             snippetSummaryRaw.$el.show();
-            snippetSummaryRaw.value(formItem.value());
+            snippetSummaryRaw.value(rawValue);
             snippetSummaryRaw.$el.focus();
           }
         }

@@ -56,32 +56,37 @@ YoastSeoData.prototype.getData = function () {
     snippetMeta: '',
     snippetCite: '',
     snippetTitle: '',
-    baseUrl: this.config.base_root + '/'
+    baseUrl: this.config.base_root
   };
 
   // For all data required by the Yoast SEO snippet.
-  // Retrieve the form item view relative to the data.
+  // If their is a field
+  // Extract the data from the fields if these fields have been mapped.
   for (var fieldName in data) {
     var formItemView = Drupal.YoastSeoForm._formItemViews[this.config.fields[this.fieldsMapping[fieldName]]];
     if (typeof formItemView !== 'undefined') {
-      data[fieldName] = this.tokenReplace(formItemView.value());
+      var fieldValue = formItemView.value();
+
+      // If the field hasn't been filled already.
+      // Use the default value if provided.
+      if (fieldValue == '') {
+        if (typeof this.config.default_text[this.fieldsMapping[fieldName]] !== 'undefined'
+            && this.config.default_text[this.fieldsMapping[fieldName]] != '') {
+          data[fieldName] = this.tokenReplace(this.config.default_text[this.fieldsMapping[fieldName]]);
+        }
+      }
+      // If the field has been filled.
+      // Extract the value from the field and replace the tokens if any by their values.
+      else {
+        data[fieldName] = this.tokenReplace(formItemView.value());
+      }
     }
-  }
 
-  if (!this.config.seo_title_overwritten) {
-    data.pageTitle = data.title;
-    data.snippetTitle = data.title;
-  }
-
-  // Placeholder text in snippet if nothing was found.
-  if (data.meta == '') {
-    data.snippetMeta = this.config.placeholder_text.description;
-  }
-  if (data.pageTitle == '') {
-    data.snippetTitle = this.config.placeholder_text.title;
-  }
-  if (data.snippetCite == '') {
-    data.snippetCite = this.config.placeholder_text.url;
+    // If the data is empty and a place holder has been defined, use the placeholder as value.
+    if ((typeof this.config.placeholder_text[fieldName] !== 'undefined'
+      && this.config.placeholder_text[fieldName] != '') && data[fieldName] == '') {
+      data[fieldName] = this.config.placeholder_text[fieldName];
+    }
   }
 
   return data;
