@@ -44,10 +44,12 @@ function yoast_seo_views_pre_view($view, $display_id, array &$args) {
  * @return mixed
  */
 function yoast_seo_form_node_afterbuild(&$form, $form_state) {
-  $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
-  $form = $yoast_seo_field_manager->setFieldsConfiguration($form);
-  $form = $yoast_seo_field_manager->addSnippetEditorMarkup($form);
-  $form = $yoast_seo_field_manager->addOverallScoreMarkup($form);
+  if (isset($form['field_yoast_seo'])) {
+    $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
+    $form = $yoast_seo_field_manager->setFieldsConfiguration($form);
+    $form = $yoast_seo_field_manager->addSnippetEditorMarkup($form);
+    $form = $yoast_seo_field_manager->addOverallScoreMarkup($form);
+  }
 
   return $form;
 }
