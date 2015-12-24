@@ -264,8 +264,16 @@
     /**
      * {@inheritdoc}
      */
-    initialize: function () {
+    initialize: function (options) {
       var self = this;
+
+      // @todo find a way to call super in Backbone.
+      var options = options || {};
+
+      // Callbacks have been given in options.
+      if (typeof options.callbacks != 'undefined') {
+        this.callbacks = options.callbacks;
+      }
 
       // Listen to any change on the CKEDITOR component.
       Drupal.editors.ckeditor.onChange(this.el, function (val) {
