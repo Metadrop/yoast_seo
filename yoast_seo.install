@@ -1,4 +1,6 @@
 <?php
+use \Drupal\views\Views;
+
 /**
  * @file
  * Install, update, and uninstall functions for the Yoast SEO for Drupal module.
@@ -69,4 +71,28 @@
 //	}
 //
 //	return $dependencies;
+//}
+
+/**
+ * Implements hook_install().
+ * Insert the YoastSeo field in the content view.
+ */
+//function yoast_seo_install() {
+//  $contentView = Views::getView('content');
+//  $display_id = 'page_1';
+//
+//
+//  $handlers = $contentView->getHandlers('field', $display_id);
+//  if (!isset($handlers['field_yoast_seo'])) {
+//    $contentView->addHandler(
+//      $display_id,
+//      'field',
+//      'node__field_yoast_seo',
+//      'field_yoast_seo',
+//      [
+//        'type' => 'yoastseo_formatter',
+//      ]
+//    );
+//    $contentView->save();
+//  }
 //}
