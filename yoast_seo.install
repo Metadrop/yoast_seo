@@ -111,20 +111,3 @@ function yoast_seo_install() {
 //  }
 }
 
-function yoast_seo_uninstall() {
-  // Enable Yoast SEO for all fields.
-  $supported_entities = [
-    'node' => 'Node',
-    'taxonomy_term' => 'Taxonomy term',
-  ];
-  $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
-  foreach ($supported_entities as $entity_type_id => $entity_type_label) {
-    $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type_id);
-    if (!empty($enabled_bundles)) {
-      foreach($enabled_bundles as $bundle_id) {
-        echo "detach $entity_type_id $bundle_id\n";
-        $yoast_seo_manager->detachYoastSeoFields($entity_type_id, $bundle_id);
-      }
-    }
-  }
-}
