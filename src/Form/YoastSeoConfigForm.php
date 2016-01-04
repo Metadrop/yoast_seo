@@ -28,13 +28,15 @@ class YoastSeoConfigForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+
     // Available entity types supported by Yoast SEO.
     $entity_types = $this->getAvailableEntityTypes();
     foreach ($entity_types as $entity_type => $entity_label) {
       // Get the available bundles Yoast SEO supports.
-      $options = $this->getAvailableBundles($entity_type);
+      $options = $yoast_seo_manager->getAvailableBundles($entity_type);
       // Get the bundles Yoast SEO has been enabled for.
-      $enabled_bundles = $this->getEnabledBundles($entity_type);
+      $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type);
 
       // Add a checkboxes collection to allow the administrator to enable/disable
       // Yoast SEO for supported bundles.
@@ -77,9 +79,9 @@ class YoastSeoConfigForm extends FormBase {
     // administrator wants to enable/disable Yoast SEO for.
     foreach ($entity_types as $entity_type_id => $entity_type_label) {
       // Get the available bundles Yoast SEO supports.
-      $bundles = $this->getAvailableBundles($entity_type_id);
+      $bundles = $yoast_seo_manager->getAvailableBundles($entity_type_id);
       // Get the bundles Yoast SEO has been enabled for.
-      $enabled_bundles = $this->getEnabledBundles($entity_type_id);
+      $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type_id);
 
       // Foreach available bundles.
       foreach ($bundles as $bundle_id => $bundle_label) {
@@ -115,52 +117,6 @@ class YoastSeoConfigForm extends FormBase {
       'node' => 'Node',
       'taxonomy_term' => 'Taxonomy term',
     ];
-  }
-
-  /**
-   * Returns an array of available bundles Yoast SEO can be enabled for.
-   *
-   * @param string $entity_type The entity
-   *
-   * @return array
-   *   A list of available bundles as $id => $label.
-   */
-  protected function getAvailableBundles($entity_type = 'node') {
-    $options        = array();
-    $entity_manager = \Drupal::service('entity.manager');
-
-    // Retrieve the bundles the entity type contains.
-    $bundles = $entity_manager->getBundleInfo($entity_type);
-    foreach ($bundles as $bundle_id => $bundle_metadata) {
-      $options[$bundle_id] = $bundle_metadata['label'];
-    }
-
-    return $options;
-  }
-
-  /**
-   * Returns an array of bundles Yoast SEO has been enabled for.
-   *
-   * @param string $entity_type The entity
-   *
-   * @return array
-   *   A list of enabled bundles as $id => $label.
-   */
-  protected function getEnabledBundles($entity_type = 'node') {
-    $enabled_bundles         = array();
-    $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
-
-    // Get the available bundles Yoast SEO supports.
-    $bundles = $this->getAvailableBundles($entity_type);
-
-    // Retrieve the bundles for which Yoast SEO has already been enabled for.
-    foreach ($bundles as $bundle_id => $bundle_label) {
-      if ($yoast_seo_field_manager->isAttached($entity_type, $bundle_id, 'field_yoast_seo')) {
-        $enabled_bundles[] = $bundle_id;
-      }
-    }
-
-    return $enabled_bundles;
   }
 
 }
