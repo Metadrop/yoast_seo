@@ -26,6 +26,7 @@ function yoast_seo_drush_command() {
  * It does 2 things :
  *  - Detach Yoast SEO from all yoastseo enabled content types
  *  - Purge the fields list from all temporary deleted fields.
+ *  - Remove Yoast SEO fields from the content view.
  * @see https://www.drupal.org/node/2418659
  */
 function drush_yoast_seo_yoastseo_prepare_uninstall() {
@@ -35,11 +36,12 @@ function drush_yoast_seo_yoastseo_prepare_uninstall() {
     'taxonomy_term' => 'Taxonomy term',
   ];
   $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+
   foreach ($supported_entities as $entity_type_id => $entity_type_label) {
     $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type_id);
     if (!empty($enabled_bundles)) {
       foreach($enabled_bundles as $bundle_id) {
-        echo "detach $entity_type_id $bundle_id\n";
+        echo "detach yoast_seo fields from $entity_type_id $bundle_id\n";
         $yoast_seo_manager->detachYoastSeoFields($entity_type_id, $bundle_id);
       }
     }
@@ -55,4 +57,6 @@ function drush_yoast_seo_yoastseo_prepare_uninstall() {
     $fields = entity_load_multiple_by_properties('field_config', $properties);
   } while ($fields);
 
+  // 3) Remove field from content view.
+  $yoast_seo_manager->detachFieldHandlerFromContentView();
 }

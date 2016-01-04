@@ -10,6 +10,7 @@ namespace Drupal\yoast_seo;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Logger\LoggerChannelFactory;
 use \Drupal\field\Entity\FieldConfig;
+use \Drupal\views\Views;
 
 /**
  * Class YoastSeoManager.
@@ -126,4 +127,46 @@ class YoastSeoManager {
     return $enabled_bundles;
   }
 
+  /**
+   * Attach a field handler for yoast seo in the content view.
+   */
+  public function attachFieldHandlerToContentView() {
+    $contentView = Views::getView('content');
+
+    if ($contentView) {
+      $display_id = 'page_1';
+
+      $handlers = $contentView->getHandlers('field', $display_id);
+      if ( ! isset( $handlers['field_yoast_seo'] )) {
+        $contentView->addHandler(
+          $display_id,
+          'field',
+          'node__field_yoast_seo',
+          'field_yoast_seo',
+          [
+            'type' => 'yoastseo_formatter',
+          ],
+          'field_yoast_seo'
+        );
+        $contentView->save();
+      }
+    }
+  }
+
+  /**
+   * Detach the field handler for yoast seo from the content view.
+   */
+  public function detachFieldHandlerFromContentView() {
+    $contentView = Views::getView('content');
+
+    if ($contentView) {
+      $display_id = 'page_1';
+
+      $handlers = $contentView->getHandlers('field', $display_id);
+      if (isset($handlers['field_yoast_seo'])) {
+        $contentView->removeHandler($display_id, 'field', 'field_yoast_seo');
+        $contentView->save();
+      }
+    }
+  }
 }

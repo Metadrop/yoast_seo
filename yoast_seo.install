@@ -79,6 +79,16 @@ use \Drupal\views\Views;
  */
 function yoast_seo_install() {
   // Enable Yoast SEO for all fields.
+  _yoast_seo_attach_to_all_content_types();
+
+  // Add status overview to content view.
+  _yoast_seo_add_status_to_content_view();
+}
+
+/**
+ * Attach Yoast SEO field to all available content types.
+ */
+function _yoast_seo_attach_to_all_content_types() {
   $supported_entities = [
     'node' => 'Node',
     'taxonomy_term' => 'Taxonomy term',
@@ -90,24 +100,13 @@ function yoast_seo_install() {
       $yoast_seo_manager->attachYoastSeoFields($entity_type_id, $bundle_id);
     }
   }
+}
 
-
-//  $contentView = Views::getView('content');
-//  $display_id = 'page_1';
-//
-//
-//  $handlers = $contentView->getHandlers('field', $display_id);
-//  if (!isset($handlers['field_yoast_seo'])) {
-//    $contentView->addHandler(
-//      $display_id,
-//      'field',
-//      'node__field_yoast_seo',
-//      'field_yoast_seo',
-//      [
-//        'type' => 'yoastseo_formatter',
-//      ]
-//    );
-//    $contentView->save();
-//  }
+/**
+ * Attach Yoast SEO field to the main content view.
+ */
+function _yoast_seo_add_status_to_content_view() {
+  $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+  $yoast_seo_manager->attachFieldHandlerToContentView();
 }
 

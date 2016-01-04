@@ -102,6 +102,19 @@ class YoastSeoConfigForm extends FormBase {
       }
     }
 
+    // If Yoast SEO is enabled for at least one content type,
+    // we add it in the content view (if not already added).
+    $node_enabled_bundles = $yoast_seo_manager->getEnabledBundles('node');
+    if (sizeof($node_enabled_bundles) > 0) {
+      $yoast_seo_manager->attachFieldHandlerToContentView();
+    }
+    // Else, if Yoast SEO is not enabled for no content types,
+    // we removed it from the content view.
+    else {
+      // TODO : WHY DOES IT BREAK THE DRUPAL VIEW SYSTEM ?
+      //$yoast_seo_manager->detachFieldHandlerFromContentView();
+    }
+
     drupal_set_message($this->t('Yoast SEO configuration by bundles has been saved successfully.'));
   }
 

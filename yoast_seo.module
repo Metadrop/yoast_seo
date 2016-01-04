@@ -11,30 +11,6 @@ function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
-
-/**
- * Implements hook_views_pre_view();
- * Add field_yoast_seo in the content views.
- */
-function yoast_seo_views_pre_view($view, $display_id, array &$args) {
-  if ($view->id() == 'content') {
-
-    $handlers = $view->getHandlers('field', $display_id);
-    if (!isset($handlers['field_yoast_seo'])) {
-      $view->addHandler(
-        $display_id,
-        'field',
-        'node__field_yoast_seo',
-        'field_yoast_seo',
-        [
-          'type' => 'yoastseo_formatter',
-        ]
-      );
-      $view->save();
-    }
-  }
-}
-
 /**
  * After build function.
  * Reads the form, and deduct associated yoastseo configuration from it.
