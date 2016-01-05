@@ -130,6 +130,7 @@
     font-size: 18px;
     font-weight: normal;
     line-height: 1.2;
+    min-height: 1.2em;
     display: block;
     overflow: hidden;
     width: 512px;
@@ -143,11 +144,13 @@
 #yoast-wrapper .url, #yoast-wrapper .desc {
     font-size: 13px;
     line-height: 1.4;
+    min-height: 1.4em;
     display: block; }
 #yoast-wrapper .url {
     font-size: 14px;
     font-style: normal;
     line-height: 16px;
+    min-height: 16px;
     color: #006621; }
 #yoast-wrapper .urlBase {
     float: left; }
