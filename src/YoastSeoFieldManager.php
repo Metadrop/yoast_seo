@@ -221,6 +221,7 @@ class YoastSeoFieldManager {
   public function setFieldsConfiguration($formAfterBuild) {
 
     // Score statuses.
+    ksort( $this->fieldsConfiguration['score_status'] );
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['score_status'] = $this->fieldsConfiguration['score_status'];
 
     // Fields requested.
@@ -315,6 +316,12 @@ class YoastSeoFieldManager {
     return $form;
   }
 
+  /**
+   * Add Overall score markup to the form.
+   * @param $form
+   *
+   * @return mixed
+   */
   public function addOverallScoreMarkup($form) {
 
     // Get template for the snippet.
@@ -330,15 +337,20 @@ class YoastSeoFieldManager {
     return $form;
   }
 
+  /**
+   * Get the status for a given score.
+   *
+   * @param int $score
+   *   score in points
+   *
+   * @return string
+   *  status corresponding to the score.
+   */
   public function getScoreStatus($score) {
     $rules = $this->fieldsConfiguration['score_status'];
     $default = $rules['default'];
     unset($rules['default']);
     ksort($rules);
-
-    if ($score < current(reset(array_keys($rules)))) {
-      return $default;
-    }
 
     foreach($rules as $rule_max_score => $rule_status) {
       if ($score <= $rule_max_score) {
