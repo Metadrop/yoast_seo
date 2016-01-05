@@ -1,23 +1,34 @@
 <?php
 
 /**
- * Implements hook_form_form_alter();
+ * @file
+ * Contains yoast_seo.module.
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter() for node_form().
  */
 function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['#after_build']) && !empty($form['#after_build'])) {
-    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild' ;
-  } else {
-    $form['#after_build'] = [ 'yoast_seo_form_node_afterbuild' ];
+    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild';
+  }
+  else {
+    $form['#after_build'] = ['yoast_seo_form_node_afterbuild'];
   }
 }
 
 /**
  * After build function.
- * Reads the form, and deduct associated yoastseo configuration from it.
- * @param $form
- * @param $form_state
  *
- * @return mixed
+ * Reads the form, and deduct associated yoastseo configuration from it.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state array.
+ *
+ * @return array
+ *   The form array.
  */
 function yoast_seo_form_node_afterbuild(&$form, $form_state) {
   if (isset($form['field_yoast_seo'])) {
@@ -52,9 +63,7 @@ function yoast_seo_theme() {
   ];
 
   $theme['content_score'] = [
-    'variables' => [
-
-    ],
+    'variables' => [],
     'template' => 'content_score',
   ];
 
