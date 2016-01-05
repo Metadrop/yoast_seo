@@ -23,20 +23,23 @@ function yoast_seo_drush_command() {
 /**
  * Prepare uninstall for yoast seo.
  * This enables to delete the fields from drupal so uninstalling the module doesn't fail.
- * It does 2 things :
+ * It does 3 things :
+ *  - Remove Yoast SEO fields from the content view.
  *  - Detach Yoast SEO from all yoastseo enabled content types
  *  - Purge the fields list from all temporary deleted fields.
- *  - Remove Yoast SEO fields from the content view.
  * @see https://www.drupal.org/node/2418659
  */
 function drush_yoast_seo_yoastseo_prepare_uninstall() {
-  // 1) Detach Yoast SEO from all the content types it is attached to.
   $supported_entities = [
     'node' => 'Node',
     'taxonomy_term' => 'Taxonomy term',
   ];
   $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
 
+  // 1) Remove field from content view.
+  $yoast_seo_manager->detachFieldHandlerFromContentView();
+
+  // 2) Detach Yoast SEO from all the content types it is attached to.
   foreach ($supported_entities as $entity_type_id => $entity_type_label) {
     $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type_id);
     if (!empty($enabled_bundles)) {
@@ -47,7 +50,7 @@ function drush_yoast_seo_yoastseo_prepare_uninstall() {
     }
   }
 
-  // 2) Purge field data.
+  // 3) Purge field data.
   do {
     field_purge_batch(1000);
     $properties = array(
@@ -57,6 +60,4 @@ function drush_yoast_seo_yoastseo_prepare_uninstall() {
     $fields = entity_load_multiple_by_properties('field_config', $properties);
   } while ($fields);
 
-  // 3) Remove field from content view.
-  $yoast_seo_manager->detachFieldHandlerFromContentView();
 }

@@ -75,6 +75,11 @@ class YoastSeoConfigForm extends FormBase {
     // Retrieve the form values.
     $values = $form_state->getValues();
 
+    // Fields to attach.
+    $to_attach = [];
+    // Fields to detach.
+    $to_detach = [];
+
     // Foreach entity types Yoast SEO can be enable for, check the bundle the
     // administrator wants to enable/disable Yoast SEO for.
     foreach ($entity_types as $entity_type_id => $entity_type_label) {
@@ -90,29 +95,50 @@ class YoastSeoConfigForm extends FormBase {
             && $values[$entity_type_id][$bundle_id] !== 0
             && !in_array($bundle_id, $enabled_bundles)
         ) {
-          $yoast_seo_manager->attachYoastSeoFields($entity_type_id, $bundle_id);
+          $to_attach[$entity_type_id][] = $bundle_id;
         }
         // Yoast SEO is required to be disabled for.
         else if (isset($values[$entity_type_id][$bundle_id])
                  && $values[$entity_type_id][$bundle_id] === 0
                  && in_array($bundle_id, $enabled_bundles)
         ) {
-          $yoast_seo_manager->detachYoastSeoFields($entity_type_id, $bundle_id);
+          $to_detach[$entity_type_id][] = $bundle_id;
         }
       }
     }
 
-    // If Yoast SEO is enabled for at least one content type,
-    // we add it in the content view (if not already added).
-    $node_enabled_bundles = $yoast_seo_manager->getEnabledBundles('node');
-    if (sizeof($node_enabled_bundles) > 0) {
+    // Process fields to be attached.
+    if(!empty($to_attach)) {
+      // Add field to content view in case not already attached.
       $yoast_seo_manager->attachFieldHandlerToContentView();
+
+      // Attach fields to content types.
+      foreach($to_attach as $entity_type_id => $bundles) {
+        foreach($bundles as $bundle_id) {
+          $yoast_seo_manager->attachYoastSeoFields($entity_type_id, $bundle_id);
+        }
+      }
     }
-    // Else, if Yoast SEO is not enabled for no content types,
-    // we removed it from the content view.
-    else {
-      // TODO : WHY DOES IT BREAK THE DRUPAL VIEW SYSTEM ?
-      //$yoast_seo_manager->detachFieldHandlerFromContentView();
+
+    // Process fields to be detached.
+    if(!empty($to_detach)) {
+      // View management. If Yoast SEO is going to be deactivated for all fields related to nodes.
+      // Then we first detach the field from the view.
+      if (!empty($to_detach['node'])) {
+        $node_enabled_bundles = $yoast_seo_manager->getEnabledBundles('node');
+        // If list of fields to detach is equal to the currently enabled bundles for node,
+        // then we should remove the fields from the view.
+        if (sizeof($node_enabled_bundles) == sizeof($to_detach['node'])) {
+          $yoast_seo_manager->detachFieldHandlerFromContentView();
+        }
+      }
+
+      // Detach fields from content types.
+      foreach($to_detach as $entity_type_id => $bundles) {
+        foreach($bundles as $bundle_id) {
+          $yoast_seo_manager->detachYoastSeoFields($entity_type_id, $bundle_id);
+        }
+      }
     }
 
     drupal_set_message($this->t('Yoast SEO configuration by bundles has been saved successfully.'));

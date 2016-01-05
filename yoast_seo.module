@@ -30,6 +30,18 @@ function yoast_seo_form_node_afterbuild(&$form, $form_state) {
   return $form;
 }
 
+///**
+// * Implements hook_views_pre_view();
+// * Add field_yoast_seo in the content views.
+// */
+//function yoast_seo_views_pre_view($view, $display_id, array &$args) {
+//  if ($view->id() == 'content') {
+//
+//    $handlers = $view->getHandlers('field', $display_id);
+//    dpm($handlers['title']);
+//  }
+//}
+
 /**
  * Implements hook_theme().
  */
@@ -52,11 +64,10 @@ function yoast_seo_theme() {
   ];
 
   $theme['content_score'] = [
-    'variables' => [
-
-    ],
+    'variables' => [],
     'template' => 'content_score',
   ];
 
   return $theme;
 }
+
