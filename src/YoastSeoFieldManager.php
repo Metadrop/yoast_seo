@@ -54,6 +54,15 @@ class YoastSeoFieldManager {
     'targets' => [
 
     ],
+
+    'score_status' => [
+      '0' => 'na',
+      '3' => 'bad',
+      '5' => 'poor',
+      '7' => 'ok',
+      '10' => 'good',
+      'default' => 'bad'
+    ]
   ];
 
   /**
@@ -210,6 +219,10 @@ class YoastSeoFieldManager {
    *   transformed form
    */
   public function setFieldsConfiguration($formAfterBuild) {
+
+    // Score statuses.
+    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['score_status'] = $this->fieldsConfiguration['score_status'];
+
     // Fields requested.
 
     // Attach settings in drupalSettings for each required field.
@@ -244,7 +257,6 @@ class YoastSeoFieldManager {
       $path = $formAfterBuild['path']['widget'][0]['source']['#value'];
     }
 
-    // TODO : move this configuration into YoastSEOFieldManager
     $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['default_text'] = [
       'meta_title' => $isDefaultMetaTitle ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
       'keyword' => $isDefaultKeyword ? $formAfterBuild['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
@@ -318,4 +330,22 @@ class YoastSeoFieldManager {
     return $form;
   }
 
+  public function getScoreStatus($score) {
+    $rules = $this->fieldsConfiguration['score_status'];
+    $default = $rules['default'];
+    unset($rules['default']);
+    ksort($rules);
+
+    if ($score < current(reset(array_keys($rules)))) {
+      return $default;
+    }
+
+    foreach($rules as $rule_max_score => $rule_status) {
+      if ($score <= $rule_max_score) {
+        return $rule_status;
+      }
+    }
+
+    return $default;
+  }
 }

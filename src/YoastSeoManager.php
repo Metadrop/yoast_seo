@@ -10,6 +10,7 @@ namespace Drupal\yoast_seo;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Logger\LoggerChannelFactory;
 use \Drupal\field\Entity\FieldConfig;
+use \Drupal\views\Views;
 
 /**
  * Class YoastSeoManager.
@@ -79,4 +80,93 @@ class YoastSeoManager {
     }
   }
 
+
+  /**
+   * Returns an array of available bundles Yoast SEO can be enabled for.
+   *
+   * @param string $entity_type The entity
+   *
+   * @return array
+   *   A list of available bundles as $id => $label.
+   */
+  public function getAvailableBundles($entity_type = 'node') {
+    $options        = array();
+    $entity_manager = \Drupal::service('entity.manager');
+
+    // Retrieve the bundles the entity type contains.
+    $bundles = $entity_manager->getBundleInfo($entity_type);
+    foreach ($bundles as $bundle_id => $bundle_metadata) {
+      $options[$bundle_id] = $bundle_metadata['label'];
+    }
+
+    return $options;
+  }
+
+  /**
+   * Returns an array of bundles Yoast SEO has been enabled for.
+   *
+   * @param string $entity_type The entity
+   *
+   * @return array
+   *   A list of enabled bundles as $id => $label.
+   */
+  public function getEnabledBundles($entity_type = 'node') {
+    $enabled_bundles         = array();
+    $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
+
+    // Get the available bundles Yoast SEO supports.
+    $bundles = $this->getAvailableBundles($entity_type);
+
+    // Retrieve the bundles for which Yoast SEO has already been enabled for.
+    foreach ($bundles as $bundle_id => $bundle_label) {
+      if ($yoast_seo_field_manager->isAttached($entity_type, $bundle_id, 'field_yoast_seo')) {
+        $enabled_bundles[] = $bundle_id;
+      }
+    }
+
+    return $enabled_bundles;
+  }
+
+  /**
+   * Attach a field handler for yoast seo in the content view.
+   */
+  public function attachFieldHandlerToContentView() {
+    $contentView = Views::getView('content');
+
+    if ($contentView) {
+      $display_id = 'page_1';
+
+      $handlers = $contentView->getHandlers('field', $display_id);
+      if ( ! isset( $handlers['field_yoast_seo'] )) {
+        $contentView->addHandler(
+          $display_id,
+          'field',
+          'node__field_yoast_seo',
+          'field_yoast_seo',
+          [
+            'type' => 'yoastseo_formatter',
+          ],
+          'field_yoast_seo'
+        );
+        $contentView->save();
+      }
+    }
+  }
+
+  /**
+   * Detach the field handler for yoast seo from the content view.
+   */
+  public function detachFieldHandlerFromContentView() {
+    $contentView = Views::getView('content');
+
+    if ($contentView) {
+      $display_id = 'page_1';
+
+      $handlers = $contentView->getHandlers('field', $display_id);
+      if (isset($handlers['field_yoast_seo'])) {
+        $contentView->removeHandler($display_id, 'field', 'field_yoast_seo');
+        $contentView->save();
+      }
+    }
+  }
 }

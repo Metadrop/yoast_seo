@@ -23,14 +23,26 @@ class YoastSeoFormatter extends FormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
     foreach ($items as $delta => $item) {
-      //$url = $item->url;
-//      $elements[$delta] = array(
-//        '#theme' => 'content_score',
-//        '#scoretest' => 'test'
-//      );
+      $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
+      $status = $yoast_seo_field_manager->getScoreStatus($item->status);
+
+      // TODO : find a way to give a weight, so the column doesn't appear at the end.
+
+      // Get template for the snippet.
+      $overallScoreTpl = [
+        '#theme' => 'overall_score',
+        '#overall_score' => $status,
+        '#attached' => [
+          'library' => [
+            'yoast_seo/yoast_seo_view'
+          ]
+        ]
+      ];
+      $output = drupal_render($overallScoreTpl);
+
 
       $elements[$delta] = array(
-        '#markup' => '<div>' . $item->status . '</div>',
+        '#markup' => $output,
       );
     }
 
