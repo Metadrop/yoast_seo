@@ -121,6 +121,11 @@
     },
 
     /**
+     * The value before it has been changed.
+     */
+    _beforeChangeValue: null,
+
+    /**
      * {@inheritdoc}
      */
     initialize: function (options) {
@@ -137,7 +142,7 @@
      * @param evt
      */
     _onInput: function () {
-      this._change($(this.el).val());
+      this._change();
     },
 
     /**
@@ -162,8 +167,11 @@
      * @param val
      */
     _change: function () {
-      if (typeof this.callbacks.changed == 'function') {
-        this.callbacks.changed(this.value());
+      var value = this.value();
+      if (typeof this.callbacks.changed == 'function'
+        && value != this._beforeChangeValue) {
+        this.callbacks.changed(value);
+        this._beforeChangeValue = value;
       }
     },
 
@@ -227,6 +235,36 @@
     /**
      * {@inheritdoc}
      */
+    events: {
+      'focus': '_onFocus',
+      'blur': '_onBlur',
+      // Parent component use the input event, but this event is not supported on IE
+      // for contenteditable elements.
+      'keyup': '_onKeyup',
+      'paste': '_onPaste'
+    },
+
+    /**
+     * {@inheritdoc}
+     */
+    _onKeyup: function (evt) {
+      this._change();
+    },
+
+    /**
+     * This function is internally called when the component catch a paste event.
+     * @param evt
+     */
+    _onPaste: function (evt) {
+      var self = this;
+      setTimeout(function() {
+        self._change();
+      }, 0);
+    },
+
+    /**
+     * {@inheritdoc}
+     */
     value: function (val) {
       // No value is provided.
       // Get the value of the component.
@@ -237,6 +275,37 @@
       // Set the value of the component.
       else {
         this.$el.html(val);
+      }
+    }
+  }, {
+    tag: 'span' // Can be any editable HTMLElement.
+  });
+
+  /**
+   * FormItem view that has for aim to control snippet element which are content editable form item.
+   * @type {YoastSeoForm.views.SnippetEditableHtmlElement}
+   */
+  YoastSeoForm.views.SnippetElement = YoastSeoForm.views.ContentEditableHtmlElement.extend({
+    /**
+     * {@inheritdoc}
+     */
+    events: {
+      'focus': '_onFocus',
+      'blur': '_onBlur',
+      'keyup': '_onKeyup',
+      'keypress': '_onKeypress',
+      'paste': '_onPaste'
+    },
+
+    /**
+     * {@inheritdoc}
+     */
+    _onKeypress: function (evt) {
+      // The user can't press enter on the snippet fields.
+      if(evt.keyCode == 13){
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        return;
       }
     }
   }, {

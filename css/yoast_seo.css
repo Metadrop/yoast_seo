@@ -19,15 +19,25 @@
     float: left;
     margin: 20px 0;
     padding: 0 0 0 20px; }
-#edit-field-yoast-seo-wrapper #yoast-overall-score {
+
+.overallScore {
     float: left;
     padding-top: 20px;
     margin-top: 20px;
-    margin-left: 10px; }
+    margin-left: 10px;
+}
+.views-field-field-yoast-seo .overallScore {
+    margin: 0;
+    padding: 0;
+}
 
-#yoast-overall-score {
+.overallScore {
     display: inline-block; }
-#yoast-overall-score .score_circle {
+.overallScore .score {
+    display: inline-block;
+    padding: 0.1em 0 0 0;
+}
+.overallScore .score_circle {
     display: inline-block;
     width: 12px;
     height: 12px;
@@ -35,18 +45,24 @@
     vertical-align: top;
     border-radius: 50%;
     background: #888; }
-#yoast-overall-score.good .score_circle {
-    background: #7ad03a; }
-#yoast-overall-score.ok .score_circle {
-    background: #ffba00; }
-#yoast-overall-score.poor .score_circle {
-    background: #ee7c1b; }
-#yoast-overall-score.bad .score_circle {
-    background: #dd3d36; }
-#yoast-overall-score .score_title {
-    font-weight: normal; }
-#yoast-overall-score .score_title strong {
-    font-weight: bold; }
+.overallScore.good .score_circle {
+    background: #7ad03a;
+}
+.overallScore.ok .score_circle {
+    background: #ffba00;
+}
+.overallScore.poor .score_circle {
+    background: #ee7c1b;
+}
+.overallScore.bad .score_circle {
+    background: #dd3d36;
+}
+.overallScore .score_title {
+    font-weight: normal;
+}
+.overallScore .score_title strong {
+    font-weight: bold;
+}
 
 #yoast-wrapper {
     clear: both;
@@ -114,6 +130,7 @@
     font-size: 18px;
     font-weight: normal;
     line-height: 1.2;
+    min-height: 1.2em;
     display: block;
     overflow: hidden;
     width: 512px;
@@ -127,11 +144,13 @@
 #yoast-wrapper .url, #yoast-wrapper .desc {
     font-size: 13px;
     line-height: 1.4;
+    min-height: 1.4em;
     display: block; }
 #yoast-wrapper .url {
     font-size: 14px;
     font-style: normal;
     line-height: 16px;
+    min-height: 16px;
     color: #006621; }
 #yoast-wrapper .urlBase {
     float: left; }
