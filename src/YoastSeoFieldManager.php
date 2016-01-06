@@ -85,7 +85,8 @@ class YoastSeoFieldManager {
 
   /**
    * Our helper to insert values in a form from a given key.
-   * example : formSet($form, 'myform.#value', 'valueToInsert');
+   *
+   * Example : formSet($form, 'myform.#value', 'valueToInsert');
    * TODO : move this helper somewhere else.
    *
    * @param array $form
