@@ -9,9 +9,10 @@
  */
 function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['#after_build']) && !empty($form['#after_build'])) {
-    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild' ;
-  } else {
-    $form['#after_build'] = [ 'yoast_seo_form_node_afterbuild' ];
+    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild';
+  }
+  else {
+    $form['#after_build'] = ['yoast_seo_form_node_afterbuild'];
   }
 }
 
