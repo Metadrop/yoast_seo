@@ -1,23 +1,34 @@
 <?php
 
 /**
- * Implements hook_form_form_alter();
+ * @file
+ * Module file for yoast_seo.
+ */
+
+/**
+ * Implements hook_form_form_alter().
  */
 function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['#after_build']) && !empty($form['#after_build'])) {
-    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild' ;
-  } else {
-    $form['#after_build'] = [ 'yoast_seo_form_node_afterbuild' ];
+    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild';
+  }
+  else {
+    $form['#after_build'] = ['yoast_seo_form_node_afterbuild'];
   }
 }
 
 /**
  * After build function.
+ *
  * Reads the form, and deduct associated yoastseo configuration from it.
- * @param $form
- * @param $form_state
+ *
+ * @param array $form
+ *   Form.
+ * @param array $form_state
+ *   Form state.
  *
  * @return mixed
+ *   The modified form.
  */
 function yoast_seo_form_node_afterbuild(&$form, $form_state) {
   if (isset($form['field_yoast_seo'])) {
@@ -29,18 +40,6 @@ function yoast_seo_form_node_afterbuild(&$form, $form_state) {
 
   return $form;
 }
-
-///**
-// * Implements hook_views_pre_view();
-// * Add field_yoast_seo in the content views.
-// */
-//function yoast_seo_views_pre_view($view, $display_id, array &$args) {
-//  if ($view->id() == 'content') {
-//
-//    $handlers = $view->getHandlers('field', $display_id);
-//    dpm($handlers['title']);
-//  }
-//}
 
 /**
  * Implements hook_theme().
@@ -70,4 +69,3 @@ function yoast_seo_theme() {
 
   return $theme;
 }
-

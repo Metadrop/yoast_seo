@@ -38,8 +38,8 @@ class YoastSeoConfigForm extends FormBase {
       // Get the bundles Yoast SEO has been enabled for.
       $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type);
 
-      // Add a checkboxes collection to allow the administrator to enable/disable
-      // Yoast SEO for supported bundles.
+      // Add a checkboxes collection to allow the administrator to
+      // enable/disable Yoast SEO for supported bundles.
       $form[$entity_type] = array(
         '#type' => 'checkboxes',
         '#title' => t($entity_label),
@@ -98,7 +98,7 @@ class YoastSeoConfigForm extends FormBase {
           $to_attach[$entity_type_id][] = $bundle_id;
         }
         // Yoast SEO is required to be disabled for.
-        else if (isset($values[$entity_type_id][$bundle_id])
+        elseif (isset($values[$entity_type_id][$bundle_id])
                  && $values[$entity_type_id][$bundle_id] === 0
                  && in_array($bundle_id, $enabled_bundles)
         ) {
@@ -108,34 +108,36 @@ class YoastSeoConfigForm extends FormBase {
     }
 
     // Process fields to be attached.
-    if(!empty($to_attach)) {
+    if (!empty($to_attach)) {
       // Add field to content view in case not already attached.
       $yoast_seo_manager->attachFieldHandlerToContentView();
 
       // Attach fields to content types.
-      foreach($to_attach as $entity_type_id => $bundles) {
-        foreach($bundles as $bundle_id) {
+      foreach ($to_attach as $entity_type_id => $bundles) {
+        foreach ($bundles as $bundle_id) {
           $yoast_seo_manager->attachYoastSeoFields($entity_type_id, $bundle_id);
         }
       }
     }
 
     // Process fields to be detached.
-    if(!empty($to_detach)) {
-      // View management. If Yoast SEO is going to be deactivated for all fields related to nodes.
+    if (!empty($to_detach)) {
+      // View management. If Yoast SEO is going to be deactivated for all
+      // fields related to nodes.
       // Then we first detach the field from the view.
       if (!empty($to_detach['node'])) {
         $node_enabled_bundles = $yoast_seo_manager->getEnabledBundles('node');
-        // If list of fields to detach is equal to the currently enabled bundles for node,
+        // If list of fields to detach is equal to the currently enabled
+        // bundles for node,
         // then we should remove the fields from the view.
-        if (sizeof($node_enabled_bundles) == sizeof($to_detach['node'])) {
+        if (count($node_enabled_bundles) == count($to_detach['node'])) {
           $yoast_seo_manager->detachFieldHandlerFromContentView();
         }
       }
 
       // Detach fields from content types.
-      foreach($to_detach as $entity_type_id => $bundles) {
-        foreach($bundles as $bundle_id) {
+      foreach ($to_detach as $entity_type_id => $bundles) {
+        foreach ($bundles as $bundle_id) {
           $yoast_seo_manager->detachYoastSeoFields($entity_type_id, $bundle_id);
         }
       }

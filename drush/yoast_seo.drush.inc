@@ -14,7 +14,7 @@ function yoast_seo_drush_command() {
   // prepares the module to be uninstalled.
   $items['yoastseo-prepare-uninstall'] = array(
     'description' => "Prepare uninstalling Yoast SEO. Remove fields and data.",
-    'aliases' => array('ypu')
+    'aliases' => array('ypu'),
   );
 
   return $items;
@@ -22,11 +22,14 @@ function yoast_seo_drush_command() {
 
 /**
  * Prepare uninstall for yoast seo.
- * This enables to delete the fields from drupal so uninstalling the module doesn't fail.
+ *
+ * This enables to delete the fields from drupal so uninstalling the module
+ * doesn't fail.
  * It does 3 things :
- *  - Remove Yoast SEO fields from the content view.
- *  - Detach Yoast SEO from all yoastseo enabled content types
- *  - Purge the fields list from all temporary deleted fields.
+ * - Remove Yoast SEO fields from the content view
+ * - Detach Yoast SEO from all yoastseo enabled content types
+ * - Purge the fields list from all temporary deleted fields.
+ *
  * @see https://www.drupal.org/node/2418659
  */
 function drush_yoast_seo_yoastseo_prepare_uninstall() {
@@ -43,7 +46,7 @@ function drush_yoast_seo_yoastseo_prepare_uninstall() {
   foreach ($supported_entities as $entity_type_id => $entity_type_label) {
     $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type_id);
     if (!empty($enabled_bundles)) {
-      foreach($enabled_bundles as $bundle_id) {
+      foreach ($enabled_bundles as $bundle_id) {
         echo "detach yoast_seo fields from $entity_type_id $bundle_id\n";
         $yoast_seo_manager->detachYoastSeoFields($entity_type_id, $bundle_id);
       }

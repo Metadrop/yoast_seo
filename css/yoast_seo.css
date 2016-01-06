@@ -1,192 +1,231 @@
 #edit-yoast-seo {
-    border: 1px solid #ddd;
-    margin: 20px 0;
-    padding: 20px 0; }
+  border: 1px solid #ddd;
+  margin: 20px 0;
+  padding: 20px 0;
+}
 #edit-yoast-seo .wrapper-title {
-    padding-left: 20px; }
+  padding-left: 20px;
+}
 
 #wpseo-plugin-loading {
-    display: block;
-    height: auto;
-    display: none; }
+  display: block;
+  height: auto;
+  display: none;
+}
 
 #edit-field-yoast-seo-wrapper:after {
-    display: block;
-    content: '';
-    clear: both; }
+  display: block;
+  content: '';
+  clear: both;
+}
 #edit-field-yoast-seo-wrapper .form-item {
-    display: inline-block;
-    float: left;
-    margin: 20px 0;
-    padding: 0 0 0 20px; }
+  display: inline-block;
+  float: left;
+  margin: 20px 0;
+  padding: 0 0 0 20px;
+}
 
 .overallScore {
-    float: left;
-    padding-top: 20px;
-    margin-top: 20px;
-    margin-left: 10px;
+  float: left;
+  padding-top: 20px;
+  margin-top: 20px;
+  margin-left: 10px;
 }
 .views-field-field-yoast-seo .overallScore {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .overallScore {
-    display: inline-block; }
+  display: inline-block;
+}
 .overallScore .score {
-    display: inline-block;
-    padding: 0.1em 0 0 0;
+  display: inline-block;
+  padding: 0.1em 0 0 0;
 }
 .overallScore .score_circle {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin: 4px 5px 0 3px;
-    vertical-align: top;
-    border-radius: 50%;
-    background: #888; }
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 4px 5px 0 3px;
+  vertical-align: top;
+  border-radius: 50%;
+  background: #888;
+}
 .overallScore.good .score_circle {
-    background: #7ad03a;
+  background: #7ad03a;
 }
 .overallScore.ok .score_circle {
-    background: #ffba00;
+  background: #ffba00;
 }
 .overallScore.poor .score_circle {
-    background: #ee7c1b;
+  background: #ee7c1b;
 }
 .overallScore.bad .score_circle {
-    background: #dd3d36;
+  background: #dd3d36;
 }
 .overallScore .score_title {
-    font-weight: normal;
+  font-weight: normal;
 }
 .overallScore .score_title strong {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 #yoast-wrapper {
-    clear: both;
-    padding: 0 20px; }
+  clear: both;
+  padding: 0 20px;
+}
 #yoast-wrapper > label {
-    font-size: inherit; }
+  font-size: inherit;
+}
 #yoast-wrapper .inputForm label {
-    line-height: 20px;
-    float: left;
-    width: 250px;
-    text-transform: capitalize;
-    color: #777; }
+  line-height: 20px;
+  float: left;
+  width: 250px;
+  text-transform: capitalize;
+  color: #777;
+}
 #yoast-wrapper .inputForm input {
-    line-height: 20px;
-    float: left;
-    width: 300px;
-    margin: 5px 0; }
+  line-height: 20px;
+  float: left;
+  width: 300px;
+  margin: 5px 0;
+}
 #yoast-wrapper .inputForm textarea {
-    float: left;
-    width: 100%;
-    height: 400px;
-    margin: 5px 0; }
+  float: left;
+  width: 100%;
+  height: 400px;
+  margin: 5px 0;
+}
 #yoast-wrapper li .score {
-    list-style-type: none; }
+  list-style-type: none;
+}
 #yoast-wrapper .wpseoanalysis {
-    margin-left: 0;
-    list-style: none; }
+  margin-left: 0;
+  list-style: none;
+}
 #yoast-wrapper .wpseoanalysis li {
-    margin: 3px 0;
-    line-height: auto; }
+  margin: 3px 0;
+  line-height: auto;
+}
 #yoast-wrapper .wpseo-score-text {
-    display: inline-block;
-    width: 90%; }
+  display: inline-block;
+  width: 90%;
+}
 #yoast-wrapper .wpseo-score-icon {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin: 3px 10px 0 3px;
-    vertical-align: top;
-    border-radius: 50%;
-    background: #888; }
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 3px 10px 0 3px;
+  vertical-align: top;
+  border-radius: 50%;
+  background: #888;
+}
 #yoast-wrapper .wpseo-score-icon.good {
-    background-color: #7ad03a; }
+  background-color: #7ad03a;
+}
 #yoast-wrapper .wpseo-score-icon.ok {
-    background-color: #ffba00; }
+  background-color: #ffba00;
+}
 #yoast-wrapper .wpseo-score-icon.poor {
-    background-color: #ee7c1b; }
+  background-color: #ee7c1b;
+}
 #yoast-wrapper .wpseo-score-icon.bad {
-    background-color: #dd3d36; }
+  background-color: #dd3d36;
+}
 #yoast-wrapper .wpseo-score-icon.na {
-    background-color: #999; }
+  background-color: #999;
+}
 #yoast-wrapper .wpseo-score-icon.noindex {
-    background-color: #1e8cbe; }
+  background-color: #1e8cbe;
+}
 #yoast-wrapper .wpseo_msg {
-    margin: 5px 0 10px 0;
-    padding: 0 5px;
-    border: 1px solid #e6db55;
-    background-color: #ffffe0; }
+  margin: 5px 0 10px 0;
+  padding: 0 5px;
+  border: 1px solid #e6db55;
+  background-color: #ffffe0;
+}
 #yoast-wrapper #snippet_preview {
-    font-family: Arial, sans-serif;
-    width: 100%;
-    padding: 20px;
-    margin: 0 0 20px; }
+  font-family: Arial, sans-serif;
+  width: 100%;
+  padding: 20px;
+  margin: 0 0 20px;
+}
 #yoast-wrapper .title {
-    font-size: 18px;
-    font-weight: normal;
-    line-height: 1.2;
-    min-height: 1.2em;
-    display: block;
-    overflow: hidden;
-    width: 512px;
-    margin: 0;
-    white-space: nowrap;
-    text-decoration: none;
-    text-overflow: ellipsis;
-    color: #1e0fbe; }
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 1.2;
+  min-height: 1.2em;
+  display: block;
+  overflow: hidden;
+  width: 512px;
+  margin: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  color: #1e0fbe;
+}
 #yoast-wrapper .title:visited {
-    color: #609; }
-#yoast-wrapper .url, #yoast-wrapper .desc {
-    font-size: 13px;
-    line-height: 1.4;
-    min-height: 1.4em;
-    display: block; }
-#yoast-wrapper .url {
-    font-size: 14px;
-    font-style: normal;
-    line-height: 16px;
-    min-height: 16px;
-    color: #006621; }
-#yoast-wrapper .urlBase {
-    float: left; }
+  color: #609;
+}
+#yoast-wrapper .url,
 #yoast-wrapper .desc {
-    color: #545454; }
+  font-size: 13px;
+  line-height: 1.4;
+  min-height: 1.4em;
+  display: block;
+}
+#yoast-wrapper .url {
+  font-size: 14px;
+  font-style: normal;
+  line-height: 16px;
+  min-height: 16px;
+  color: #006621;
+}
+#yoast-wrapper .urlBase {
+  float: left;
+}
+#yoast-wrapper .desc {
+  color: #545454;
+}
 #yoast-wrapper input {
-    font-size: 14px;
-    display: block;
-    width: 540px;
-    margin: 5px 5px 5px 0;
-    padding: 5px; }
+  font-size: 14px;
+  display: block;
+  width: 540px;
+  margin: 5px 5px 5px 0;
+  padding: 5px;
+}
 #yoast-wrapper textarea {
-    font-size: 14px;
-    display: block;
-    width: 540px;
-    height: 60px;
-    margin: 5px 5px 5px 0;
-    padding: 5px; }
+  font-size: 14px;
+  display: block;
+  width: 540px;
+  height: 60px;
+  margin: 5px 5px 5px 0;
+  padding: 5px;
+}
 #yoast-wrapper #snippet_preview {
-    font-family: Arial, sans-serif;
-    width: 512px;
-    padding: 20px;
-    border: 1px solid #ddd; }
+  font-family: Arial, sans-serif;
+  width: 512px;
+  padding: 20px;
+  border: 1px solid #ddd;
+}
 #yoast-wrapper .screen-reader-text {
-    position: absolute !important;
-    overflow: hidden;
-    clip: rect(1px, 1px, 1px, 1px);
-    width: 1px;
-    height: 1px; }
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  width: 1px;
+  height: 1px;
+}
 #yoast-wrapper #snippet_preview:hover {
-    background-color: #f5f5f5; }
+  background-color: #f5f5f5;
+}
 #yoast-wrapper #snippet_preview *[contenteditable='true']:hover {
-    cursor: pointer;
-    background: #bbdefb; }
+  cursor: pointer;
+  background: #bbdefb;
+}
 #yoast-wrapper #snippet_preview *[contenteditable='true']:focus {
-    cursor: text;
-    background-color: #bbdefb; }
+  cursor: text;
+  background-color: #bbdefb;
+}
 
 /*# sourceMappingURL=yoast_seo.css.map */

@@ -4,7 +4,8 @@
  * Contains \Drupal\yoast_seo\Tests\YoastSeoTest.
  *
  * Scenarios :
- * * The Yoast SEO section is only available when it has been previously enabled on the given content type.
+ * The Yoast SEO section is only available when it has
+ * been previously enabled on the given content type.
  */
 
 namespace Drupal\yoast_seo\Tests;
@@ -24,7 +25,7 @@ class YoastSeoTest extends WebTestBase {
   protected $profile = 'testing';
 
   /**
-   * Admin user
+   * Admin user.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
@@ -89,15 +90,17 @@ class YoastSeoTest extends WebTestBase {
   }
 
   /**
-   * The Yoast SEO section is only available when it has been previously enabled on the given content type.
+   * Only available when it has been previously enabled on the content type.
    *
    * Given    I am logged in as admin
-   * When     I am adding a content on a content type which doesn't have a Meta Tag field
+   * When     I am adding a content on a content type which doesn't have a Meta
+   * Tag field
    * Then     Then I should not see the Yoast SEO section active
-   * When     I am adding a content on a content type which have a Meta Tag field
+   * When     I am adding a content on a content type which have a Meta Tag
+   * field.
    */
   public function testYoastSeoEnabledDisabled() {
-    // Given I am logged in as admin
+    // Given I am logged in as admin.
     $this->drupalLogin($this->adminUser);
     // Create a page node type.
     $this->entityManager->getStorage('node_type')->create(array(
@@ -105,9 +108,9 @@ class YoastSeoTest extends WebTestBase {
       'name' => 'page',
     ))->save();
 
-    // When I am adding an Entity Test content
+    // When I am adding an Entity Test content.
     $this->drupalGet('node/add/page');
-    // Then I should not see the Yoast SEO section active
+    // Then I should not see the Yoast SEO section active.
     $this->assertNoText('Yoast SEO for drupal');
 
     // When I enable Yoast SEO for the page bundle.

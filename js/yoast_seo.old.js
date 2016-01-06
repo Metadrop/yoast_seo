@@ -1,4 +1,5 @@
 /**
+ * @file
  * JavaScript file that handles initializing and firing the Yoast
  * js-text-analysis library.
  */
@@ -70,12 +71,12 @@
             };
 
             // Make it global.
-            window.YoastSEO.app = new YoastSEO.App( YoastSEO.analyzerArgs );
+            window.YoastSEO.app = new YoastSEO.App(YoastSEO.analyzerArgs);
 
-            // Parse the input from snippet preview fields to their corresponding metatag and path fields
-            DrupalSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title );
-            DrupalSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.url, YoastSEO.analyzerArgs.fields.url );
-            DrupalSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.meta, YoastSEO.analyzerArgs.fields.meta );
+            // Parse the input from snippet preview fields to their corresponding metatag and path fields.
+            DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title);
+            DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.url, YoastSEO.analyzerArgs.fields.url);
+            DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.meta, YoastSEO.analyzerArgs.fields.meta);
 
             // No enter on contenteditable fields.
             $("#snippet_title, #snippet_cite, #snippet_meta").keypress(function(e) {
@@ -140,8 +141,10 @@
 
 /**
  * Inputgenerator generates a form for use as input.
+ *
  * @param args
  * @param refObj
+ *
  * @constructor
  */
 YoastSEO_DrupalSource = function(args) {
@@ -152,7 +155,8 @@ YoastSEO_DrupalSource = function(args) {
 };
 
 /**
- * Sets field value and dispatches an event to fire content analysis magic
+ * Sets field value and dispatches an event to fire content analysis magic.
+ *
  * @param field
  */
 YoastSEO_DrupalSource.prototype.triggerEvent = function(field) {
@@ -167,12 +171,13 @@ YoastSEO_DrupalSource.prototype.triggerEvent = function(field) {
 }
 
 /**
- * Parses the input in snippet preview fields on input evt to data in the metatag and path fields
+ * Parses the input in snippet preview fields on input evt to data in the metatag and path fields.
+ *
  * @param source
  * @param target
  */
 YoastSEO_DrupalSource.prototype.parseSnippetData = function(source, target) {
-  var listener = function ( ev ) {
+  var listener = function (ev) {
     document.getElementById(target).value = ev.target.innerText;
     this.triggerEvent(target);
   }.bind(this);
@@ -181,21 +186,22 @@ YoastSEO_DrupalSource.prototype.parseSnippetData = function(source, target) {
 
 
 /**
- * Grabs data from the refObj and returns populated analyzerData
+ * Grabs data from the refObj and returns populated analyzerData.
+ *
  * @returns analyzerData
  */
 YoastSEO_DrupalSource.prototype.getData = function() {
   // Default data in here.
   data = {
-    keyword: this.getDataFromInput( "keyword" ),
-    meta: this.getDataFromInput( "meta" ),
-    snippetMeta: this.getDataFromInput( "meta" ),
-    text: this.getDataFromInput( "text" ),
-    snippetTitle: this.getDataFromInput( "title" ),
-    pageTitle: this.getDataFromInput( "title" ),
+    keyword: this.getDataFromInput("keyword"),
+    meta: this.getDataFromInput("meta"),
+    snippetMeta: this.getDataFromInput("meta"),
+    text: this.getDataFromInput("text"),
+    snippetTitle: this.getDataFromInput("title"),
+    pageTitle: this.getDataFromInput("title"),
     baseUrl: this.config.baseRoot + '/',
-    url: this.config.baseRoot + '/' + this.getDataFromInput( "url" ),
-    snippetCite: this.getDataFromInput( "url" )
+    url: this.config.baseRoot + '/' + this.getDataFromInput("url"),
+    snippetCite: this.getDataFromInput("url")
   };
 
   // Placeholder text in snippet if nothing was found.
@@ -227,26 +233,27 @@ YoastSEO_DrupalSource.prototype.getAnalyzerInput = function() {
   YoastSEO.app.runAnalyzerCallback();
 };
 
-YoastSEO_DrupalSource.prototype.getDataFromInput = function( field ) {
+YoastSEO_DrupalSource.prototype.getDataFromInput = function(field) {
   return document.getElementById(this.config.fields[field]).value;
 }
 
 /**
- * Grabs data from the refObj and returns populated analyzerData
+ * Grabs data from the refObj and returns populated analyzerData.
+ *
  * @returns analyzerData
  */
 YoastSEO_DrupalSource.prototype.updateRawData = function() {
   data = {
-    keyword: this.getDataFromInput( "keyword" ),
-    meta: this.getDataFromInput( "meta" ),
-    snippetMeta: this.getDataFromInput( "meta" ),
-    text: this.getDataFromInput( "text" ),
-    nodeTitle: this.getDataFromInput( "nodeTitle" ),
-    snippetTitle: this.getDataFromInput( "title" ),
-    pageTitle: this.getDataFromInput( "title" ),
+    keyword: this.getDataFromInput("keyword"),
+    meta: this.getDataFromInput("meta"),
+    snippetMeta: this.getDataFromInput("meta"),
+    text: this.getDataFromInput("text"),
+    nodeTitle: this.getDataFromInput("nodeTitle"),
+    snippetTitle: this.getDataFromInput("title"),
+    pageTitle: this.getDataFromInput("title"),
     baseUrl: this.config.baseRoot + '/',
-    url: this.config.baseRoot + '/' + this.getDataFromInput( "url" ),
-    snippetCite: this.getDataFromInput( "url" )
+    url: this.config.baseRoot + '/' + this.getDataFromInput("url"),
+    snippetCite: this.getDataFromInput("url")
   };
 
   if (!this.config.SEOTitleOverwritten) {
@@ -271,22 +278,26 @@ YoastSEO_DrupalSource.prototype.updateRawData = function() {
 };
 
 /**
- * when the snippet is updated, set this data in rawData.
+ * When the snippet is updated, set this data in rawData.
+ *
  * @param {string} value
  * @param {string} type
  */
-YoastSEO_DrupalSource.prototype.setRawData = function( value, type ) {
-  switch ( type ) {
+YoastSEO_DrupalSource.prototype.setRawData = function(value, type) {
+  switch (type) {
     case 'snippet_meta':
       this.parseSnippetData(type, this.config.fields.meta);
       YoastSEO.app.rawData.snippetMeta = value;
       break;
+
     case 'snippet_cite':
       YoastSEO.app.rawData.snippetCite = value;
       break;
+
     case 'snippet_title':
       YoastSEO.app.rawData.snippetTitle = value;
       break;
+
     default:
       break;
   }
@@ -312,10 +323,11 @@ YoastSEO_DrupalSource.prototype.inputElementEventBinder = function() {
 };
 
 /**
- * calls getAnalyzerinput function on change event from element
+ * Calls getAnalyzerinput function on change event from element.
+ *
  * @param event
  */
-YoastSEO_DrupalSource.prototype.renewData = function ( ev ) {
+YoastSEO_DrupalSource.prototype.renewData = function (ev) {
   if (!this.config.SEOTitleOverwritten && (ev.target.id == this.config.fields.title || ev.target.id == this.config.snippetFields.title)) {
     this.config.SEOTitleOverwritten = true;
   }
@@ -328,41 +340,48 @@ YoastSEO_DrupalSource.prototype.renewData = function ( ev ) {
  *
  * @param {Object} ev
  */
-YoastSEO_DrupalSource.prototype.updateSnippetValues = function( ev ) {
+YoastSEO_DrupalSource.prototype.updateSnippetValues = function(ev) {
 };
 
 /**
- * calles getAnalyzerinput function on focus of the snippet elements;
+ * Calles getAnalyzerinput function on focus of the snippet elements;.
+ *
  * @param event
  */
-YoastSEO_DrupalSource.prototype.snippetCallback = function( ev ) {
+YoastSEO_DrupalSource.prototype.snippetCallback = function(ev) {
   this.getAnalyzerInput();
 };
 
 /**
- * retuns a string that is used as a CSSclass, based on the numeric score
+ * Retuns a string that is used as a CSSclass, based on the numeric score.
+ *
  * @param score
+ *
  * @returns output
  */
-YoastSEO_DrupalSource.prototype.scoreRating = function( score ) {
+YoastSEO_DrupalSource.prototype.scoreRating = function(score) {
   var scoreRate;
-  switch ( score ) {
+  switch (score) {
     case 0:
       scoreRate = "na";
       break;
+
     case 4:
     case 5:
       scoreRate = "poor";
       break;
+
     case 6:
     case 7:
       scoreRate = "ok";
       break;
+
     case 8:
     case 9:
     case 10:
       scoreRate = "good";
       break;
+
     default:
       scoreRate = "bad";
       break;
@@ -375,9 +394,10 @@ YoastSEO_DrupalSource.prototype.scoreRating = function( score ) {
 
 /**
  * Sets the SEO score in the hidden element.
+ *
  * @param score
  */
-YoastSEO_DrupalSource.prototype.saveScores = function ( score ) {
-  document.getElementById(this.config.targets.overall).getElementsByClassName("score_title")[0].innerHTML = this.scoreRating( score );
+YoastSEO_DrupalSource.prototype.saveScores = function (score) {
+  document.getElementById(this.config.targets.overall).getElementsByClassName("score_title")[0].innerHTML = this.scoreRating(score);
   document.getElementById(this.config.scoreElement).value = score;
 };

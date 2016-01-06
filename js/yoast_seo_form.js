@@ -3,7 +3,7 @@
  * Drupal Yoast SEO form utility.
  *
  * This library will help developers to interacts with drupal form
- * on client side
+ * on client side.
  *
  * @ignore
  */
@@ -27,6 +27,7 @@
      * to use to control the form item HTMLElement field.
      *
      * @param el
+     *
      * @returns {function}
      */
     getFormItemClass: function (el_wrapper) {
@@ -59,6 +60,7 @@
      *
      * @param el_wrapper The HTMLElement to plug the FormItem view element on.
      * @param options Options to pass to the form item view constructor.
+     *
      * @returns {Backbone.View}
      */
     getFormItemView: function (el_wrapper, options) {
@@ -68,7 +70,7 @@
         el = null,
       // The form item view.
         formItem = null,
-      // The options to pass to the form item class
+      // The options to pass to the form item class.
         options = options || {};
 
       // Based on the FormItem view tag, retrieve the HTMLElement to bind the View onto.
@@ -96,6 +98,7 @@
 
   /**
    * Abstract class (kind of) which as for aim to control Drupal Form Item field.
+   *
    * @type {YoastSeoForm.views.FormItem}
    */
   YoastSeoForm.views.FormItem = Backbone.View.extend({
@@ -139,6 +142,7 @@
 
     /**
      * Listen to the input event.
+     *
      * @param evt
      */
     _onInput: function () {
@@ -147,6 +151,7 @@
 
     /**
      * Listen to the focus event.
+     *
      * @param evt
      */
     _onFocus: function () {
@@ -155,6 +160,7 @@
 
     /**
      * Listen to the blur event.
+     *
      * @param evt
      */
     _onBlur: function () {
@@ -163,6 +169,7 @@
 
     /**
      * This function is internally called when the component value changed.
+     *
      * @param evt
      * @param val
      */
@@ -177,6 +184,7 @@
 
     /**
      * This function is internally called when the component get the focus.
+     *
      * @param evt
      */
     _focus: function () {
@@ -187,6 +195,7 @@
 
     /**
      * This function is internally called when the component has blured.
+     *
      * @param evt
      */
     _blur: function () {
@@ -197,7 +206,9 @@
 
     /**
      * Get/Set the value of the form item view component.
+     *
      * @param val (optional) set the value of the form item view.
+     *
      * @return The value of the component if getter or void if setter.
      */
     value: function (val) {
@@ -221,6 +232,7 @@
 
   /**
    * FormItem view that has for aim to control textfield form item.
+   *
    * @type {YoastSeoForm.views.Textfield}
    */
   YoastSeoForm.views.Textfield = YoastSeoForm.views.FormItem.extend({}, {
@@ -229,6 +241,7 @@
 
   /**
    * FormItem view that has for aim to control html element which are editable form item.
+   *
    * @type {YoastSeoForm.views.ContentEditableHtmlElement}
    */
   YoastSeoForm.views.ContentEditableHtmlElement = YoastSeoForm.views.FormItem.extend({
@@ -253,6 +266,7 @@
 
     /**
      * This function is internally called when the component catch a paste event.
+     *
      * @param evt
      */
     _onPaste: function (evt) {
@@ -278,11 +292,13 @@
       }
     }
   }, {
-    tag: 'span' // Can be any editable HTMLElement.
+    // Can be any editable HTMLElement.
+    tag: 'span'
   });
 
   /**
    * FormItem view that has for aim to control snippet element which are content editable form item.
+   *
    * @type {YoastSeoForm.views.SnippetEditableHtmlElement}
    */
   YoastSeoForm.views.SnippetElement = YoastSeoForm.views.ContentEditableHtmlElement.extend({
@@ -302,18 +318,20 @@
      */
     _onKeypress: function (evt) {
       // The user can't press enter on the snippet fields.
-      if(evt.keyCode == 13){
+      if (evt.keyCode == 13) {
         evt.preventDefault();
         evt.stopImmediatePropagation();
         return;
       }
     }
   }, {
-    tag: 'span' // Can be any editable HTMLElement.
+    // Can be any editable HTMLElement.
+    tag: 'span'
   });
 
   /**
    * FormItem view that has for aim to control textfield form item.
+   *
    * @type {YoastSeoForm.views.Textarea}
    */
   YoastSeoForm.views.Textarea = YoastSeoForm.views.FormItem.extend({}, {
@@ -322,6 +340,7 @@
 
   /**
    * FormItem view that has for aim to control textarea ckeditor form item.
+   *
    * @type {YoastSeoForm.views.Ckeditor}
    */
   YoastSeoForm.views.Ckeditor = YoastSeoForm.views.Textarea.extend({

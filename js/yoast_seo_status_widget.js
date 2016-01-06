@@ -17,8 +17,9 @@ YoastSeoStatusWidget = function (args) {
 }
 
 /**
- * retuns a string that is used as a CSSclass, based on the numeric score
+ * Retuns a string that is used as a CSSclass, based on the numeric score.
  * @param score
+ *
  * @returns output
  */
 YoastSeoStatusWidget.prototype.scoreRating = function (score) {
@@ -39,6 +40,7 @@ YoastSeoStatusWidget.prototype.scoreRating = function (score) {
 
 /**
  * Sets the SEO score in both the hidden input and the rating element.
+ *
  * @param score
  */
 YoastSeoStatusWidget.prototype.saveScores = function (score) {
