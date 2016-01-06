@@ -1,19 +1,17 @@
 <?php
-
 /**
  * @file
- * Module file for yoast_seo.
+ * Contains yoast_seo.module.
  */
 
 /**
- * Implements hook_form_form_alter().
+ * Implements hook_form_FORM_ID_alter() for node_form().
  */
 function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['#after_build']) && !empty($form['#after_build'])) {
-    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild';
-  }
-  else {
-    $form['#after_build'] = ['yoast_seo_form_node_afterbuild'];
+    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild' ;
+  } else {
+    $form['#after_build'] = [ 'yoast_seo_form_node_afterbuild' ];
   }
 }
 
@@ -23,9 +21,9 @@ function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
  * Reads the form, and deduct associated yoastseo configuration from it.
  *
  * @param array $form
- *   Form.
+ *   The form array.
  * @param array $form_state
- *   Form state.
+ *   The form state array.
  *
  * @return mixed
  *   The modified form.
