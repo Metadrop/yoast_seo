@@ -224,3 +224,34 @@ YoastSeoData.prototype.bindElementEvents = function () {
  */
 YoastSeoData.prototype.updateSnippetValues = function (ev) {
 };
+
+/**
+ * Load focus keyword autocomplete.
+ *
+ * @param focusKeywordId
+ */
+YoastSeoData.prototype.loadFocusKeywordAutocomplete = function (focusKeywordId, language) {
+  // Autocomplete for focus keyword field.
+  // We use the google autocomplete api.
+  var $ = jQuery;
+  $('#' + focusKeywordId).autocomplete({
+    source: function(request, response) {
+      $.getJSON("http://suggestqueries.google.com/complete/search?callback=?",
+        {
+          "hl":language,
+          "jsonp":"suggestCallBack",
+          "q":request.term,
+          "client":"youtube"
+        }
+      );
+      suggestCallBack = function (data) {
+        var suggestions = [];
+        $.each(data[1], function(key, val) {
+          suggestions.push({"value":val[0]});
+        });
+        suggestions.length = 5;
+        response(suggestions);
+      };
+    }
+  });
+}

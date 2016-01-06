@@ -97,6 +97,9 @@
       // Make it global.
       window.YoastSEO.app = new YoastSEO.App(YoastSEO.analyzerArgs);
 
+      // Load autocomplete on focus keyword.
+      yoastSeoData.loadFocusKeywordAutocomplete(YsSettings.fields.focus_keyword, YsSettings.language);
+
       // Instantiate the FormItem View component plugged on the snippet preview title field.
       var snippetTitle = new Drupal.YoastSeoForm.views.SnippetElement({
         el: $('#snippet_title'),

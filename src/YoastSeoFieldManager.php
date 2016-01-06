@@ -236,6 +236,10 @@ class YoastSeoFieldManager {
    */
   public function setFieldsConfiguration($form_after_build) {
 
+    // Set the language code.
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['language'] = $language;
+
     // Score statuses.
     ksort($this->fieldsConfiguration['score_status']);
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['score_status'] = $this->fieldsConfiguration['score_status'];
