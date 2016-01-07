@@ -144,6 +144,10 @@
           blured: function() {
             snippetTitle.$el.show();
             snippetTitleRaw.$el.hide();
+          },
+          // When the component get the focus.
+          focused: function() {
+            snippetTitleRaw.moveCursorEnd();
           }
         }
       });
@@ -192,6 +196,10 @@
           blured: function() {
             snippetSummary.$el.show();
             snippetSummaryRaw.$el.hide();
+          },
+          // When the component get the focus.
+          focused: function() {
+            snippetSummaryRaw.moveCursorEnd();
           }
         }
       });
@@ -205,11 +213,16 @@
           // the advanced alias field, including tokens).
           focused: function() {
             // Retrieve the Form Item view behind the advanced alias field.
-            var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['path']];
+            var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['path']],
+              value = formItem.value();
+            // If the value is empty, add a default / at the beginning of the field.
+            if (value == '') {
+              value = '/';
+            }
             // Display the raw value component instead of the computed value.
             snippetUrl.$el.hide();
             snippetUrlRaw.$el.show();
-            snippetUrlRaw.value(formItem.value());
+            snippetUrlRaw.value(value);
             snippetUrlRaw.$el.focus();
           }
         }
@@ -231,8 +244,17 @@
           },
           // When the component lose the focus, hide it and display the snippet preview url component instead.
           blured: function() {
+            if (snippetUrlRaw.value() == '/') {
+              var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['path']];
+              formItem.value('');
+              formItem._change();
+            }
             snippetUrl.$el.show();
             snippetUrlRaw.$el.hide();
+          },
+          // When the component get the focus.
+          focused: function() {
+            snippetUrlRaw.moveCursorEnd();
           }
         }
       });
