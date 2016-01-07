@@ -7,9 +7,6 @@
 
 namespace Drupal\yoast_seo;
 
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Logger\LoggerChannelFactory;
-use \Drupal\field\Entity\FieldConfig;
 use \Drupal\Component\Utility\NestedArray;
 use \Drupal\Component\Utility\Html;
 
@@ -38,7 +35,7 @@ class YoastSeoFieldManager {
       'body',
       'focus_keyword',
       'seo_status',
-      'path'
+      'path',
     ],
 
     // Tokens for the fields.
@@ -51,8 +48,15 @@ class YoastSeoFieldManager {
       '[node:summary]' => 'summary',
     ],
 
-    'targets' => [
+    'targets' => [],
 
+    'score_status' => [
+      '0' => 'na',
+      '3' => 'bad',
+      '5' => 'poor',
+      '7' => 'ok',
+      '10' => 'good',
+      'default' => 'bad',
     ],
   ];
 
@@ -81,13 +85,19 @@ class YoastSeoFieldManager {
 
   /**
    * Our helper to insert values in a form from a given key.
-   * example : formSet($form, 'myform.#value', 'valueToInsert');
+   *
+   * Example : formSet($form, 'myform.#value', 'valueToInsert');
    * TODO : move this helper somewhere else.
-   * @param $form
-   * @param $key
-   * @param $value
+   *
+   * @param array $form
+   *   The form.
+   * @param string $key
+   *   The key.
+   * @param mixed $value
+   *   Value.
    *
    * @return mixed
+   *   Form with the set value.
    */
   private function formSet(&$form, $key, $value) {
     return NestedArray::setValue(
@@ -99,12 +109,17 @@ class YoastSeoFieldManager {
 
   /**
    * Our helper to retrieve values in a form from a given key.
-   * example : formGet($form, 'myform.#value');
+   *
+   * Example : formGet($form, 'myform.#value');
    * TODO : move this helper somewhere else.
-   * @param $form
-   * @param $key
+   *
+   * @param array $form
+   *   The form.
+   * @param string $key
+   *   The key.
    *
    * @return mixed
+   *   Value accessed by get.
    */
   private function formGet($form, $key) {
     return NestedArray::getValue(
@@ -116,17 +131,20 @@ class YoastSeoFieldManager {
   /**
    * Attach a field to a target content type.
    *
-   * @param $entity_type
-   * @param $bundle
-   * @param $field
+   * @param string $entity_type
+   *   Entity type. Example 'node'.
+   * @param string $bundle
+   *   Bundle type.
+   * @param mixed $field
+   *   Field.
    */
   public function attachField($entity_type, $bundle, $field) {
     // Retrieve the yoast seo field attached to the target entity.
-    $fieldStorageConfig = $this->entity_manager->getStorage('field_storage_config')
+    $field_storage_config = $this->entity_manager->getStorage('field_storage_config')
                                                ->load($entity_type . '.' . $field['field_name']);
 
     // If the field hasn't been attached yet to the target entity, attach it.
-    if (is_null($fieldStorageConfig)) {
+    if (is_null($field_storage_config)) {
       $this->entity_manager->getStorage('field_storage_config')
                            ->create([
                              'field_name' => $field['field_name'],
@@ -167,9 +185,12 @@ class YoastSeoFieldManager {
   /**
    * Detach a field from a target content type.
    *
-   * @param $entity_type
-   * @param $bundle
-   * @param $field_name
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $bundle
+   *   Bundle.
+   * @param string $field_name
+   *   Field name.
    */
   public function detachField($entity_type, $bundle, $field_name) {
     $fields_config = \Drupal::service('entity_field.manager')
@@ -183,11 +204,15 @@ class YoastSeoFieldManager {
   /**
    * Check if a field has been already attached to a bundle.
    *
-   * @param $entity_type
-   * @param $bundle
-   * @param $field_name
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $bundle
+   *   Bundle.
+   * @param string $field_name
+   *   Field name.
    *
-   * @return boolean
+   * @return bool
+   *   Whether it is attached or not.
    */
   public function isAttached($entity_type, $bundle, $field_name) {
     $fields_config = \Drupal::service('entity_field.manager')
@@ -203,95 +228,106 @@ class YoastSeoFieldManager {
    * Explores the field present in the form and build a setting array
    * that will be used by yoast_seo javascript.
    *
-   * @param $formAfterBuild
-   *   node form after build
+   * @param array $form_after_build
+   *   Node form after build.
    *
    * @return mixed
-   *   transformed form
+   *   Transformed form.
    */
-  public function setFieldsConfiguration($formAfterBuild) {
-    // Fields requested.
+  public function setFieldsConfiguration($form_after_build) {
 
+    // Set the language code.
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['language'] = $language;
+
+    // Score statuses.
+    ksort($this->fieldsConfiguration['score_status']);
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['score_status'] = $this->fieldsConfiguration['score_status'];
+
+    // Fields requested.
     // Attach settings in drupalSettings for each required field.
-    foreach ($this->fieldsConfiguration['fields'] as $fieldName) {
-      $fieldId = $this->formGet($formAfterBuild, $this->fieldsConfiguration['paths'][$fieldName] . '.#id');
-      $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields'][$fieldName] = $fieldId;
+    foreach ($this->fieldsConfiguration['fields'] as $field_name) {
+      $field_id = $this->formGet($form_after_build, $this->fieldsConfiguration['paths'][$field_name] . '.#id');
+      $form_after_build['#attached']['drupalSettings']['yoast_seo']['fields'][$field_name] = $field_id;
     }
 
     // Attach settings for the tokens.
-    foreach($this->fieldsConfiguration['tokens'] as $fieldName => $token) {
-      $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['tokens'][$fieldName] = $token;
+    foreach ($this->fieldsConfiguration['tokens'] as $field_name => $token) {
+      $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens'][$field_name] = $token;
     }
     // Other tokens commonly used.
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:name]'] = \Drupal::config('system.site')->get('name');
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:slogan]'] = \Drupal::config('system.site')->get('slogan');
-
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:name]'] = \Drupal::config('system.site')->get('name');
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:slogan]'] = \Drupal::config('system.site')->get('slogan');
 
     // Attach settings for the targets.
-    foreach($this->fieldsConfiguration['targets'] as $targetName => $targetId) {
-      $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['targets'][$targetName] = $targetId;
+    foreach ($this->fieldsConfiguration['targets'] as $target_name => $target_id) {
+      $form_after_build['#attached']['drupalSettings']['yoast_seo']['targets'][$target_name] = $target_id;
     }
 
-    $isDefaultMetaTitle = !empty($formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#default_value']) ? TRUE : FALSE;
-    $isDefaultKeyword = !empty($formAfterBuild['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value']) ? TRUE : FALSE;
-    $isDefaultMetaDescription = !empty($formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value']) ? TRUE : FALSE;
-    $isDefaultBody = !empty($formAfterBuild['body']['widget'][0]['#default_value']) ? TRUE : FALSE;
+    $is_default_meta_title = !empty($form_after_build['field_meta_tags']['widget'][0]['basic']['title']['#default_value']) ? TRUE : FALSE;
+    $is_default_keyword = !empty($form_after_build['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value']) ? TRUE : FALSE;
+    $is_default_meta_description = !empty($form_after_build['field_meta_tags']['widget'][0]['basic']['description']['#default_value']) ? TRUE : FALSE;
+    $is_default_body = !empty($form_after_build['body']['widget'][0]['#default_value']) ? TRUE : FALSE;
 
     // The path default value.
     // @todo Should be completed once pathauto has been released for Drupal 8.
     $path = '';
-    if (!empty($formAfterBuild['path']['widget'][0]['source']['#value'])) {
-      $path = $formAfterBuild['path']['widget'][0]['source']['#value'];
+    if (!empty($form_after_build['path']['widget'][0]['source']['#value'])) {
+      $path = $form_after_build['path']['widget'][0]['source']['#value'];
     }
 
-    // TODO : move this configuration into YoastSEOFieldManager
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['default_text'] = [
-      'meta_title' => $isDefaultMetaTitle ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
-      'keyword' => $isDefaultKeyword ? $formAfterBuild['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
-      'meta_description' => $isDefaultMetaDescription ? $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
-      'body' => $isDefaultBody ? $formAfterBuild['body']['widget'][0]['#default_value'] : '',
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['default_text'] = [
+      'meta_title' => $is_default_meta_title ? $form_after_build['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
+      'keyword' => $is_default_keyword ? $form_after_build['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
+      'meta_description' => $is_default_meta_description ? $form_after_build['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
+      'body' => $is_default_body ? $form_after_build['body']['widget'][0]['#default_value'] : '',
       'path' => $path,
     ];
 
     // FIELDS
-    // Add Metatag fields
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['meta_title'] = $formAfterBuild['field_meta_tags']['widget'][0]['basic']['title']['#id'];
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['fields']['meta_description'] = $formAfterBuild['field_meta_tags']['widget'][0]['basic']['description']['#id'];
+    // Add Metatag fields.
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['fields']['meta_title'] = $form_after_build['field_meta_tags']['widget'][0]['basic']['title']['#id'];
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['fields']['meta_description'] = $form_after_build['field_meta_tags']['widget'][0]['basic']['description']['#id'];
 
     // Placeholders.
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['placeholder_text'] = [
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['placeholder_text'] = [
       'snippetTitle' => t('Please click here to alter your page meta title'),
       'snippetMeta' => t('Please click here and alter your page meta description.'),
       'snippetCite' => t('/example-post'),
     ];
 
     global $base_root;
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['seo_title_overwritten'] = $isDefaultMetaTitle;
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['text_format'] = $formAfterBuild['body']['widget'][0]['#format'];
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['base_root'] = $base_root;
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['seo_title_overwritten'] = $is_default_meta_title;
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['text_format'] = $form_after_build['body']['widget'][0]['#format'];
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['base_root'] = $base_root;
 
-    // Other conf
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['analyzer'] = TRUE;
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['snippet_preview'] = TRUE;
-    $formAfterBuild['#attached']['drupalSettings']['yoast_seo']['form_id'] = $formAfterBuild['#id'];
+    // Other conf.
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['analyzer'] = TRUE;
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['snippet_preview'] = TRUE;
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['form_id'] = $form_after_build['#id'];
 
-    return $formAfterBuild;
+    return $form_after_build;
   }
 
   /**
    * Add code for snippet.
-   * @param $form
+   *
+   * @param array $form
+   *   Form.
+   *
+   * @return array
+   *   Form.
    */
   public function addSnippetEditorMarkup($form) {
 
     // Get template for the snippet.
-    $snippetTpl = [
+    $snippet_tpl = [
       '#theme' => 'snippet',
       '#wrapper_target_id' => $this->fieldsConfiguration['targets']['wrapper_target_id'],
       '#snippet_target_id' => $this->fieldsConfiguration['targets']['snippet_target_id'],
       '#output_target_id' => $this->fieldsConfiguration['targets']['output_target_id'],
     ];
-    $output = drupal_render($snippetTpl);
+    $output = drupal_render($snippet_tpl);
 
     // Add rendered template to the form, where we want the snippet.
     $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.snippet_analysis', [
@@ -303,19 +339,52 @@ class YoastSeoFieldManager {
     return $form;
   }
 
+  /**
+   * Add Overall score markup to the form.
+   *
+   * @param array $form
+   *   The form.
+   *
+   * @return mixed
+   *   Modified form.
+   */
   public function addOverallScoreMarkup($form) {
 
     // Get template for the snippet.
-    $overallScoreTpl = [
+    $overall_score_tpl = [
       '#theme' => 'overall_score',
       '#overall_score_target_id' => $this->fieldsConfiguration['targets']['overall_score_target_id'],
       '#overall_score' => 0,
     ];
-    $output = drupal_render($overallScoreTpl);
+    $output = drupal_render($overall_score_tpl);
 
     $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.focus_keyword.#suffix', $output);
 
     return $form;
+  }
+
+  /**
+   * Get the status for a given score.
+   *
+   * @param int $score
+   *   Score in points.
+   *
+   * @return string
+   *   Status corresponding to the score.
+   */
+  public function getScoreStatus($score) {
+    $rules = $this->fieldsConfiguration['score_status'];
+    $default = $rules['default'];
+    unset($rules['default']);
+    ksort($rules);
+
+    foreach ($rules as $rule_max_score => $rule_status) {
+      if ($score <= $rule_max_score) {
+        return $rule_status;
+      }
+    }
+
+    return $default;
   }
 
 }

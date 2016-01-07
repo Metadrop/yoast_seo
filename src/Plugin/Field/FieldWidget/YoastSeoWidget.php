@@ -30,7 +30,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
   /**
    * Instance of YoastSeoManager service.
    */
-  protected $yoast_seo_manager;
+  protected $yoastSeoManager;
 
   /**
    * {@inheritdoc}
@@ -51,7 +51,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, YoastSeoManager $manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-    $this->yoast_seoManager = $manager;
+    $this->yoastSeoManager = $manager;
   }
 
   /**
@@ -74,7 +74,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       '#type' => 'textfield',
       '#title' => t('Focus keyword'),
       '#default_value' => isset($items[$delta]->focus_keyword) ? $items[$delta]->focus_keyword : NULL,
-      '#description' => t("Pick the main keyword or keyphrase that this post/page is about.")
+      '#description' => t("Pick the main keyword or keyphrase that this post/page is about."),
     );
 
     $element['yoast_seo']['status'] = array(

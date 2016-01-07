@@ -1,47 +1,33 @@
 <?php
+/**
+ * @file
+ * Contains yoast_seo.module.
+ */
 
 /**
- * Implements hook_form_form_alter();
+ * Implements hook_form_FORM_ID_alter() for node_form().
  */
 function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['#after_build']) && !empty($form['#after_build'])) {
-    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild' ;
-  } else {
-    $form['#after_build'] = [ 'yoast_seo_form_node_afterbuild' ];
+    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild';
   }
-}
-
-
-/**
- * Implements hook_views_pre_view();
- * Add field_yoast_seo in the content views.
- */
-function yoast_seo_views_pre_view($view, $display_id, array &$args) {
-  if ($view->id() == 'content') {
-
-    $handlers = $view->getHandlers('field', $display_id);
-    if (!isset($handlers['field_yoast_seo'])) {
-      $view->addHandler(
-        $display_id,
-        'field',
-        'node__field_yoast_seo',
-        'field_yoast_seo',
-        [
-          'type' => 'yoastseo_formatter',
-        ]
-      );
-      $view->save();
-    }
+  else {
+    $form['#after_build'] = ['yoast_seo_form_node_afterbuild'];
   }
 }
 
 /**
  * After build function.
+ *
  * Reads the form, and deduct associated yoastseo configuration from it.
- * @param $form
- * @param $form_state
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state array.
  *
  * @return mixed
+ *   The modified form.
  */
 function yoast_seo_form_node_afterbuild(&$form, $form_state) {
   if (isset($form['field_yoast_seo'])) {
@@ -76,9 +62,7 @@ function yoast_seo_theme() {
   ];
 
   $theme['content_score'] = [
-    'variables' => [
-
-    ],
+    'variables' => [],
     'template' => 'content_score',
   ];
 

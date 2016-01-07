@@ -28,16 +28,18 @@ class YoastSeoConfigForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+
     // Available entity types supported by Yoast SEO.
     $entity_types = $this->getAvailableEntityTypes();
     foreach ($entity_types as $entity_type => $entity_label) {
       // Get the available bundles Yoast SEO supports.
-      $options = $this->getAvailableBundles($entity_type);
+      $options = $yoast_seo_manager->getAvailableBundles($entity_type);
       // Get the bundles Yoast SEO has been enabled for.
-      $enabled_bundles = $this->getEnabledBundles($entity_type);
+      $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type);
 
-      // Add a checkboxes collection to allow the administrator to enable/disable
-      // Yoast SEO for supported bundles.
+      // Add a checkboxes collection to allow the administrator to
+      // enable/disable Yoast SEO for supported bundles.
       $form[$entity_type] = array(
         '#type' => 'checkboxes',
         '#title' => t($entity_label),
@@ -73,13 +75,18 @@ class YoastSeoConfigForm extends FormBase {
     // Retrieve the form values.
     $values = $form_state->getValues();
 
+    // Fields to attach.
+    $to_attach = [];
+    // Fields to detach.
+    $to_detach = [];
+
     // Foreach entity types Yoast SEO can be enable for, check the bundle the
     // administrator wants to enable/disable Yoast SEO for.
     foreach ($entity_types as $entity_type_id => $entity_type_label) {
       // Get the available bundles Yoast SEO supports.
-      $bundles = $this->getAvailableBundles($entity_type_id);
+      $bundles = $yoast_seo_manager->getAvailableBundles($entity_type_id);
       // Get the bundles Yoast SEO has been enabled for.
-      $enabled_bundles = $this->getEnabledBundles($entity_type_id);
+      $enabled_bundles = $yoast_seo_manager->getEnabledBundles($entity_type_id);
 
       // Foreach available bundles.
       foreach ($bundles as $bundle_id => $bundle_label) {
@@ -88,13 +95,49 @@ class YoastSeoConfigForm extends FormBase {
             && $values[$entity_type_id][$bundle_id] !== 0
             && !in_array($bundle_id, $enabled_bundles)
         ) {
-          $yoast_seo_manager->attachYoastSeoFields($entity_type_id, $bundle_id);
+          $to_attach[$entity_type_id][] = $bundle_id;
         }
         // Yoast SEO is required to be disabled for.
-        else if (isset($values[$entity_type_id][$bundle_id])
+        elseif (isset($values[$entity_type_id][$bundle_id])
                  && $values[$entity_type_id][$bundle_id] === 0
                  && in_array($bundle_id, $enabled_bundles)
         ) {
+          $to_detach[$entity_type_id][] = $bundle_id;
+        }
+      }
+    }
+
+    // Process fields to be attached.
+    if (!empty($to_attach)) {
+      // Add field to content view in case not already attached.
+      $yoast_seo_manager->attachFieldHandlerToContentView();
+
+      // Attach fields to content types.
+      foreach ($to_attach as $entity_type_id => $bundles) {
+        foreach ($bundles as $bundle_id) {
+          $yoast_seo_manager->attachYoastSeoFields($entity_type_id, $bundle_id);
+        }
+      }
+    }
+
+    // Process fields to be detached.
+    if (!empty($to_detach)) {
+      // View management. If Yoast SEO is going to be deactivated for all
+      // fields related to nodes.
+      // Then we first detach the field from the view.
+      if (!empty($to_detach['node'])) {
+        $node_enabled_bundles = $yoast_seo_manager->getEnabledBundles('node');
+        // If list of fields to detach is equal to the currently enabled
+        // bundles for node,
+        // then we should remove the fields from the view.
+        if (count($node_enabled_bundles) == count($to_detach['node'])) {
+          $yoast_seo_manager->detachFieldHandlerFromContentView();
+        }
+      }
+
+      // Detach fields from content types.
+      foreach ($to_detach as $entity_type_id => $bundles) {
+        foreach ($bundles as $bundle_id) {
           $yoast_seo_manager->detachYoastSeoFields($entity_type_id, $bundle_id);
         }
       }
@@ -113,54 +156,8 @@ class YoastSeoConfigForm extends FormBase {
     // @todo Should be the same than the ones supported by the metatag module.
     return [
       'node' => 'Node',
-      'taxonomy_term' => 'Taxonomy term',
+      //'taxonomy_term' => 'Taxonomy term',
     ];
-  }
-
-  /**
-   * Returns an array of available bundles Yoast SEO can be enabled for.
-   *
-   * @param string $entity_type The entity
-   *
-   * @return array
-   *   A list of available bundles as $id => $label.
-   */
-  protected function getAvailableBundles($entity_type = 'node') {
-    $options        = array();
-    $entity_manager = \Drupal::service('entity.manager');
-
-    // Retrieve the bundles the entity type contains.
-    $bundles = $entity_manager->getBundleInfo($entity_type);
-    foreach ($bundles as $bundle_id => $bundle_metadata) {
-      $options[$bundle_id] = $bundle_metadata['label'];
-    }
-
-    return $options;
-  }
-
-  /**
-   * Returns an array of bundles Yoast SEO has been enabled for.
-   *
-   * @param string $entity_type The entity
-   *
-   * @return array
-   *   A list of enabled bundles as $id => $label.
-   */
-  protected function getEnabledBundles($entity_type = 'node') {
-    $enabled_bundles         = array();
-    $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
-
-    // Get the available bundles Yoast SEO supports.
-    $bundles = $this->getAvailableBundles($entity_type);
-
-    // Retrieve the bundles for which Yoast SEO has already been enabled for.
-    foreach ($bundles as $bundle_id => $bundle_label) {
-      if ($yoast_seo_field_manager->isAttached($entity_type, $bundle_id, 'field_yoast_seo')) {
-        $enabled_bundles[] = $bundle_id;
-      }
-    }
-
-    return $enabled_bundles;
   }
 
 }

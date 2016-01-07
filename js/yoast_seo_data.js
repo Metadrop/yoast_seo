@@ -1,3 +1,6 @@
+/**
+ * @file
+ */
 YoastSeoData = function (args) {
   this.config = args.settings;
   this.analyzerArgs = args.analyzerArgs;
@@ -27,9 +30,10 @@ YoastSeoData = function (args) {
 };
 
 /**
- * This should return an object with the given properties
+ * This should return an object with the given properties.
  *
  * @callback YoastSEO.App~getData
+ *
  * @returns {Object} data
  * @returns {String} data.keyword The keyword that should be used
  * @returns {String} data.meta
@@ -110,7 +114,7 @@ YoastSeoData.prototype.tokenReplace = function (value) {
         var fieldName = this.config.tokens[match[i]];
         var isRelativeField = this.config.fields[fieldName] != undefined;
         // If no field exist with the same token value, we consider it's a raw value.
-        if ( ! isRelativeField) {
+        if (! isRelativeField) {
           tokenRawValue = true;
         }
         // Else, we know it's related to a field content.
@@ -136,7 +140,8 @@ YoastSeoData.prototype.tokenReplace = function (value) {
         // If the token value has already been resolved and stored locally.
         if (typeof this.tokensRemote[match[i]] != 'undefined') {
           value = value.replace(match[i], this.tokensRemote[match[i]]);
-        } else {
+        }
+        else {
           tokensNotFound.push(match[i]);
         }
       }
@@ -194,7 +199,8 @@ YoastSeoData.prototype.getAnalyzerInput = function () {
 
 
 /**
- * Grabs data from the refObj and returns populated analyzerData
+ * Grabs data from the refObj and returns populated analyzerData.
+ *
  * @returns analyzerData
  */
 YoastSeoData.prototype.updateRawData = function () {
@@ -218,3 +224,34 @@ YoastSeoData.prototype.bindElementEvents = function () {
  */
 YoastSeoData.prototype.updateSnippetValues = function (ev) {
 };
+
+/**
+ * Load focus keyword autocomplete.
+ *
+ * @param focusKeywordId
+ */
+YoastSeoData.prototype.loadFocusKeywordAutocomplete = function (focusKeywordId, language) {
+  // Autocomplete for focus keyword field.
+  // We use the google autocomplete api.
+  var $ = jQuery;
+  $('#' + focusKeywordId).autocomplete({
+    source: function(request, response) {
+      $.getJSON("http://suggestqueries.google.com/complete/search?callback=?",
+        {
+          "hl":language,
+          "jsonp":"suggestCallBack",
+          "q":request.term,
+          "client":"youtube"
+        }
+      );
+      suggestCallBack = function (data) {
+        var suggestions = [];
+        $.each(data[1], function(key, val) {
+          suggestions.push({"value":val[0]});
+        });
+        suggestions.length = 5;
+        response(suggestions);
+      };
+    }
+  });
+}

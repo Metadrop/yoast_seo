@@ -11,12 +11,16 @@ use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * YoastSeoController.
+ */
 class YoastSeoController extends ControllerBase {
 
   /**
    * A simple demo content page.
    *
    * @return array
+   *   Content.
    */
   public function content() {
     return [
@@ -30,17 +34,20 @@ class YoastSeoController extends ControllerBase {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request of the page.
-   *   * data The context to use to retrieve the tokens value, see Drupal\Core\Utility\token::replace()
-   *   * tokens An array of tokens to get the values for
+   *   * data The context to use to retrieve the tokens value,
+   *     see Drupal\Core\Utility\token::replace()
+   *   * tokens An array of tokens to get the values for.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The JSON response.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   In case of AccessDeniedException.
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   In case of NotFoundHttpException.
    */
   public function tokens(Request $request) {
-    $tokenValues = array();
+    $token_values = array();
     $tokens = $request->request->get('tokens');
     $data = $request->request->get('data');
 
@@ -52,19 +59,20 @@ class YoastSeoController extends ControllerBase {
     // Use the metatag token service, which use either core or token module
     // regarding if this one is installed.
     foreach ($tokens as $token) {
-      $tokenValues[$token] = \Drupal::service('metatag.token')->tokenReplace($token, $data);
+      $token_values[$token] = \Drupal::service('metatag.token')->tokenReplace($token, $data);
     }
 
-    return new JsonResponse($tokenValues);
+    return new JsonResponse($token_values);
   }
 
   /**
    * Settings page.
    *
    * @return array
+   *   The configuration form.
    */
   public function settings() {
-    $form = [ ];
+    $form = [];
 
     // Check if XML Sitemap is installed and enabled.
     if (\Drupal::moduleHandler()->moduleExists('xmlsitemap')) {
@@ -77,7 +85,7 @@ class YoastSeoController extends ControllerBase {
             '!url' => \Drupal::l(
               t('XML Sitemap configuration page'),
               Url::fromRoute('xmlsitemap.admin_search')
-            )
+            ),
           ]
         );
       }
@@ -91,7 +99,7 @@ class YoastSeoController extends ControllerBase {
       // installing and enabling it.
       $xmlsitemap_description = t(
         'You currently do not have XML Sitemap enabled. We strongly recommend you to install XML Sitemap. You can download the module from <a href="@project-page-url">@project-page-url</a>.',
-        [ '@project-page-url' => 'https://www.drupal.org/project/xmlsitemap' ]
+        ['@project-page-url' => 'https://www.drupal.org/project/xmlsitemap']
       );
     }
 
@@ -112,7 +120,7 @@ class YoastSeoController extends ControllerBase {
           '@url' => \Drupal::l(
             t('Metatag configuration page'),
             Url::fromRoute('entity.metatag_defaults.collection')
-          )
+          ),
         ]
       );
     }
@@ -128,8 +136,8 @@ class YoastSeoController extends ControllerBase {
       '#open'   => TRUE,
     ];
 
-    // Add to the page the Yoast SEO form which allows the administrator to enable/disable
-    // Yoast SEO by bundles.
+    // Add to the page the Yoast SEO form which allows the administrator
+    // to enable/disable Yoast SEO by bundles.
     $config_form       = \Drupal::formBuilder()
                                 ->getForm('Drupal\yoast_seo\Form\YoastSeoConfigForm');
     $form['yoast_seo'] = [
@@ -137,9 +145,10 @@ class YoastSeoController extends ControllerBase {
       '#title'       => 'Configure Yoast SEO by bundles',
       '#description' => 'Select the bundles Yoast SEO will be enabled for',
       '#markup'      => render($config_form),
-      '#open'        => TRUE
+      '#open'        => TRUE,
     ];
 
     return $form;
   }
+
 }

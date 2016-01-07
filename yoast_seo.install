@@ -1,72 +1,44 @@
 <?php
+
 /**
  * @file
  * Install, update, and uninstall functions for the Yoast SEO for Drupal module.
  */
 
-///**
-// * Implements hook_requirements().
-// */
-//function yoast_seo_requirements($phase) {
-//	$requirements = array();
-//	// Ensure translations don't break during installation.
-//	$t = get_t();
-//
-//	// We want to make sure the correct JavaScript files have been placed in the
-//	// libraries.
-//	if ($phase == 'runtime') {
-//		$requirements['yoast_seo'] = array(
-//			'title' => $t('Yoast SEO for Drupal'),
-//		);
-//
-//		// Is installed correctly?
-//		$dependencies = _yoast_seo_requirements_getinstalledversion();
-//		if (!in_array(NULL, $dependencies)) {
-//			$requirements['yoast_seo'] += array(
-//				'value' => 'Installed',
-//				'severity' => REQUIREMENT_OK,
-//			);
-//		}
-//		else {
-//			$description = '';
-//			foreach ($dependencies as $dependency => $version) {
-//				if ($dependency == 'js-text-analysis' && is_null($version)) {
-//					$description .= $t('Without the text analysis tool the Yoast SEO won\'t function properly. Please download it at <a href="@link">@link</a> and place it in the libraries folder.', array('@link' => 'https://github.com/Yoast/js-text-analysis'));
-//				}
-//				$description .= ' ';
-//			}
-//
-//			$requirements['yoast_seo'] += array(
-//				'value' => $t('Not found'),
-//				'description' => $description,
-//				'severity' => REQUIREMENT_ERROR,
-//			);
-//		}
-//	}
-//
-//	return $requirements;
-//}
-//
-///**
-// * Determines the version of the JS text analysis tool.
-// */
-//function _yoast_seo_requirements_getinstalledversion() {
-//	module_load_include('module', 'yoast_seo');
-//	$dependencies = array(
-//		'js-text-analysis' => NULL,
-//	);
-//
-//	foreach ($dependencies as $dependency => $version) {
-//		$file = '';
-//		if ($dependency == 'js-text-analysis') {
-//			$file = yoast_seo_library_path($dependency, 'local') . '/js/dist/yoast-seo-content-analysis.min.js';
-//		}
-//
-//		$file_content = @file_get_contents($file);
-//		if ($file_content) {
-//			$dependencies[$dependency] = 'TBD';
-//		}
-//	}
-//
-//	return $dependencies;
-//}
+/**
+ * Implements hook_install().
+ *
+ * Insert the YoastSeo field in the content view.
+ */
+function yoast_seo_install() {
+  // Enable Yoast SEO for all fields.
+  _yoast_seo_attach_to_all_content_types();
+
+  // Add status overview to content view.
+  _yoast_seo_add_status_to_content_view();
+}
+
+/**
+ * Attach Yoast SEO field to all available content types.
+ */
+function _yoast_seo_attach_to_all_content_types() {
+  $supported_entities = [
+    'node' => 'Node',
+    'taxonomy_term' => 'Taxonomy term',
+  ];
+  $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+  foreach ($supported_entities as $entity_type_id => $entity_type_label) {
+    $bundles = $yoast_seo_manager->getAvailableBundles($entity_type_id);
+    foreach ($bundles as $bundle_id => $bundle_label) {
+      $yoast_seo_manager->attachYoastSeoFields($entity_type_id, $bundle_id);
+    }
+  }
+}
+
+/**
+ * Attach Yoast SEO field to the main content view.
+ */
+function _yoast_seo_add_status_to_content_view() {
+  $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+  $yoast_seo_manager->attachFieldHandlerToContentView();
+}

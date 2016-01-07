@@ -20,7 +20,6 @@
 
       // Load Yoast SEO with its settings.
       YoastSEO.analyzerArgs = {
-        //source: YoastSeoData,
         analyzer: YsSettings.analyzer,
         snippetPreview: YsSettings.snippet_preview,
         elementTarget: [YsSettings.targets.wrapper_target_id],
@@ -64,7 +63,7 @@
         baseRoot: YsSettings.base_root
       };
 
-      // Construct the form
+      // Construct the form.
       $('.js-form-item', $('#' + YsSettings.form_id)).each(function () {
         var formItem = Drupal.YoastSeoForm.getFormItemView(this, {
           callbacks: {
@@ -98,8 +97,11 @@
       // Make it global.
       window.YoastSEO.app = new YoastSEO.App(YoastSEO.analyzerArgs);
 
+      // Load autocomplete on focus keyword.
+      yoastSeoData.loadFocusKeywordAutocomplete(YsSettings.fields.focus_keyword, YsSettings.language);
+
       // Instantiate the FormItem View component plugged on the snippet preview title field.
-      var snippetTitle = new Drupal.YoastSeoForm.views.ContentEditableHtmlElement({
+      var snippetTitle = new Drupal.YoastSeoForm.views.SnippetElement({
         el: $('#snippet_title'),
         callbacks: {
           // When the snippet preview title get the focus.
@@ -110,7 +112,7 @@
             var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['meta_title']],
               rawValue = formItem.value();
 
-            // If the raw value is empty, check if a default value has been provided
+            // If the raw value is empty, check if a default value has been provided.
             if (rawValue == '' && settings.yoast_seo.default_text['meta_title'] != '') {
               rawValue = settings.yoast_seo.default_text['meta_title'];
             }
@@ -124,11 +126,11 @@
         }
       });
 
-      // Add a field to manage the snippet preview title raw value
+      // Add a field to manage the snippet preview title raw value.
       $('<span contenteditable="true" class="title" id="snippet_title_raw" style="display:none"></span>').appendTo('#title_container');
 
       // Instantiate the FormItem View component plugged on the snippet preview title raw field.
-      var snippetTitleRaw = new Drupal.YoastSeoForm.views.ContentEditableHtmlElement({
+      var snippetTitleRaw = new Drupal.YoastSeoForm.views.SnippetElement({
         el: $('#snippet_title_raw'),
         callbacks: {
           // When snippet preview title raw value component change, update the meta tag title value.
@@ -147,7 +149,7 @@
       });
 
       // Instantiate the FormItem View component plugged on the snippet preview summary field.
-      var snippetSummary = new Drupal.YoastSeoForm.views.ContentEditableHtmlElement({
+      var snippetSummary = new Drupal.YoastSeoForm.views.SnippetElement({
         el: $('#snippet_meta'),
         callbacks: {
           // When the snippet preview summary get the focus.
@@ -158,7 +160,7 @@
             var formItem = Drupal.YoastSeoForm._formItemViews[settings.yoast_seo.fields['meta_description']],
               rawValue = formItem.value();
 
-            // If the raw value is empty, check if a default value has been provided
+            // If the raw value is empty, check if a default value has been provided.
             if (rawValue == '' && settings.yoast_seo.default_text['meta_description'] != '') {
               rawValue = settings.yoast_seo.default_text['meta_description'];
             }
@@ -172,11 +174,11 @@
         }
       });
 
-      // Add a field to manage the snippet preview summary raw value
+      // Add a field to manage the snippet preview summary raw value.
       $('<span contenteditable="true" class="desc" id="snippet_meta_raw" style="display:none"></span>').appendTo('#meta_container');
 
       // Instantiate the FormItem View component plugged on the snippet preview summary raw field.
-      var snippetSummaryRaw = new Drupal.YoastSeoForm.views.ContentEditableHtmlElement({
+      var snippetSummaryRaw = new Drupal.YoastSeoForm.views.SnippetElement({
         el: $('#snippet_meta_raw'),
         callbacks: {
           // When snippet preview summary raw value component change, update the meta tag summary value.
@@ -195,7 +197,7 @@
       });
 
       // Instantiate the FormItem View component plugged on the snippet preview url field.
-      var snippetUrl = new Drupal.YoastSeoForm.views.ContentEditableHtmlElement({
+      var snippetUrl = new Drupal.YoastSeoForm.views.SnippetElement({
         el: $('#snippet_cite'),
         callbacks: {
           // When the snippet preview cite get the focus.
@@ -213,11 +215,11 @@
         }
       });
 
-      // Add a field to manage the snippet preview summary raw value
+      // Add a field to manage the snippet preview summary raw value.
       $('<span contenteditable="true" class="url" id="snippet_cite_raw" style="display:none"></span>').appendTo('#url_container');
 
       // Instantiate the FormItem View component plugged on the snippet preview cite raw field.
-      var snippetUrlRaw = new Drupal.YoastSeoForm.views.ContentEditableHtmlElement({
+      var snippetUrlRaw = new Drupal.YoastSeoForm.views.SnippetElement({
         el: $('#snippet_cite_raw'),
         callbacks: {
           // When snippet preview url raw value component change, update the advanced alias field value.

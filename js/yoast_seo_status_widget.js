@@ -17,40 +17,30 @@ YoastSeoStatusWidget = function (args) {
 }
 
 /**
- * retuns a string that is used as a CSSclass, based on the numeric score
+ * Retuns a string that is used as a CSSclass, based on the numeric score.
  * @param score
+ *
  * @returns output
  */
 YoastSeoStatusWidget.prototype.scoreRating = function (score) {
-  var scoreRate;
+  var rules = this.config.score_status;
+  var def = rules['default'];
+  delete rules['default'];
 
-  switch (score) {
-    case 0:
-      scoreRate = Drupal.t('na');
-      break;
-    case 4:
-    case 5:
-      scoreRate = Drupal.t('poor');
-      break;
-    case 6:
-    case 7:
-      scoreRate = Drupal.t('ok');
-      break;
-    case 8:
-    case 9:
-    case 10:
-      scoreRate = Drupal.t('good');
-      break;
-    default:
-      scoreRate = Drupal.t('bad');
-      break;
+  var i = 0;
+
+  for (i in rules) {
+    if (score <= parseInt(i)) {
+      return rules[i];
+    }
   }
 
-  return scoreRate;
+  return def;
 };
 
 /**
  * Sets the SEO score in both the hidden input and the rating element.
+ *
  * @param score
  */
 YoastSeoStatusWidget.prototype.saveScores = function (score) {
