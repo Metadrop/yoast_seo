@@ -356,7 +356,12 @@
       var self = this;
 
       // @todo find a way to call super in Backbone.
-      var options = options || {};
+      var options = options || {},
+        elId = this.$el.attr('id');
+
+      if (typeof eltId  == 'undefined') {
+        console.debug('YoastSeoForm.views.Ckeditor requires the elements it is attached to to have an id.');
+      }
 
       // Callbacks have been given in options.
       if (typeof options.callbacks != 'undefined') {
@@ -368,6 +373,22 @@
         self.$el.val(val);
         self._change();
       });
+
+      // Listen to any change on the CKEDITOR component when it is in source mode.
+      if (typeof CKEDITOR.instances[elId] != 'undefined') {
+        CKEDITOR.instances[elId].on('key', function() {
+          var ckeditor = this;
+
+          if (ckeditor.mode == 'source') {
+            setTimeout(function() {
+              self.$el.val(ckeditor.getData());
+              self._change();
+            }, 0);
+          }
+        });
+      } else {
+        console.debug('YoastSeoForm.views.Ckeditor is attached to an element which CKEDITOR can not retrieve');
+      }
     }
   }, {
     tag: 'textarea'
