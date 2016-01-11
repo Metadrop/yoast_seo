@@ -70,7 +70,7 @@ class YoastSeoManager {
       [
         '@url' => \Drupal::l(
           t('Yoast shop'),
-          Url::fromUri('https://yoast.com/wordpress/plugins/seo-premium/#download-plugin')
+          Url::fromUri('https://yoast.com/software/yoast-seo-for-drupal-module/')
         )
       ]
     );
