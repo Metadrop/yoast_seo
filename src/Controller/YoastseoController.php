@@ -73,6 +73,21 @@ class YoastSeoController extends ControllerBase {
    */
   public function settings() {
     $form = [];
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+
+    // Add an advertisement for the Yoast SEO premium module.
+    if (!$yoast_seo_manager->isPremiumInstalled()) {
+      $premium_message = $yoast_seo_manager->getPremiumMessage();
+      $form['yoast_seo_premium'] = array(
+        '#type' => 'text',
+        '#markup' => $premium_message,
+        '#attached' => array(
+          'library' => array(
+            'yoast_seo/yoast_seo_admin',
+          ),
+        ),
+      );
+    }
 
     // Check if XML Sitemap is installed and enabled.
     if (\Drupal::moduleHandler()->moduleExists('xmlsitemap')) {

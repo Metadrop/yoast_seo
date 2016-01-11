@@ -16,6 +16,11 @@ yoast_seo:
   css:
     theme:
       css/yoast_seo.css: {}
+yoast_seo_admin:
+  version: 1.x
+  css:
+      theme:
+        css/yoast_seo.message.css: {}
 yoast_seo_view:
   version: 1.x
   css:

@@ -66,9 +66,19 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       '#attached' => array(
         'library' => array(
           'yoast_seo/yoast_seo',
+          'yoast_seo/yoast_seo_admin',
         ),
       ),
     );
+
+    // Add an advertisement for the Yoast SEO premium module.
+    if (!$this->yoastSeoManager->isPremiumInstalled('yoast_seo_premium')) {
+      $premium_message = $this->yoastSeoManager->getPremiumMessage();
+      $element['yoast_seo']['yoast_seo_premium'] = array(
+        '#type' => 'text',
+        '#markup' => $premium_message,
+      );
+    }
 
     $element['yoast_seo']['focus_keyword'] = array(
       '#type' => 'textfield',

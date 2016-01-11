@@ -7,7 +7,9 @@
 
 namespace Drupal\yoast_seo;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use \Drupal\views\Views;
+use Drupal\Core\Url;
 
 /**
  * Class YoastSeoManager.
@@ -17,17 +19,61 @@ use \Drupal\views\Views;
 class YoastSeoManager {
 
   /**
-   * Metatag logging channel.
+   * Module handler service.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $logger;
+  protected $moduleHandler;
 
   /**
    * Constructor for YoastSeoManager.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   Module handler service.
    */
-  public function __construct() {
+  public function __construct(ModuleHandlerInterface $module_handler) {
+    $this->moduleHandler = $module_handler;
     $this->yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
+  }
+
+  /**
+   * Check if the premium module has been enabled.
+   *
+   * @return boolean
+   *   Return true if the premium module is enabled, false otherwise.
+   */
+  public function isPremiumInstalled() {
+    if ($this->moduleHandler->moduleExists('yoast_seo_premium')) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check if the premium module has been activated.
+   *
+   * @return boolean
+   *   Return true if the premium module has been activated, false otherwise.
+   */
+  public function isPremiumActivated() {
+    return true;
+  }
+
+  /**
+   * Get premium message advertisement.
+   *
+   * @return {string}
+   */
+  public function getPremiumMessage() {
+    return  t(
+      '<div class="messages messages--info">A Premium Yoast SEO plugin for even more features and support is available at the @url.</div>',
+      [
+        '@url' => \Drupal::l(
+          t('Yoast shop'),
+          Url::fromUri('https://yoast.com/wordpress/plugins/seo-premium/#download-plugin')
+        )
+      ]
+    );
   }
 
   /**
