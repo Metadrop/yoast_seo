@@ -4,6 +4,8 @@
  * Contains yoast_seo.module.
  */
 
+use Drupal\Core\Access\AccessResult;
+
 /**
  * Implements hook_form_FORM_ID_alter() for node_form().
  */
@@ -49,6 +51,24 @@ function yoast_seo_form_field_storage_config_edit_form_alter(&$form, FormStateIn
     $form['cardinality_container']['#access'] = FALSE;
     $form['cardinality_container']['#disabled'] = TRUE;
   }
+}
+
+/**
+ * Implements hook_field_access().
+ */
+function yoast_seo_entity_field_access($operation, $field_definition, $account, $items = NULL) {
+  if ($field_definition->getName() == 'field_yoast_seo') {
+    return AccessResult::forbiddenIf(
+      ! ( $account->hasPermission('use yoast seo') || $account->hasPermission('administer yoast seo') )
+      || ! ( $account->hasPermission('create url aliases') || $account->hasPermission('administer url aliases') )
+      // Such edit meta tags permission doesn't exist anymore, and administer meta tags is too restrictive.
+      // Wait or changes.
+      // || ! ( $account->hasPermission('edit meta tags') || $account->hasPermission('administer meta tags') )
+    )->cachePerPermissions();
+  }
+
+  // No opinion.
+  return AccessResult::neutral();
 }
 
 /**
