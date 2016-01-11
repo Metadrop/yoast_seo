@@ -41,6 +41,17 @@ function yoast_seo_form_node_afterbuild(&$form, $form_state) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for 'field_storage_config_edit_form'.
+ */
+function yoast_seo_form_field_storage_config_edit_form_alter(&$form, FormStateInterface $form_state) {
+  if ($form_state->getFormObject()->getEntity()->getType() == 'yoast_seo') {
+    // Hide the cardinality field.
+    $form['cardinality_container']['#access'] = FALSE;
+    $form['cardinality_container']['#disabled'] = TRUE;
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function yoast_seo_theme() {
