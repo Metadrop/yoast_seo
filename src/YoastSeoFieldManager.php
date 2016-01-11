@@ -221,7 +221,6 @@ class YoastSeoFieldManager {
     return isset($fields_config[$field_name]);
   }
 
-
   /**
    * Set fields configuration from a form.
    *

@@ -50,16 +50,6 @@ class YoastSeoManager {
   }
 
   /**
-   * Check if the premium module has been activated.
-   *
-   * @return boolean
-   *   Return true if the premium module has been activated, false otherwise.
-   */
-  public function isPremiumActivated() {
-    return true;
-  }
-
-  /**
    * Get premium message advertisement.
    *
    * @return {string}

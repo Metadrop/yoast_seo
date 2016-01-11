@@ -10,6 +10,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\yoast_seo_premimum;
 
 /**
  * YoastSeoController.
@@ -87,6 +88,32 @@ class YoastSeoController extends ControllerBase {
           ),
         ),
       );
+    } else {
+      $yoast_seo_premimum_manager = \Drupal::service('yoast_seo_premium.manager');
+      if (!$yoast_seo_premimum_manager->isPremiumActivated()) {
+        $activate_premium_message = $yoast_seo_premimum_manager->getActivatePremiumMessage();
+        $form['yoast_seo_premium'] = array(
+          '#type' => 'text',
+          '#markup' => $activate_premium_message,
+          '#attached' => array(
+            'library' => array(
+              'yoast_seo/yoast_seo_admin',
+            ),
+          ),
+        );
+
+        // Add to the page the Yoast SEO form which allows the administrator
+        // to enter a valid license key.
+        $config_form       = \Drupal::formBuilder()
+                                    ->getForm('Drupal\yoast_seo_premium\Form\YoastSeoPremiumLicenseForm');
+        $form['yoast_seo_license'] = [
+          '#type'        => 'details',
+          '#title'       => 'Yoast SEO license',
+          '#description' => 'Activate the Yoast SEO premium plugin by copy/pasting here your valid license key',
+          '#markup'      => render($config_form),
+          '#open'        => TRUE,
+        ];
+      }
     }
 
     // Check if XML Sitemap is installed and enabled.
