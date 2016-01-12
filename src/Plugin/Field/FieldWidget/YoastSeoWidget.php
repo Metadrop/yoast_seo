@@ -78,6 +78,15 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
         '#type' => 'text',
         '#markup' => $premium_message,
       );
+    } else {
+      $yoast_seo_premimum_manager = \Drupal::service('yoast_seo_premium.manager');
+      if (!$yoast_seo_premimum_manager->isPremiumActivated()) {
+        $activate_premium_message = $yoast_seo_premimum_manager->getActivatePremiumMessage();
+        $element['yoast_seo']['yoast_seo_premium'] = array(
+          '#type' => 'text',
+          '#markup' => $activate_premium_message,
+        );
+      }
     }
 
     $element['yoast_seo']['focus_keyword'] = array(
