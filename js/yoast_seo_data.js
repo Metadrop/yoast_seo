@@ -18,6 +18,8 @@ YoastSeoData = function (args) {
 
   this.tokensRemote = {};
   this.data = this.getData();
+  // Save cookie for the first time.
+  this.saveCookie();
 
   var self = this;
   // Update this.data everytime the field values are modified.
@@ -26,6 +28,7 @@ YoastSeoData = function (args) {
     self.data = self.getData();
     self.refreshSnippet();
     self.refreshAnalysis();
+    self.saveCookie();
   });
 };
 
@@ -181,6 +184,23 @@ YoastSeoData.prototype.refreshAnalysis = function () {
   }
   YoastSEO.app.runAnalyzerCallback();
 };
+
+/**
+ * Save Meta title and description in a cookies.
+ * This is for reusing in the preview page.
+ */
+YoastSeoData.prototype.saveCookie = function () {
+  var $ = jQuery;
+  $.cookie.json = true;
+  var data = this.getData();
+  var dataToStore = {
+    "pageTitle": data.pageTitle,
+    "meta": data.meta
+  };
+  // Store meta title and meta description in a cookie.
+  $.cookie('yoastseo.metatags', dataToStore, {json: true});
+};
+
 
 /**
  * Initializes the snippetPreview if it isn't there.
