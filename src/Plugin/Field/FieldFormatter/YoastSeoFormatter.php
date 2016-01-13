@@ -28,9 +28,9 @@ class YoastSeoFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
     foreach ($items as $delta => $item) {
-      $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
-      $status = $yoast_seo_field_manager->getScoreStatus($item->status);
+      $status = $yoast_seo_manager->getScoreStatus($item->status);
 
       // TODO : find a way to give a weight, so the column doesn't appear
       // at the end.

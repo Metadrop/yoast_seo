@@ -33,8 +33,12 @@ function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
  */
 function yoast_seo_form_node_afterbuild(&$form, $form_state) {
   if (isset($form['field_yoast_seo'])) {
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
     $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
+    $form = $yoast_seo_manager->setGeneralConfiguration($form);
     $form = $yoast_seo_field_manager->setFieldsConfiguration($form);
+    $form = $yoast_seo_manager->setTargetsConfiguration($form);
+    $form = $yoast_seo_manager->setScoreToStatusRulesConfiguration($form);
     $form = $yoast_seo_field_manager->addSnippetEditorMarkup($form);
     $form = $yoast_seo_field_manager->addOverallScoreMarkup($form);
   }
@@ -99,3 +103,4 @@ function yoast_seo_theme() {
 
   return $theme;
 }
+

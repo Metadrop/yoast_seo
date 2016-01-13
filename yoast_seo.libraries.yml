@@ -16,6 +16,21 @@ yoast_seo:
   css:
     theme:
       css/yoast_seo.css: {}
+      css/yoast_seo_score.css: {}
+yoast_seo_base_style:
+  version: 1.x
+  css:
+      theme:
+        css/yoast_seo.css: {}
+        css/yoast_seo_score.css: {}
+yoast_seo_base_scripts:
+  version: 1.x
+  js:
+    js/js-text-analysis/yoast-seo.min.js: {}
+    js/yoast_seo_status_widget.js: {}
+  dependencies:
+      - core/jquery
+      - core/drupalSettings
 yoast_seo_admin:
   version: 1.x
   css:
@@ -26,3 +41,4 @@ yoast_seo_view:
   css:
       theme:
         css/yoast_seo.css: {}
+        css/yoast_seo_score.css: {}

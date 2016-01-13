@@ -1,0 +1,7 @@
+score_to_status_rules:
+  0: na
+  3: bad
+  5: poor
+  7: ok
+  10: good
+  default: bad

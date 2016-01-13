@@ -195,10 +195,13 @@ YoastSeoData.prototype.saveCookie = function () {
   var data = this.getData();
   var dataToStore = {
     "pageTitle": data.pageTitle,
-    "meta": data.meta
+    "meta": data.meta,
+    "keyword": data.keyword,
+    "url": data.url
   };
+
   // Store meta title and meta description in a cookie.
-  $.cookie('yoastseo.metatags', dataToStore, {json: true});
+  $.cookie(this.config.cookie_data_key, dataToStore, {json: true, path: '/' });
 };
 
 

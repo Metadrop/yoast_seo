@@ -25,52 +25,6 @@
   padding: 0 0 0 20px;
 }
 
-.overallScore {
-  float: left;
-  padding-top: 20px;
-  margin-top: 20px;
-  margin-left: 10px;
-}
-.views-field-field-yoast-seo .overallScore {
-  margin: 0;
-  padding: 0;
-}
-
-.overallScore {
-  display: inline-block;
-}
-.overallScore .score {
-  display: inline-block;
-  padding: 0.1em 0 0 0;
-}
-.overallScore .score_circle {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin: 4px 5px 0 3px;
-  vertical-align: top;
-  border-radius: 50%;
-  background: #888;
-}
-.overallScore.good .score_circle {
-  background: #7ad03a;
-}
-.overallScore.ok .score_circle {
-  background: #ffba00;
-}
-.overallScore.poor .score_circle {
-  background: #ee7c1b;
-}
-.overallScore.bad .score_circle {
-  background: #dd3d36;
-}
-.overallScore .score_title {
-  font-weight: normal;
-}
-.overallScore .score_title strong {
-  font-weight: bold;
-}
-
 #yoast-wrapper {
   clear: both;
   padding: 0 20px;
