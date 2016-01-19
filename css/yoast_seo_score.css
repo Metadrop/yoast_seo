@@ -1,8 +1,33 @@
-.overallScore {
-    float: left;
-    padding-top: 20px;
-    margin-top: 20px;
-    margin-left: 10px;
+.yoast-seo-score-widget {
+    margin: 20px 0px;
+    padding: 0px 0px 0px 20px;
+}
+.yoast-seo-score-widget ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.yoast-seo-score-widget ul li {
+    display: block;
+}
+.yoast-seo-score-widget ul li label {
+    font-weight: normal;
+    display: inline-block;
+    width: 115px;
+}
+.yoast-seo-score-widget ul li a.help {
+    position: relative;
+    margin: 0px 20px 0px 0px;
+}
+.yoast-seo-score-widget ul li a.help:after {
+    position: absolute;
+    top: 0px;
+    right: -20px;
+    content: "";
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: transparent url("../misc/icons/help.png") repeat scroll 0% 0%;
 }
 .views-field-field-yoast-seo .overallScore {
     margin: 0;
@@ -20,7 +45,7 @@
     display: inline-block;
     width: 12px;
     height: 12px;
-    margin: 4px 5px 0 3px;
+    margin: 2px 5px 0 3px;
     vertical-align: top;
     border-radius: 50%;
     background: #888;

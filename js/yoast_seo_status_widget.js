@@ -1,53 +1,79 @@
+'use strict';
+var YoastSeo = YoastSeo || {};
+
 /**
  * @file
- * Drupal Yoast SEO status widget.
- *
- * This component takes care of displaying the Yoast SEO score computed for
- * a content.
- *
- * It requires the Yoast SEO text analysis library to be loaded.
- *
- * @see \Drupal\yoast_seo\Plugin\Field\FieldWidget\YoastSeoWidget
+ * Drupal Yoast SEO.
  *
  * @ignore
  */
 
-YoastSeoStatusWidget = function (args) {
-  this.config = args.settings;
-}
+(function ($, Drupal) {
 
-/**
- * Retuns a string that is used as a CSSclass, based on the numeric score.
- * @param score
- *
- * @returns output
- */
-YoastSeoStatusWidget.prototype.scoreRating = function (score) {
-  var rules = this.config.score_status;
-  var def = rules['default'];
-  delete rules['default'];
+  /**
+   * This component takes care of displaying the Yoast SEO score computed for
+   * a content.
+   *
+   * @type {YoastSeo.Status}
+   */
+  YoastSeo.Status = Backbone.View.extend({
 
-  var i = 0;
+    /**
+     * {@inheritdoc}
+     */
+    initialize: function (options) {
+      var options = options || {};
+      this.config = options.settings;
 
-  for (i in rules) {
-    if (score <= parseInt(i)) {
-      return rules[i];
+      if (typeof options.score_element_selector == 'undefined') {
+        throw 'The options.score_element_selector should not be undefined.';
+      }
+      else if ($('#' + options.score_element_selector).length == 0) {
+        throw 'No HTMLElement found with the given selector options.score_element_selector (' + options.score_element_selector + ').';
+      }
+
+      this.options = options;
+    },
+
+    /**
+     * Returns a string that is used as a CSS class, based on the numeric score.
+     *
+     * @param score
+     * @returns output
+     */
+    scoreRating: function (score) {
+      var rules = this.options.score_status,
+        def = rules['default'];
+      delete rules['default'];
+
+      var i = 0;
+
+      for (i in rules) {
+        if (score <= parseInt(i)) {
+          return rules[i];
+        }
+      }
+
+      return def;
+    },
+
+    /**
+     * Sets the SEO score in both the hidden input and the rating element.
+     *
+     * @param score
+     */
+    setScore: function (score) {
+      this.score = score;
+
+      // Update score text in the score box.
+      jQuery('.score_value', '#' + this.options.score_element_selector).text(this.scoreRating(score));
+
+      // Update score in the score field.
+      jQuery('[data-drupal-selector="' + this.options.seo_status + '"]')
+        .attr('value', score)
+        .val(score);
     }
-  }
 
-  return def;
-};
+  }, {});
 
-/**
- * Sets the SEO score in both the hidden input and the rating element.
- *
- * @param score
- */
-YoastSeoStatusWidget.prototype.saveScores = function (score) {
-  // Update score text in the score box.
-  jQuery('.score_value', '#' + this.config.targets.overall_score_target_id).text(this.scoreRating(score));
-  // Update score in the score field.
-  jQuery('[data-drupal-selector="' + this.config.fields.seo_status + '"]')
-    .attr('value', score)
-    .val(score);
-};
+})(jQuery, Drupal);

@@ -81,8 +81,10 @@
       });
 
       // Instantiate YoastSeoStatusWidget, to handle scores display.
-      var yoastSeoStatusWidget = new YoastSeoStatusWidget({
-        settings: settings.yoast_seo
+      var yoastSeoStatusWidget = new YoastSeo.Status({
+        score_element_selector: settings.yoast_seo.targets.overall_score_target_id,
+        score_status: settings.yoast_seo.score_status,
+        seo_status: settings.yoast_seo.fields.seo_status
       });
 
       // Declaring the callback functions, for now we bind DrupalSource.
@@ -91,7 +93,7 @@
         getAnalyzerInput: yoastSeoData.getAnalyzerInput.bind(yoastSeoData),
         bindElementEvents: yoastSeoData.bindElementEvents.bind(yoastSeoData),
         updateSnippetValues: yoastSeoData.updateSnippetValues.bind(yoastSeoData),
-        saveScores: yoastSeoStatusWidget.saveScores.bind(yoastSeoStatusWidget)
+        saveScores: yoastSeoStatusWidget.setScore.bind(yoastSeoStatusWidget)
       };
 
       // Make it global.

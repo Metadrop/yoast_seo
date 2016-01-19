@@ -90,6 +90,8 @@ class YoastSeoController extends ControllerBase {
       );
     } else {
       $yoast_seo_premimum_manager = \Drupal::service('yoast_seo_premium.manager');
+
+      // If the premium plugin is not activated yet, display a warning message.
       if (!$yoast_seo_premimum_manager->isPremiumActivated()) {
         $activate_premium_message = $yoast_seo_premimum_manager->getActivatePremiumMessage();
         $form['yoast_seo_premium'] = array(
@@ -101,19 +103,19 @@ class YoastSeoController extends ControllerBase {
             ),
           ),
         );
-
-        // Add to the page the Yoast SEO form which allows the administrator
-        // to enter a valid license key.
-        $config_form       = \Drupal::formBuilder()
-                                    ->getForm('Drupal\yoast_seo_premium\Form\YoastSeoPremiumLicenseForm');
-        $form['yoast_seo_license'] = [
-          '#type'        => 'details',
-          '#title'       => 'Yoast SEO license',
-          '#description' => 'Activate the Yoast SEO premium plugin by copy/pasting here your valid license key',
-          '#markup'      => render($config_form),
-          '#open'        => TRUE,
-        ];
       }
+
+      // Add to the page the Yoast SEO form which allows the administrator
+      // to enter a valid license key.
+      $config_form       = \Drupal::formBuilder()
+                                  ->getForm('Drupal\yoast_seo_premium\Form\YoastSeoPremiumLicenseForm');
+      $form['yoast_seo_license'] = [
+        '#type'        => 'details',
+        '#title'       => 'Yoast SEO license',
+        '#description' => 'Activate the Yoast SEO premium plugin by copy/pasting here your valid license key',
+        '#markup'      => render($config_form),
+        '#open'        => TRUE,
+      ];
     }
 
     // Check if XML Sitemap is installed and enabled.

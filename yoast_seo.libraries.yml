@@ -1,8 +1,8 @@
-yoast_seo:
+yoast_seo.edit_node:
   version: 1.x
   js:
     js/js-text-analysis/yoast-seo.min.js: {}
-    js/yoast_seo.js: {}
+    js/yoast_seo.edit_node.js: {}
     js/yoast_seo_status_widget.js: {}
     js/yoast_seo_form.js: {}
     js/yoast_seo_data.js: {}

@@ -70,6 +70,25 @@ class YoastSeoManager {
   }
 
   /**
+   * Check if the premium module has been activated.
+   *
+   * @return boolean
+   *   Return true if the premium module is activated, false otherwise.
+   */
+  public function isPremiumActivated() {
+    //return FALSE;
+    if (!$this->isPremiumInstalled()) {
+      return FALSE;
+    }
+    $yoast_seo_premimum_manager = \Drupal::service('yoast_seo_premium.manager');
+    if (!$yoast_seo_premimum_manager->isPremiumActivated()) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
    * Get premium message advertisement.
    *
    * @return {string}
@@ -331,9 +350,17 @@ class YoastSeoManager {
    *   HTML Markup of the overall score.
    */
   public function getOverallScoreMarkup($score = 0) {
+    $template = 'overall_score';
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+
+    // If the premium plugin is activated use
+    if ($yoast_seo_manager->isPremiumActivated()) {
+      $template = 'premium_overall_score';
+    }
+
     // Get template for the snippet.
     $overall_score_tpl = [
-      '#theme' => 'overall_score',
+      '#theme' => $template,
       '#overall_score_target_id' => self::$jsTargets['overall_score_target_id'],
       '#overall_score' => $this->getScoreStatus($score),
     ];
