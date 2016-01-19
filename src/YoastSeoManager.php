@@ -293,13 +293,28 @@ class YoastSeoManager {
     return $elt;
   }
 
-  public function getScoreToStatusRules() {
-    $score_to_status_rules = Yaml::parse(
+
+  /**
+   * Get configuration from Yaml file.
+   *
+   * @return mixed
+   */
+  public function getConfiguration() {
+    $conf = Yaml::parse(
       file_get_contents(
         drupal_get_path('module', 'yoast_seo') . '/config/yoast_seo.yml'
       )
     );
-    $score_to_status_rules = $score_to_status_rules['score_to_status_rules'];
+    return $conf;
+  }
+
+  /**
+   * Get rules to convert a score into a status, from the config file.
+   *
+   * @return mixed
+   */
+  public function getScoreToStatusRules() {
+    $score_to_status_rules = $this->getConfiguration()['score_to_status_rules'];
     ksort($score_to_status_rules);
     return $score_to_status_rules;
   }
@@ -317,6 +332,22 @@ class YoastSeoManager {
       '#wrapper_target_id' => self::$jsTargets['wrapper_target_id'],
       '#snippet_target_id' => self::$jsTargets['snippet_target_id'],
       '#output_target_id' => self::$jsTargets['output_target_id'],
+    ];
+    return \Drupal::service('renderer')->renderRoot($snippet_tpl);
+  }
+
+  /**
+   * Get Markup for the snippet editor.
+   *
+   * @return string
+   *   HTML Markup of the snippet editor.
+   */
+  public function getNewsletterMarkup() {
+    $conf = $this->getConfiguration();
+    // Get template for the snippet.
+    $snippet_tpl = [
+      '#theme' => 'yoast_newsletter',
+      '#newsletter_link' => $conf['newsletter']['link'],
     ];
     return \Drupal::service('renderer')->renderRoot($snippet_tpl);
   }
