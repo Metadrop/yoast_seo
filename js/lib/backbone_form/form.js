@@ -15,7 +15,7 @@
   /**
    * @namespace
    */
-  var YoastSeoForm = {
+  var BackboneForm = {
 
     /**
      * Form item views store.
@@ -31,7 +31,7 @@
      * @returns {function}
      */
     getFormItemClass: function (el_wrapper) {
-      var field_item_class = YoastSeoForm.views.Textfield;
+      var field_item_class = BackboneForm.views.Textfield;
       var field_types_map = {
         'js-form-type-textfield': 'Textfield',
         'js-form-type-textarea': 'Textarea'
@@ -40,13 +40,13 @@
       // If the element carries a CKEDITOR.
       var $textarea = $('textarea', $(el_wrapper));
       if ($textarea.length && CKEDITOR.dom.element.get($textarea[0]).getEditor()) {
-        field_item_class = YoastSeoForm.views.Ckeditor;
+        field_item_class = BackboneForm.views.Ckeditor;
       }
       else {
         // Else define the FormItem class regarding the element wrapper classes.
         for (var field_type in field_types_map) {
           if ($(el_wrapper).hasClass(field_type)) {
-            field_item_class = YoastSeoForm.views[field_types_map[field_type]];
+            field_item_class = BackboneForm.views[field_types_map[field_type]];
           }
         }
       }
@@ -65,7 +65,7 @@
      */
     getFormItemView: function (el_wrapper, options) {
       // Get the FormItem view class based on the HTMLElement wrapper.
-      var FormItemViewClass = YoastSeoForm.getFormItemClass(el_wrapper),
+      var FormItemViewClass = BackboneForm.getFormItemClass(el_wrapper),
       // The HTMLElement to bind the FieldItem view onto.
         el = null,
       // The form item view.
@@ -83,7 +83,7 @@
       // If the element has an idea, store it.
       var id = el.attr('id');
       if (id) {
-        YoastSeoForm._formItemViews[id] = formItem;
+        BackboneForm._formItemViews[id] = formItem;
       }
 
       // Instantiate the FormItem view.
@@ -94,14 +94,14 @@
   /**
    * @namespace
    */
-  YoastSeoForm.views = {};
+  BackboneForm.views = {};
 
   /**
    * Abstract class (kind of) which as for aim to control Drupal Form Item field.
    *
-   * @type {YoastSeoForm.views.FormItem}
+   * @type {BackboneForm.views.FormItem}
    */
-  YoastSeoForm.views.FormItem = Backbone.View.extend({
+  BackboneForm.views.FormItem = Backbone.View.extend({
     /**
      * {@inheritdoc}
      */
@@ -233,18 +233,18 @@
   /**
    * FormItem view that has for aim to control textfield form item.
    *
-   * @type {YoastSeoForm.views.Textfield}
+   * @type {BackboneForm.views.Textfield}
    */
-  YoastSeoForm.views.Textfield = YoastSeoForm.views.FormItem.extend({}, {
+  BackboneForm.views.Textfield = BackboneForm.views.FormItem.extend({}, {
     tag: 'input'
   });
 
   /**
    * FormItem view that has for aim to control html element which are editable form item.
    *
-   * @type {YoastSeoForm.views.ContentEditableHtmlElement}
+   * @type {BackboneForm.views.ContentEditableHtmlElement}
    */
-  YoastSeoForm.views.ContentEditableHtmlElement = YoastSeoForm.views.FormItem.extend({
+  BackboneForm.views.ContentEditableHtmlElement = BackboneForm.views.FormItem.extend({
     /**
      * {@inheritdoc}
      */
@@ -313,53 +313,20 @@
   });
 
   /**
-   * FormItem view that has for aim to control snippet element which are content editable form item.
-   *
-   * @type {YoastSeoForm.views.SnippetElement}
-   */
-  YoastSeoForm.views.SnippetElement = YoastSeoForm.views.ContentEditableHtmlElement.extend({
-    /**
-     * {@inheritdoc}
-     */
-    events: {
-      'focus': '_onFocus',
-      'blur': '_onBlur',
-      'keyup': '_onKeyup',
-      'keypress': '_onKeypress',
-      'paste': '_onPaste'
-    },
-
-    /**
-     * {@inheritdoc}
-     */
-    _onKeypress: function (evt) {
-      // The user can't press enter on the snippet fields.
-      if (evt.keyCode == 13) {
-        evt.preventDefault();
-        evt.stopImmediatePropagation();
-        return;
-      }
-    }
-  }, {
-    // Can be any editable HTMLElement.
-    tag: 'span'
-  });
-
-  /**
    * FormItem view that has for aim to control textfield form item.
    *
-   * @type {YoastSeoForm.views.Textarea}
+   * @type {BackboneForm.views.Textarea}
    */
-  YoastSeoForm.views.Textarea = YoastSeoForm.views.FormItem.extend({}, {
+  BackboneForm.views.Textarea = BackboneForm.views.FormItem.extend({}, {
     tag: 'textarea'
   });
 
   /**
    * FormItem view that has for aim to control textarea ckeditor form item.
    *
-   * @type {YoastSeoForm.views.Ckeditor}
+   * @type {BackboneForm.views.Ckeditor}
    */
-  YoastSeoForm.views.Ckeditor = YoastSeoForm.views.Textarea.extend({
+  BackboneForm.views.Ckeditor = BackboneForm.views.Textarea.extend({
     /**
      * {@inheritdoc}
      */
@@ -376,7 +343,7 @@
         elId = this.$el.attr('id');
 
       if (typeof eltId  == 'undefined') {
-        console.debug('YoastSeoForm.views.Ckeditor requires the elements it is attached to to have an id.');
+        console.debug('BackboneForm.views.Ckeditor requires the elements it is attached to to have an id.');
       }
 
       // Callbacks have been given in options.
@@ -403,13 +370,13 @@
           }
         });
       } else {
-        console.debug('YoastSeoForm.views.Ckeditor is attached to an element which CKEDITOR can not retrieve');
+        console.debug('BackboneForm.views.Ckeditor is attached to an element which CKEDITOR can not retrieve');
       }
     }
   }, {
     tag: 'textarea'
   });
 
-  Drupal.YoastSeoForm = YoastSeoForm;
+  Drupal.BackboneForm = BackboneForm;
 
 })(jQuery, Drupal);

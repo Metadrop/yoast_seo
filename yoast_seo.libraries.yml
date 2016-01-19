@@ -1,11 +1,28 @@
+yoast_seo_base_style:
+  version: 1.x
+  css:
+      theme:
+        css/yoast_seo.css: {}
+        css/yoast_seo_score.css: {}
+yoast_seo_base_scripts:
+  version: 1.x
+  js:
+    js/lib/yoast/yoast-seo.min.js: {}
+    js/yoast_seo_status_widget.js: {}
+  dependencies:
+      - core/jquery
+      - core/drupalSettings
 yoast_seo.edit_node:
   version: 1.x
   js:
-    js/js-text-analysis/yoast-seo.min.js: {}
+    js/lib/yoast/yoast-seo.min.js: {}
+    js/lib/backbone_form/form.js: {}
+    js/inc/widget/status.js: {}
+    js/inc/widget/focus_keyword.js: {}
+    js/inc/form/snippet_element.js: {}
+    js/inc/yoast_analyser.js: {}
+    js/inc/yoast_analyser_edit_node.js: {}
     js/yoast_seo.edit_node.js: {}
-    js/yoast_seo_status_widget.js: {}
-    js/yoast_seo_form.js: {}
-    js/yoast_seo_data.js: {}
   dependencies:
     - core/jquery
     - core/backbone
@@ -17,20 +34,6 @@ yoast_seo.edit_node:
     theme:
       css/yoast_seo.css: {}
       css/yoast_seo_score.css: {}
-yoast_seo_base_style:
-  version: 1.x
-  css:
-      theme:
-        css/yoast_seo.css: {}
-        css/yoast_seo_score.css: {}
-yoast_seo_base_scripts:
-  version: 1.x
-  js:
-    js/js-text-analysis/yoast-seo.min.js: {}
-    js/yoast_seo_status_widget.js: {}
-  dependencies:
-      - core/jquery
-      - core/drupalSettings
 yoast_seo_admin:
   version: 1.x
   css:

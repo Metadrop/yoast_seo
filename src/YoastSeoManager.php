@@ -293,6 +293,13 @@ class YoastSeoManager {
 
     // Cookie key where to store data.
     $elt['#attached']['drupalSettings']['yoast_seo']['cookie_data_key'] = 'yoastseo.metatags';
+
+    // Is the premium module activated.
+    $elt['#attached']['drupalSettings']['yoast_seo']['premium'] = array(
+      'installed' => $this->isPremiumInstalled(),
+      'activated' => $this->isPremiumActivated()
+    );
+
     return $elt;
   }
 

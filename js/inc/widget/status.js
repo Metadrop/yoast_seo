@@ -1,4 +1,3 @@
-'use strict';
 var YoastSeo = YoastSeo || {};
 
 /**
@@ -9,6 +8,8 @@ var YoastSeo = YoastSeo || {};
  */
 
 (function ($, Drupal) {
+
+  'use strict';
 
   /**
    * This component takes care of displaying the Yoast SEO score computed for
@@ -66,10 +67,10 @@ var YoastSeo = YoastSeo || {};
       this.score = score;
 
       // Update score text in the score box.
-      jQuery('.score_value', '#' + this.options.score_element_selector).text(this.scoreRating(score));
+      $('.score_value', '#' + this.options.score_element_selector).text(this.scoreRating(score));
 
       // Update score in the score field.
-      jQuery('[data-drupal-selector="' + this.options.seo_status + '"]')
+      $('[data-drupal-selector="' + this.options.seo_status + '"]')
         .attr('value', score)
         .val(score);
     }
