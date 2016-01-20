@@ -48,21 +48,6 @@ var YoastSeo = YoastSeo || {};
           text: ''
         }
       },
-      //fields: {
-      //  keyword: null,
-      //  title: null,
-      //  nodeTitle: null,
-      //  meta: null,
-      //  text: null,
-      //  url: null
-      //},
-      //placeholderText: {
-      //  title: 'Please click here and alter your page title.',
-      //  description: 'Please click here and alter your page description.',
-      //  url: 'Please click here and alter your page url.'
-      //},
-      SEOTitleOverwritten: null,
-      scoreElement: null,
       baseRoot: '/'
     },
 
