@@ -2,7 +2,7 @@ var YoastSeo = YoastSeo || {};
 
 /**
  * @file
- * Drupal Yoast SEO.
+ * Drupal Yoast SEO focus keyword field handler.
  *
  * @ignore
  */
@@ -13,6 +13,7 @@ var YoastSeo = YoastSeo || {};
 
   /**
    * This component takes care of handling the focus keyword field.
+   *
    *
    * @type {YoastSeo.FocusKeyword}
    */

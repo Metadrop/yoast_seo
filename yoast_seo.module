@@ -40,7 +40,7 @@ function yoast_seo_form_node_afterbuild(&$form, $form_state) {
     $form = $yoast_seo_manager->setTargetsConfiguration($form);
     $form = $yoast_seo_manager->setScoreToStatusRulesConfiguration($form);
     $form = $yoast_seo_field_manager->addSnippetEditorMarkup($form);
-    $form = $yoast_seo_field_manager->addOverallScoreMarkup($form);
+    $form = $yoast_seo_field_manager->addOverallScoreMarkup($form, $form_state);
   }
 
   return $form;
@@ -94,6 +94,13 @@ function yoast_seo_theme() {
       'overall_score' => NULL,
     ],
     'template' => 'overall_score',
+  ];
+
+  $theme['view_overall_score'] = [
+    'variables' => [
+      'overall_score' => NULL,
+    ],
+    'template' => 'view_overall_score',
   ];
 
   $theme['content_score'] = [

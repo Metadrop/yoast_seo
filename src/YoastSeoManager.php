@@ -402,6 +402,7 @@ class YoastSeoManager {
       '#overall_score_target_id' => self::$jsTargets['overall_score_target_id'],
       '#overall_score' => $this->getScoreStatus($score),
     ];
+
     return \Drupal::service('renderer')->renderRoot($overall_score_tpl);
   }
 

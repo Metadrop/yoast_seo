@@ -3,10 +3,10 @@ YoastSeo.form = YoastSeo.form || {};
 
 /**
  * @file
- * Drupal Yoast SEO form utility.
+ * Drupal Yoast SEO form snippet element Backbone view.
  *
- * This library will help developers to interacts with drupal form
- * on client side.
+ * This widget as form aim to handle snippet preview field which are content
+ * editable element.
  *
  * @ignore
  */

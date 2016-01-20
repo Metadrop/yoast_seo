@@ -306,12 +306,22 @@ class YoastSeoFieldManager {
    * @return mixed
    *   Modified form.
    */
-  public function addOverallScoreMarkup($form) {
+  public function addOverallScoreMarkup($form, &$form_state) {
     $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
-    $output = $yoast_seo_manager->getOverallScoreMarkup();
+
+    // Retrieve the entity stored score.
+    $field_value = $form_state->getFormObject()
+      ->getEntity()
+      ->get('field_yoast_seo')
+      ->getValue();
+    $score = $field_value[0]['status'];
+
+    // Render the score markup.
+    $output = $yoast_seo_manager->getOverallScoreMarkup($score);
 
     $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.focus_keyword.#suffix', $output);
 
     return $form;
   }
+
 }

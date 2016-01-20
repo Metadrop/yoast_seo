@@ -16,6 +16,9 @@
       // Settings for Yoast SEO.
       var yoast_settings = settings.yoast_seo;
 
+      // Store the score status.
+      YoastSeo.model.Status.score_status = yoast_settings.score_status;
+
       // Initialize the backbone form fields layer upon the drupal rendered fields.
       // It will help to manipulate and interact with them from javascript.
       $('.js-form-item', $('#' + yoast_settings.form_id)).each(function () {
@@ -30,14 +33,13 @@
 
       // Instantiate the Yoast SEO status widget, to handle scores display.
       var status_widget_class = YoastSeo.Status;
-      // If the premium module is activated, use the premium status widget.
+      // If the premium module is activated, use the premium status widgets.
       if (yoast_settings.premium.activated) {
-        status_widget_class = YoastSeo.PremiumStatus;
+        status_widget_class = YoastSeo.PremiumEstimatedStatus;
       }
+
       var status_widget = new status_widget_class({
-        score_element_selector: yoast_settings.targets.overall_score_target_id,
-        score_status: yoast_settings.score_status,
-        seo_status: yoast_settings.fields.seo_status
+        el: $('#' + yoast_settings.targets.overall_score_target_id)
       });
 
       // Instantiate the Yoast SEO focus keyword widget, to handle the autocomplete capability.
@@ -66,6 +68,7 @@
         callback: {
           saveScores: function(score) {
             status_widget.setScore(score);
+            analyser.saveCookie();
           }
         },
         default_text: yoast_settings.default_text,
@@ -84,10 +87,9 @@
 
       // Update this.data everytime the field values are modified.
       jQuery(window).on('yoast_seo-form_item-changed', function () {
-        var data = analyser.getData();
+        analyser.getData();
         analyser.refreshSnippet();
         analyser.refreshAnalysis();
-        //self.saveCookie();
       });
 
       // Instantiate the FormItem View component plugged on the snippet preview title field.

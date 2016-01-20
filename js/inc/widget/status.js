@@ -37,37 +37,16 @@ var YoastSeo = YoastSeo || {};
     },
 
     /**
-     * Returns a string that is used as a CSS class, based on the numeric score.
-     *
-     * @param score
-     * @returns output
-     */
-    scoreRating: function (score) {
-      var rules = this.options.score_status,
-        def = rules['default'];
-      delete rules['default'];
-
-      var i = 0;
-
-      for (i in rules) {
-        if (score <= parseInt(i)) {
-          return rules[i];
-        }
-      }
-
-      return def;
-    },
-
-    /**
      * Sets the SEO score in both the hidden input and the rating element.
      *
      * @param score
      */
     setScore: function (score) {
       this.score = score;
+      var rate = YoastSeo.model.Status.scoreRating(score);
 
       // Update score text in the score box.
-      $('.score_value', '#' + this.options.score_element_selector).text(this.scoreRating(score));
+      $('.score_value', '#' + this.options.score_element_selector).text(rate);
 
       // Update score in the score field.
       $('[data-drupal-selector="' + this.options.seo_status + '"]')

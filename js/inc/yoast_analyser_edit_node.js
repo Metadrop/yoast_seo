@@ -35,23 +35,13 @@ var YoastSeo = YoastSeo || {};
     tokensRemote: {},
 
     /**
-     * {@inheritdoc}
+     * Extract the form node edit page fields values.
+     * Resolve tokens if there are and they can be solved, either locally or remotely.
+     *
+     * @param data
+     * @returns {*}
      */
-    getData: function () {
-      var data = {
-        keyword: '',
-        meta: '',
-        text: '',
-        pageTitle: '',
-        title: '',
-        url: '',
-        excerpt: '',
-        snippetMeta: '',
-        snippetCite: '',
-        snippetTitle: '',
-        baseUrl: this.options.base_root
-      };
-
+    extractFieldsValues: function(data) {
       // For all data required by the Yoast SEO snippet.
       // If their is a field extract the data from the fields if these fields
       // have been mapped.
@@ -82,6 +72,30 @@ var YoastSeo = YoastSeo || {};
           data[fieldName] = this.options.placeholder_text[fieldName];
         }
       }
+
+      return data;
+    },
+
+    /**
+     * {@inheritdoc}
+     */
+    getData: function () {
+      var data = {
+        keyword: '',
+        meta: '',
+        text: '',
+        pageTitle: '',
+        title: '',
+        url: '',
+        excerpt: '',
+        snippetMeta: '',
+        snippetCite: '',
+        snippetTitle: '',
+        baseUrl: this.options.base_root
+      };
+
+      // Extract form values regarding the required getData fields.
+      data = this.extractFieldsValues(data);
 
       // The get data function can be called before the yoast analyser
       // has been instantiated (while instantiating this class by instance).

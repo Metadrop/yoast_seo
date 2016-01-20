@@ -36,7 +36,7 @@ class YoastSeoFormatter extends FormatterBase {
       // at the end.
       // Get template for the snippet.
       $overall_score_tpl = [
-        '#theme' => 'overall_score',
+        '#theme' => 'view_overall_score',
         '#overall_score' => $status,
         '#attached' => [
           'library' => [
