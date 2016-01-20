@@ -24,15 +24,6 @@ var YoastSeo = YoastSeo || {};
      */
     initialize: function (options) {
       var options = options || {};
-      this.config = options.settings;
-
-      if (typeof options.score_element_selector == 'undefined') {
-        throw 'The options.score_element_selector should not be undefined.';
-      }
-      else if ($('#' + options.score_element_selector).length == 0) {
-        throw 'No HTMLElement found with the given selector options.score_element_selector (' + options.score_element_selector + ').';
-      }
-
       this.options = options;
     },
 
@@ -43,13 +34,14 @@ var YoastSeo = YoastSeo || {};
      */
     setScore: function (score) {
       this.score = score;
-      var rate = YoastSeo.model.Status.scoreRating(score);
+      var rate = YoastSeo.model.Status.scoreRating(score),
+        yoast_settings = drupalSettings.yoast_seo;
 
       // Update score text in the score box.
-      $('.score_value', '#' + this.options.score_element_selector).text(rate);
+      $('.score_value', this.$el).text(rate);
 
       // Update score in the score field.
-      $('[data-drupal-selector="' + this.options.seo_status + '"]')
+      $('[data-drupal-selector="' + yoast_settings.fields.seo_status + '"]')
         .attr('value', score)
         .val(score);
     }
