@@ -76,7 +76,6 @@ class YoastSeoManager {
    *   Return true if the premium module is activated, false otherwise.
    */
   public function isPremiumActivated() {
-    //return FALSE;
     if (!$this->isPremiumInstalled()) {
       return FALSE;
     }
@@ -155,7 +154,6 @@ class YoastSeoManager {
       $this->yoast_seo_field_manager->detachField($entity_type, $bundle, $field_name);
     }
   }
-
 
   /**
    * Returns an array of available bundles Yoast SEO can be enabled for.
