@@ -75,9 +75,9 @@
         base_root: yoast_settings.base_root,
         fields: yoast_settings.fields,
         placeholder_text: {
-          title: yoast_settings.placeholder_text.snippetTitle,
-          description: yoast_settings.placeholder_text.snippetMeta,
-          url: yoast_settings.placeholder_text.snippetCite
+          snippetTitle: yoast_settings.placeholder_text.snippetTitle,
+          snippetMeta: yoast_settings.placeholder_text.snippetMeta,
+          snippetCite: yoast_settings.placeholder_text.snippetCite
         },
         scoreElement: yoast_settings.fields.seo_status,
         tokens: yoast_settings.tokens,
