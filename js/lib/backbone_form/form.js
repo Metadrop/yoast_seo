@@ -342,7 +342,7 @@
       var options = options || {},
         elId = this.$el.attr('id');
 
-      if (typeof eltId  == 'undefined') {
+      if (typeof elId  == 'undefined') {
         console.debug('BackboneForm.views.Ckeditor requires the elements it is attached to to have an id.');
       }
 
