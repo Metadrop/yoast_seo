@@ -52,7 +52,7 @@ var YoastSeo = YoastSeo || {};
     },
 
     // Analyser constructor.
-    initialize: function (options) {
+    initialize: function (attributes, options) {
       this.options = $.extend(true, {}, this.default_options, options);
 
       // Declaring the callback functions required by the Yoast SEO analyser.

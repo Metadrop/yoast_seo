@@ -79,11 +79,10 @@
           snippetMeta: yoast_settings.placeholder_text.snippetMeta,
           snippetCite: yoast_settings.placeholder_text.snippetCite
         },
-        scoreElement: yoast_settings.fields.seo_status,
         tokens: yoast_settings.tokens,
         cookie_data_key: yoast_settings.cookie_data_key
       };
-      var analyser = new YoastSeo.AnalyserEditNode(analyzer_options);
+      var analyser = new YoastSeo.AnalyserEditNode({}, analyzer_options);
 
       // Update this.data everytime the field values are modified.
       jQuery(window).on('yoast_seo-form_item-changed', function () {

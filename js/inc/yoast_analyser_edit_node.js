@@ -205,7 +205,7 @@ var YoastSeo = YoastSeo || {};
       //if (typeof YoastSEO.app.snippetPreview === "undefined") {
       //  YoastSEO.app.init();
       //}
-      this.yoast_analyser.runAnalyzerCallback();
+      this.yoast_analyser.refresh();
     },
 
     /**

@@ -1,9 +1,9 @@
 score_to_status_rules:
   0: na
-  3: bad
-  5: poor
-  7: ok
-  10: good
+  30: bad
+  50: poor
+  70: ok
+  100: good
   default: bad
 newsletter:
   link: http://eepurl.com/bLPFaz
