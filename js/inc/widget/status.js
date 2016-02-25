@@ -25,6 +25,9 @@ var YoastSeo = YoastSeo || {};
     initialize: function (options) {
       var options = options || {};
       this.options = options;
+
+      // Initialize the tooltips.
+      $('#yoast-overall-score a.help').tooltip();
     },
 
     /**

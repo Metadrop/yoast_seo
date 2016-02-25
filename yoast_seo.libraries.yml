@@ -16,15 +16,15 @@ yoast_seo_core:
 yoast_seo.edit_node:
   version: 1.x
   js:
-    js/lib/yoast/yoast-seo.min.js: {}
     js/lib/backbone_form/form.js: {}
-    js/inc/widget/status.js: {}
     js/inc/widget/focus_keyword.js: {}
+    js/inc/widget/status.js: {}
     js/inc/form/snippet_element.js: {}
     js/inc/yoast_analyser_edit_node.js: {}
     js/yoast_seo.edit_node.js: {}
   dependencies:
     - core/jquery
+    - core/jquery.ui.tooltip
     - core/backbone
     - core/underscore
     - ckeditor/drupal.ckeditor

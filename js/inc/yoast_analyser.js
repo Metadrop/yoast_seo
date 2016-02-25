@@ -69,6 +69,13 @@ var YoastSeo = YoastSeo || {};
     },
 
     /**
+     * Destroy the analyser
+     */
+    destroy: function() {
+      delete this.yoast_analyser;
+    },
+
+    /**
      * Return an object fulfilling the Yoast SEO library getData callback requirements.
      *
      * @callback YoastSEO.App~getData

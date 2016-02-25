@@ -3,7 +3,7 @@
     <ul>
         <li {% if overall_score_target_id %}id="{{ overall_score_target_id }}"{% endif %}
             class="overallScore {{ overall_score }}">
-            <label>{% trans %}Estimated{% endtrans %}<a class="help"></a></label>
+            <label>{% trans %}Estimated{% endtrans %}<a class="help" title="Estimated score is computed dynamically based on the node's fields. To get a realistic score based on the final page rendering, see the full analysis score."></a></label>
             <span class="score_circle"></span>
             <span class="score_value">{{ overall_score }}</span>
         </li>

@@ -202,10 +202,8 @@ var YoastSeo = YoastSeo || {};
      * Refresh the anlysis
      */
     refreshAnalysis: function () {
-      //if (typeof YoastSEO.app.snippetPreview === "undefined") {
-      //  YoastSEO.app.init();
-      //}
-      this.yoast_analyser.refresh();
+      //this.yoast_analyser.refresh(); // If the external Yoast lib is switched to 1.0.4
+      this.yoast_analyser.runAnalyzerCallback();
     },
 
     /**
