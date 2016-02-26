@@ -18,19 +18,6 @@ use Drupal\yoast_seo_premimum;
 class YoastSeoController extends ControllerBase {
 
   /**
-   * A simple demo content page.
-   *
-   * @return array
-   *   Content.
-   */
-  public function content() {
-    return [
-      '#type' => 'markup',
-      '#markup' => $this->t('Hello, World!'),
-    ];
-  }
-
-  /**
    * Returns a set of tokens' values.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
