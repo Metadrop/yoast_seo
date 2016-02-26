@@ -7,7 +7,11 @@
 
 namespace Drupal\yoast_seo;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use \Drupal\views\Views;
+use Drupal\Core\Url;
+use \Drupal\Component\Utility\Html;
+use \Symfony\Component\Yaml\Yaml;
 
 /**
  * Class YoastSeoManager.
@@ -17,17 +21,87 @@ use \Drupal\views\Views;
 class YoastSeoManager {
 
   /**
-   * Metatag logging channel.
+   * Module handler service.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $logger;
+  protected $moduleHandler;
+
+  /**
+   * Target elements for Javascript.
+   * @var array
+   */
+  public static $jsTargets = [
+    'wrapper_target_id'       => 'yoast-wrapper',
+    'snippet_target_id'       => 'yoast-snippet',
+    'output_target_id'        => 'yoast-output',
+    'overall_score_target_id' => 'yoast-overall-score',
+  ];
 
   /**
    * Constructor for YoastSeoManager.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   Module handler service.
    */
-  public function __construct() {
+  public function __construct(ModuleHandlerInterface $module_handler) {
+    $this->moduleHandler = $module_handler;
     $this->yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
+
+    // Populate js target ids.
+    foreach(self::$jsTargets as $js_target_name => $js_target_id) {
+      if (! preg_match('/^js/', $js_target_id)) {
+        self::$jsTargets[$js_target_name] = Html::getUniqueId($js_target_id);
+      }
+    }
+  }
+
+  /**
+   * Check if the premium module has been enabled.
+   *
+   * @return boolean
+   *   Return true if the premium module is enabled, false otherwise.
+   */
+  public function isPremiumInstalled() {
+    if ($this->moduleHandler->moduleExists('yoast_seo_premium')) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check if the premium module has been activated.
+   *
+   * @return boolean
+   *   Return true if the premium module is activated, false otherwise.
+   */
+  public function isPremiumActivated() {
+    if (!$this->isPremiumInstalled()) {
+      return FALSE;
+    }
+    $yoast_seo_premimum_manager = \Drupal::service('yoast_seo_premium.manager');
+    if (!$yoast_seo_premimum_manager->isPremiumActivated()) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Get premium message advertisement.
+   *
+   * @return {string}
+   */
+  public function getPremiumMessage() {
+    return  t(
+      '<div class="messages messages--info">A Premium Yoast SEO plugin for even more features and support is available at the @url.</div>',
+      [
+        '@url' => \Drupal::l(
+          t('Yoast shop'),
+          Url::fromUri('https://yoast.com/software/yoast-seo-for-drupal-module/')
+        )
+      ]
+    );
   }
 
   /**
@@ -80,7 +154,6 @@ class YoastSeoManager {
       $this->yoast_seo_field_manager->detachField($entity_type, $bundle, $field_name);
     }
   }
-
 
   /**
    * Returns an array of available bundles Yoast SEO can be enabled for.
@@ -171,6 +244,187 @@ class YoastSeoManager {
         $content_view->save();
       }
     }
+  }
+
+  /**
+   * Set configuration for js target elements.
+   *
+   * @param array elt
+   *   The element on which to attach the configuration.
+   *
+   * @return array
+   *   The same element passed, with the new configuration attached.
+   */
+  public function setTargetsConfiguration(&$elt) {
+    foreach(self::$jsTargets as $js_target_name => $js_target_id) {
+      $elt['#attached']['drupalSettings']['yoast_seo']['targets'][$js_target_name] = $js_target_id;
+    }
+    return $elt;
+  }
+
+  /**
+   * Set general configuration for yoast seo js.
+   *
+   * Set
+   * - language
+   * - options (analyzer, snippet_preview)
+   * - base_root
+   *
+   * @param array elt
+   *   The element on which to attach the configuration.
+   *
+   * @return array
+   *   The same element passed, with the new configuration attached.
+   */
+  public function setGeneralConfiguration(&$elt) {
+    // Set the language code.
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $elt['#attached']['drupalSettings']['yoast_seo']['language'] = $language;
+
+    // General Yoast SEO js config.
+    $elt['#attached']['drupalSettings']['yoast_seo']['analyzer'] = TRUE;
+    $elt['#attached']['drupalSettings']['yoast_seo']['snippet_preview'] = TRUE;
+
+    // Base root.
+    global $base_root;
+    $elt['#attached']['drupalSettings']['yoast_seo']['base_root'] = $base_root;
+
+    // Cookie key where to store data.
+    $elt['#attached']['drupalSettings']['yoast_seo']['cookie_data_key'] = 'yoastseo.metatags';
+
+    // Is the premium module activated.
+    $elt['#attached']['drupalSettings']['yoast_seo']['premium'] = array(
+      'installed' => $this->isPremiumInstalled(),
+      'activated' => $this->isPremiumActivated()
+    );
+
+    return $elt;
+  }
+
+  /**
+   * Set configuration for score to status rules.
+   *
+   * @param array elt
+   *   The element on which to attach the configuration.
+   *
+   * @return array
+   *   The same element passed, with the new configuration attached.
+   */
+  public function setScoreToStatusRulesConfiguration(&$elt) {
+    $score_to_status_rules = $this->getScoreToStatusRules();
+    // Score statuses.
+    $elt['#attached']['drupalSettings']['yoast_seo']['score_status'] = $score_to_status_rules;
+    return $elt;
+  }
+
+
+  /**
+   * Get configuration from Yaml file.
+   *
+   * @return mixed
+   */
+  public function getConfiguration() {
+    $conf = Yaml::parse(
+      file_get_contents(
+        drupal_get_path('module', 'yoast_seo') . '/config/yoast_seo.yml'
+      )
+    );
+    return $conf;
+  }
+
+  /**
+   * Get rules to convert a score into a status, from the config file.
+   *
+   * @return mixed
+   */
+  public function getScoreToStatusRules() {
+    $score_to_status_rules = $this->getConfiguration()['score_to_status_rules'];
+    ksort($score_to_status_rules);
+    return $score_to_status_rules;
+  }
+
+  /**
+   * Get Markup for the snippet editor.
+   *
+   * @return string
+   *   HTML Markup of the snippet editor.
+   */
+  public function getSnippetEditorMarkup() {
+    // Get template for the snippet.
+    $snippet_tpl = [
+      '#theme' => 'snippet',
+      '#wrapper_target_id' => self::$jsTargets['wrapper_target_id'],
+      '#snippet_target_id' => self::$jsTargets['snippet_target_id'],
+      '#output_target_id' => self::$jsTargets['output_target_id'],
+    ];
+    return \Drupal::service('renderer')->renderRoot($snippet_tpl);
+  }
+
+  /**
+   * Get Markup for the snippet editor.
+   *
+   * @return string
+   *   HTML Markup of the snippet editor.
+   */
+  public function getNewsletterMarkup() {
+    $conf = $this->getConfiguration();
+    // Get template for the snippet.
+    $snippet_tpl = [
+      '#theme' => 'yoast_newsletter',
+      '#newsletter_link' => $conf['newsletter']['link'],
+    ];
+    return \Drupal::service('renderer')->renderRoot($snippet_tpl);
+  }
+
+  /**
+   * Get Markup for the overall score.
+   *
+   * @param int $score
+   *   the default score to display
+   *
+   * @return string
+   *   HTML Markup of the overall score.
+   */
+  public function getOverallScoreMarkup($score = 0) {
+    $template = 'overall_score';
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+
+    // If the premium plugin is activated use
+    if ($yoast_seo_manager->isPremiumActivated()) {
+      $template = 'premium_overall_score';
+    }
+
+    // Get template for the snippet.
+    $overall_score_tpl = [
+      '#theme' => $template,
+      '#overall_score_target_id' => self::$jsTargets['overall_score_target_id'],
+      '#overall_score' => $this->getScoreStatus($score),
+    ];
+
+    return \Drupal::service('renderer')->renderRoot($overall_score_tpl);
+  }
+
+  /**
+   * Get the status for a given score.
+   *
+   * @param int $score
+   *   Score in points.
+   *
+   * @return string
+   *   Status corresponding to the score.
+   */
+  public function getScoreStatus($score) {
+    $rules = $this->getScoreToStatusRules();
+    $default = $rules['default'];
+    unset($rules['default']);
+
+    foreach ($rules as $rule_max_score => $rule_status) {
+      if ($score <= $rule_max_score) {
+        return $rule_status;
+      }
+    }
+
+    return $default;
   }
 
 }

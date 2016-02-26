@@ -25,52 +25,6 @@
   padding: 0 0 0 20px;
 }
 
-.overallScore {
-  float: left;
-  padding-top: 20px;
-  margin-top: 20px;
-  margin-left: 10px;
-}
-.views-field-field-yoast-seo .overallScore {
-  margin: 0;
-  padding: 0;
-}
-
-.overallScore {
-  display: inline-block;
-}
-.overallScore .score {
-  display: inline-block;
-  padding: 0.1em 0 0 0;
-}
-.overallScore .score_circle {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin: 4px 5px 0 3px;
-  vertical-align: top;
-  border-radius: 50%;
-  background: #888;
-}
-.overallScore.good .score_circle {
-  background: #7ad03a;
-}
-.overallScore.ok .score_circle {
-  background: #ffba00;
-}
-.overallScore.poor .score_circle {
-  background: #ee7c1b;
-}
-.overallScore.bad .score_circle {
-  background: #dd3d36;
-}
-.overallScore .score_title {
-  font-weight: normal;
-}
-.overallScore .score_title strong {
-  font-weight: bold;
-}
-
 #yoast-wrapper {
   clear: both;
   padding: 0 20px;
@@ -100,19 +54,19 @@
 #yoast-wrapper li .score {
   list-style-type: none;
 }
-#yoast-wrapper .wpseoanalysis {
+.wpseoanalysis {
   margin-left: 0;
   list-style: none;
 }
-#yoast-wrapper .wpseoanalysis li {
+.wpseoanalysis li {
   margin: 3px 0;
   line-height: auto;
 }
-#yoast-wrapper .wpseo-score-text {
+.wpseo-score-text {
   display: inline-block;
   width: 90%;
 }
-#yoast-wrapper .wpseo-score-icon {
+.wpseo-score-icon {
   display: inline-block;
   width: 12px;
   height: 12px;
@@ -121,25 +75,25 @@
   border-radius: 50%;
   background: #888;
 }
-#yoast-wrapper .wpseo-score-icon.good {
+.wpseo-score-icon.good {
   background-color: #7ad03a;
 }
-#yoast-wrapper .wpseo-score-icon.ok {
+.wpseo-score-icon.ok {
   background-color: #ffba00;
 }
-#yoast-wrapper .wpseo-score-icon.poor {
+.wpseo-score-icon.poor {
   background-color: #ee7c1b;
 }
-#yoast-wrapper .wpseo-score-icon.bad {
+.wpseo-score-icon.bad {
   background-color: #dd3d36;
 }
-#yoast-wrapper .wpseo-score-icon.na {
+.wpseo-score-icon.na {
   background-color: #999;
 }
-#yoast-wrapper .wpseo-score-icon.noindex {
+.wpseo-score-icon.noindex {
   background-color: #1e8cbe;
 }
-#yoast-wrapper .wpseo_msg {
+.wpseo_msg {
   margin: 5px 0 10px 0;
   padding: 0 5px;
   border: 1px solid #e6db55;
@@ -209,7 +163,7 @@
   padding: 20px;
   border: 1px solid #ddd;
 }
-#yoast-wrapper .screen-reader-text {
+.screen-reader-text {
   position: absolute !important;
   overflow: hidden;
   clip: rect(1px, 1px, 1px, 1px);
@@ -226,6 +180,13 @@
 #yoast-wrapper #snippet_preview *[contenteditable='true']:focus {
   cursor: text;
   background-color: #bbdefb;
+}
+div.yoast_newsletter_subscription{
+    margin-top: 2em;
+}
+
+div.yoast_newsletter_subscription a.button{
+    margin-top: 1.5em;
 }
 
 /*# sourceMappingURL=yoast_seo.css.map */

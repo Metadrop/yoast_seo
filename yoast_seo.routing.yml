@@ -1,11 +1,3 @@
-yoast_seo.content:
-  path: '/hello'
-  defaults:
-    _controller: '\Drupal\yoast_seo\Controller\YoastSeoController::content'
-    _title: 'Hello World'
-  requirements:
-    _permission: 'use yoast seo'
-
 yoast_seo.tokens:
   path: '/yoast_seo/tokens'
   defaults:

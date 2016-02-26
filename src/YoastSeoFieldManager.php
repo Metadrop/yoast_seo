@@ -47,17 +47,6 @@ class YoastSeoFieldManager {
       '[current-page:summary]' => 'summary',
       '[node:summary]' => 'summary',
     ],
-
-    'targets' => [],
-
-    'score_status' => [
-      '0' => 'na',
-      '3' => 'bad',
-      '5' => 'poor',
-      '7' => 'ok',
-      '10' => 'good',
-      'default' => 'bad',
-    ],
   ];
 
   /**
@@ -72,14 +61,6 @@ class YoastSeoFieldManager {
    */
   public function __construct() {
     $this->entity_manager = \Drupal::entityManager();
-
-    // Get Output generated ids.
-    $this->fieldsConfiguration['targets'] = [
-      'wrapper_target_id'       => Html::getUniqueId('yoast-wrapper'),
-      'snippet_target_id'       => Html::getUniqueId('yoast-snippet'),
-      'output_target_id'        => Html::getUniqueId('yoast-output'),
-      'overall_score_target_id' => Html::getUniqueId('yoast-overall-score'),
-    ];
   }
 
 
@@ -221,7 +202,6 @@ class YoastSeoFieldManager {
     return isset($fields_config[$field_name]);
   }
 
-
   /**
    * Set fields configuration from a form.
    *
@@ -235,14 +215,6 @@ class YoastSeoFieldManager {
    *   Transformed form.
    */
   public function setFieldsConfiguration($form_after_build) {
-
-    // Set the language code.
-    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    $form_after_build['#attached']['drupalSettings']['yoast_seo']['language'] = $language;
-
-    // Score statuses.
-    ksort($this->fieldsConfiguration['score_status']);
-    $form_after_build['#attached']['drupalSettings']['yoast_seo']['score_status'] = $this->fieldsConfiguration['score_status'];
 
     // Fields requested.
     // Attach settings in drupalSettings for each required field.
@@ -259,10 +231,6 @@ class YoastSeoFieldManager {
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:name]'] = \Drupal::config('system.site')->get('name');
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:slogan]'] = \Drupal::config('system.site')->get('slogan');
 
-    // Attach settings for the targets.
-    foreach ($this->fieldsConfiguration['targets'] as $target_name => $target_id) {
-      $form_after_build['#attached']['drupalSettings']['yoast_seo']['targets'][$target_name] = $target_id;
-    }
 
     $is_default_meta_title = !empty($form_after_build['field_meta_tags']['widget'][0]['basic']['title']['#default_value']) ? TRUE : FALSE;
     $is_default_keyword = !empty($form_after_build['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value']) ? TRUE : FALSE;
@@ -296,14 +264,10 @@ class YoastSeoFieldManager {
       'snippetCite' => t('/example-post'),
     ];
 
-    global $base_root;
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['seo_title_overwritten'] = $is_default_meta_title;
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['text_format'] = $form_after_build['body']['widget'][0]['#format'];
-    $form_after_build['#attached']['drupalSettings']['yoast_seo']['base_root'] = $base_root;
 
-    // Other conf.
-    $form_after_build['#attached']['drupalSettings']['yoast_seo']['analyzer'] = TRUE;
-    $form_after_build['#attached']['drupalSettings']['yoast_seo']['snippet_preview'] = TRUE;
+    // Form config.
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['form_id'] = $form_after_build['#id'];
 
     return $form_after_build;
@@ -319,15 +283,9 @@ class YoastSeoFieldManager {
    *   Form.
    */
   public function addSnippetEditorMarkup($form) {
-
-    // Get template for the snippet.
-    $snippet_tpl = [
-      '#theme' => 'snippet',
-      '#wrapper_target_id' => $this->fieldsConfiguration['targets']['wrapper_target_id'],
-      '#snippet_target_id' => $this->fieldsConfiguration['targets']['snippet_target_id'],
-      '#output_target_id' => $this->fieldsConfiguration['targets']['output_target_id'],
-    ];
-    $output = drupal_render($snippet_tpl);
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
+    $output = $yoast_seo_manager->getSnippetEditorMarkup();
+    $output .= $yoast_seo_manager->getNewsletterMarkup();
 
     // Add rendered template to the form, where we want the snippet.
     $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.snippet_analysis', [
@@ -348,43 +306,22 @@ class YoastSeoFieldManager {
    * @return mixed
    *   Modified form.
    */
-  public function addOverallScoreMarkup($form) {
+  public function addOverallScoreMarkup($form, &$form_state) {
+    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
 
-    // Get template for the snippet.
-    $overall_score_tpl = [
-      '#theme' => 'overall_score',
-      '#overall_score_target_id' => $this->fieldsConfiguration['targets']['overall_score_target_id'],
-      '#overall_score' => 0,
-    ];
-    $output = drupal_render($overall_score_tpl);
+    // Retrieve the entity stored score.
+    $field_value = $form_state->getFormObject()
+      ->getEntity()
+      ->get('field_yoast_seo')
+      ->getValue();
+    $score = $field_value[0]['status'];
+
+    // Render the score markup.
+    $output = $yoast_seo_manager->getOverallScoreMarkup($score);
 
     $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.focus_keyword.#suffix', $output);
 
     return $form;
-  }
-
-  /**
-   * Get the status for a given score.
-   *
-   * @param int $score
-   *   Score in points.
-   *
-   * @return string
-   *   Status corresponding to the score.
-   */
-  public function getScoreStatus($score) {
-    $rules = $this->fieldsConfiguration['score_status'];
-    $default = $rules['default'];
-    unset($rules['default']);
-    ksort($rules);
-
-    foreach ($rules as $rule_max_score => $rule_status) {
-      if ($score <= $rule_max_score) {
-        return $rule_status;
-      }
-    }
-
-    return $default;
   }
 
 }
