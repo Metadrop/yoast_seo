@@ -94,7 +94,7 @@ class YoastSeoManager {
    */
   public function getPremiumMessage() {
     return  t(
-      '<div class="messages messages--info">A Premium Yoast SEO plugin for even more features and support is available at the @url.</div>',
+      '<div class="messages messages--info">A Premium Yoast SEO plugin for even more features and support is soon available at the @url.</div>',
       [
         '@url' => \Drupal::l(
           t('Yoast shop'),
