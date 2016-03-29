@@ -44,7 +44,7 @@ class YoastSeoFormatter extends FormatterBase {
           ],
         ],
       ];
-      $output = drupal_render($overall_score_tpl);
+      $output = \Drupal::service('renderer')->render($overall_score_tpl);
 
       $elements[$delta] = array(
         '#markup' => $output,
