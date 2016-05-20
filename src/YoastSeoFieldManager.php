@@ -314,7 +314,7 @@ class YoastSeoFieldManager {
       ->getEntity()
       ->get('field_yoast_seo')
       ->getValue();
-    $score = $field_value[0]['status'];
+    $score = isset($field_value[0]['status']) ? $field_value[0]['status'] : 0;
 
     // Render the score markup.
     $output = $yoast_seo_manager->getOverallScoreMarkup($score);
