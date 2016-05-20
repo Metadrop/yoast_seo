@@ -5,6 +5,7 @@
  */
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Implements hook_form_FORM_ID_alter() for node_form().
@@ -25,13 +26,13 @@ function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
  *
  * @param array $form
  *   The form array.
- * @param array $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The form state array.
  *
  * @return mixed
  *   The modified form.
  */
-function yoast_seo_form_node_afterbuild(&$form, $form_state) {
+function yoast_seo_form_node_afterbuild($form, FormStateInterface $form_state) {
   if (isset($form['field_yoast_seo'])) {
     $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
     $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
