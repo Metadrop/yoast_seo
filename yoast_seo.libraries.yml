@@ -27,7 +27,6 @@ yoast_seo.edit_node:
     - core/jquery.ui.tooltip
     - core/backbone
     - core/underscore
-    - ckeditor/drupal.ckeditor
     - ckeditor/drupal.ckeditor.admin
     - core/drupalSettings
     - yoast_seo/yoast_seo_core

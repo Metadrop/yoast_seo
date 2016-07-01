@@ -82,7 +82,11 @@
         tokens: yoast_settings.tokens,
         cookie_data_key: yoast_settings.cookie_data_key
       };
-      var analyser = new YoastSeo.AnalyserEditNode({}, analyzer_options);
+
+      //We need only one analyser object to exist on page
+      if (typeof YoastSEO.app == "undefined") {
+        var analyser = new YoastSeo.AnalyserEditNode({}, analyzer_options);
+      }
 
       // Update this.data everytime the field values are modified.
       jQuery(window).on('yoast_seo-form_item-changed', function () {
