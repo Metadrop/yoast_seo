@@ -285,7 +285,6 @@ class YoastSeoFieldManager {
   public function addSnippetEditorMarkup($form) {
     $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
     $output = $yoast_seo_manager->getSnippetEditorMarkup();
-    $output .= $yoast_seo_manager->getNewsletterMarkup();
 
     // Add rendered template to the form, where we want the snippet.
     $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.snippet_analysis', [

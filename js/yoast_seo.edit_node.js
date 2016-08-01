@@ -33,10 +33,6 @@
 
       // Instantiate the Yoast SEO status widget, to handle scores display.
       var status_widget_class = YoastSeo.Status;
-      // If the premium module is activated, use the premium status widgets.
-      if (yoast_settings.premium.activated) {
-        status_widget_class = YoastSeo.PremiumEstimatedStatus;
-      }
 
       var status_widget = new status_widget_class({
         el: $('#' + yoast_settings.targets.overall_score_target_id)

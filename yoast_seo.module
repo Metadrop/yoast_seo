@@ -109,13 +109,6 @@ function yoast_seo_theme() {
     'template' => 'content_score',
   ];
 
-  $theme['yoast_newsletter'] = [
-    'variables' => [
-      'newsletter_link' => NULL,
-    ],
-    'template' => 'newsletter',
-  ];
-
   return $theme;
 }
 

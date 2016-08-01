@@ -61,65 +61,7 @@ class YoastSeoController extends ControllerBase {
    *   The configuration form.
    */
   public function settings() {
-    $form              = [];
-    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
-
-    // Add an advertisement for the Yoast SEO premium module.
-    if (!$yoast_seo_manager->isPremiumInstalled()) {
-      $premium_message           = $yoast_seo_manager->getPremiumMessage();
-      $form['yoast_seo_premium'] = array(
-        '#type' => 'text',
-        '#markup' => $premium_message,
-        '#attached' => array(
-          'library' => array(
-            'yoast_seo/yoast_seo_admin',
-          ),
-        ),
-      );
-    }
-    else {
-      $yoast_seo_premimum_manager = \Drupal::service('yoast_seo_premium.manager');
-
-      // If the premium plugin is not activated yet, display a warning message.
-      if (!$yoast_seo_premimum_manager->isPremiumActivated()) {
-        $activate_premium_message  = $yoast_seo_premimum_manager->getActivatePremiumMessage();
-        $form['yoast_seo_premium'] = array(
-          '#type' => 'text',
-          '#markup' => $activate_premium_message,
-          '#attached' => array(
-            'library' => array(
-              'yoast_seo/yoast_seo_admin',
-            ),
-          ),
-        );
-
-        // Add to the page the Yoast SEO form which allows the administrator
-        // to enter a valid license key.
-        $activate_license_form     = \Drupal::formBuilder()
-                                            ->getForm('Drupal\yoast_seo_premium\Form\YoastSeoPremiumActivateLicenseForm');
-        $form['yoast_seo_license'] = [
-          '#type' => 'details',
-          '#title' => 'Yoast SEO license',
-          '#description' => 'Activate the Yoast SEO premium plugin by copy/pasting here your valid license key',
-          '#markup' => render($activate_license_form),
-          '#open' => TRUE,
-        ];
-
-      }
-      else {
-        // Add to the page the Yoast SEO form which allow the administrator
-        // to deactivate the premium module
-        $deactivate_license_form     = \Drupal::formBuilder()
-                                            ->getForm('Drupal\yoast_seo_premium\Form\YoastSeoPremiumDeactivateLicenseForm');
-        $form['yoast_seo_license'] = [
-          '#type' => 'details',
-          '#title' => 'Yoast SEO license',
-          '#description' => 'Details of your license',
-          '#markup' => render($deactivate_license_form),
-          '#open' => TRUE,
-        ];
-      }
-    }
+    $form = [];
 
     // Check if XML Sitemap is installed and enabled.
     if (\Drupal::moduleHandler()->moduleExists('xmlsitemap')) {

@@ -5,5 +5,3 @@ score_to_status_rules:
   7: ok
   10: good
   default: bad
-newsletter:
-  link: http://eepurl.com/bLPFaz

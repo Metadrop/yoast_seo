@@ -57,54 +57,6 @@ class YoastSeoManager {
   }
 
   /**
-   * Check if the premium module has been enabled.
-   *
-   * @return boolean
-   *   Return true if the premium module is enabled, false otherwise.
-   */
-  public function isPremiumInstalled() {
-    if ($this->moduleHandler->moduleExists('yoast_seo_premium')) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Check if the premium module has been activated.
-   *
-   * @return boolean
-   *   Return true if the premium module is activated, false otherwise.
-   */
-  public function isPremiumActivated() {
-    if (!$this->isPremiumInstalled()) {
-      return FALSE;
-    }
-    $yoast_seo_premimum_manager = \Drupal::service('yoast_seo_premium.manager');
-    if (!$yoast_seo_premimum_manager->isPremiumActivated()) {
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Get premium message advertisement.
-   *
-   * @return {string}
-   */
-  public function getPremiumMessage() {
-    return  t(
-      '<div class="messages messages--info">A Premium Yoast SEO plugin for even more features and support is soon available at the @url.</div>',
-      [
-        '@url' => \Drupal::l(
-          t('Yoast shop'),
-          Url::fromUri('https://yoast.com/software/yoast-seo-for-drupal-module/')
-        )
-      ]
-    );
-  }
-
-  /**
    * Attach the yoast seo fields to a target content type.
    *
    * @param string $entity_type
@@ -292,12 +244,6 @@ class YoastSeoManager {
     // Cookie key where to store data.
     $elt['#attached']['drupalSettings']['yoast_seo']['cookie_data_key'] = 'yoastseo.metatags';
 
-    // Is the premium module activated.
-    $elt['#attached']['drupalSettings']['yoast_seo']['premium'] = array(
-      'installed' => $this->isPremiumInstalled(),
-      'activated' => $this->isPremiumActivated()
-    );
-
     return $elt;
   }
 
@@ -361,22 +307,6 @@ class YoastSeoManager {
   }
 
   /**
-   * Get Markup for the snippet editor.
-   *
-   * @return string
-   *   HTML Markup of the snippet editor.
-   */
-  public function getNewsletterMarkup() {
-    $conf = $this->getConfiguration();
-    // Get template for the snippet.
-    $snippet_tpl = [
-      '#theme' => 'yoast_newsletter',
-      '#newsletter_link' => $conf['newsletter']['link'],
-    ];
-    return \Drupal::service('renderer')->renderRoot($snippet_tpl);
-  }
-
-  /**
    * Get Markup for the overall score.
    *
    * @param int $score
@@ -388,11 +318,6 @@ class YoastSeoManager {
   public function getOverallScoreMarkup($score = 0) {
     $template = 'overall_score';
     $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
-
-    // If the premium plugin is activated use
-    if ($yoast_seo_manager->isPremiumActivated()) {
-      $template = 'premium_overall_score';
-    }
 
     // Get template for the snippet.
     $overall_score_tpl = [
