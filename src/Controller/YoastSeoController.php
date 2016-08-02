@@ -47,8 +47,7 @@ class YoastSeoController extends ControllerBase {
     // Use the metatag token service, which use either core or token module
     // regarding if this one is installed.
     foreach ($tokens as $token) {
-      $token_values[$token] = \Drupal::service('metatag.token')
-                                     ->tokenReplace($token, $data);
+      $token_values[$token] = \Drupal::token()->replace($token, $data);
     }
 
     return new JsonResponse($token_values);
