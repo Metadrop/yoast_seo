@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\yoast_seo\Controller\YoastSeoController.
- */
 
 namespace Drupal\yoast_seo\Controller;
 

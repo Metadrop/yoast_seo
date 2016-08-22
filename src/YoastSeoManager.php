@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains the \Drupal\yoast_seo\YoastSeoManager class.
- */
-
 namespace Drupal\yoast_seo;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;

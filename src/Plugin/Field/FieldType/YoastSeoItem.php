@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\yoast_seo\Plugin\Field\FieldType\YoastSeoItem.
- */
-
 namespace Drupal\yoast_seo\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;

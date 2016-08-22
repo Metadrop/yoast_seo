@@ -1,12 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\yoast_seo\Tests\YoastSeoTest.
- *
- * Scenarios :
- * The Yoast SEO section is only available when it has
- * been previously enabled on the given content type.
- */
 
 namespace Drupal\yoast_seo\Tests;
 

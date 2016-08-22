@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\yoast_seo\Plugin\Field\FieldWidget\YoastSeoWidget.
- */
 
 namespace Drupal\yoast_seo\Plugin\Field\FieldWidget;
 

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\yoast_seo\Form\YoastSeoConfigForm.
- */
-
 namespace Drupal\yoast_seo\Form;
 
 use Drupal\Core\Form\FormBase;

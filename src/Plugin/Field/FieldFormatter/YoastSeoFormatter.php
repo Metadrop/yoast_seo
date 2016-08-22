@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Yoast Seo Formatter.
- */
-
 namespace Drupal\yoast_seo\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;

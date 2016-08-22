@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains the \Drupal\yoast_seo\YoastSeoFieldManager class.
- */
-
 namespace Drupal\yoast_seo;
 
 use \Drupal\Component\Utility\NestedArray;
