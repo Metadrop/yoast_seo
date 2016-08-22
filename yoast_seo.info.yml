@@ -4,6 +4,7 @@ package: SEO
 
 type: module
 core: 8.x
+configure: yoast_seo.settings
 
 dependencies:
   - metatag

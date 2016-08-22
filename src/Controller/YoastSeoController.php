@@ -68,9 +68,9 @@ class YoastSeoController extends ControllerBase {
       // module configuration page if he has access to do so.
       if (\Drupal::currentUser()->hasPermission('administer xmlsitemap')) {
         $xmlsitemap_description = t(
-          'You can configure the XML Sitemap settings at the !url.',
+          'You can configure the XML Sitemap settings at the @url.',
           [
-            '!url' => \Drupal::l(
+            '@url' => \Drupal::l(
               t('XML Sitemap configuration page'),
               Url::fromRoute('xmlsitemap.admin_search')
             ),
