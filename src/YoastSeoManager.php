@@ -293,7 +293,7 @@ class YoastSeoManager {
   public function getSnippetEditorMarkup() {
     // Get template for the snippet.
     $snippet_tpl = [
-      '#theme' => 'snippet',
+      '#theme' => 'yoast_snippet',
       '#wrapper_target_id' => self::$jsTargets['wrapper_target_id'],
       '#snippet_target_id' => self::$jsTargets['snippet_target_id'],
       '#output_target_id' => self::$jsTargets['output_target_id'],
