@@ -4,6 +4,7 @@ namespace Drupal\yoast_seo\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Drupal\metatag\MetatagToken;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\yoast_seo_premimum;
@@ -31,6 +32,8 @@ class YoastSeoController extends ControllerBase {
    *   In case of NotFoundHttpException.
    */
   public function tokens(Request $request) {
+    /** @var MetatagToken $metatag_token */
+    $metatag_token = \Drupal::service('metatag.token');
     $token_values = array();
     $tokens       = $request->request->get('tokens');
     $data         = $request->request->get('data');
@@ -43,7 +46,7 @@ class YoastSeoController extends ControllerBase {
     // Use the metatag token service, which use either core or token module
     // regarding if this one is installed.
     foreach ($tokens as $token) {
-      $token_values[$token] = \Drupal::token()->replace($token, $data);
+      $token_values[$token] = $metatag_token->replace($token, $data);
     }
 
     return new JsonResponse($token_values);

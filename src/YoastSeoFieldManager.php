@@ -16,8 +16,6 @@ class YoastSeoFieldManager {
     // Paths to access the fields inside the form array.
     'paths' => [
       'title' => 'title.widget.0.value',
-      'summary' => 'body.widget.0.summary',
-      'body' => 'body.widget.0.value',
       'focus_keyword' => 'field_yoast_seo.widget.0.yoast_seo.focus_keyword',
       'seo_status' => 'field_yoast_seo.widget.0.yoast_seo.status',
       'path' => 'path.widget.0.alias',
@@ -27,7 +25,6 @@ class YoastSeoFieldManager {
     'fields' => [
       'title',
       'summary',
-      'body',
       'focus_keyword',
       'seo_status',
       'path',
@@ -38,7 +35,6 @@ class YoastSeoFieldManager {
       '[current-page:title]' => 'title',
       '[node:title]' => 'title',
       '[current-page:body]' => 'body',
-      '[node:body]' => 'body',
       '[current-page:summary]' => 'summary',
       '[node:summary]' => 'summary',
     ],
@@ -210,6 +206,27 @@ class YoastSeoFieldManager {
    *   Transformed form.
    */
   public function setFieldsConfiguration($form_after_build) {
+    $yoast_settings = $form_after_build['#yoast_settings'];
+    $body_field = isset($yoast_settings['body']) ? $yoast_settings['body'] : '';
+    $body_element = FALSE;
+
+    if ($body_field && isset($form_after_build[$body_field]['widget'][0])) {
+      $body_element = $form_after_build[$body_field]['widget'][0];
+    }
+    else {
+      return;
+    }
+
+    // Provide preview for [node:summary] even if there is no summary.
+    $summary_path = isset($body_element[0]['summary']) ? 'summary' : 'value';
+    $this->fieldsConfiguration['paths']['summary'] = $body_field . '.widget.0.' . $summary_path;
+
+    // Update field configurations.
+    $this->fieldsConfiguration['paths'][$body_field] = $body_field . '.widget.0.value';
+    $this->fieldsConfiguration['fields'][] = $body_field;
+    $this->fieldsConfiguration['tokens']['[node:' . $body_field . ']'] = $body_field;
+
+    $body_format = isset($body_element['#format']) ? $body_element['#format'] : '';
 
     // Fields requested.
     // Attach settings in drupalSettings for each required field.
@@ -230,7 +247,7 @@ class YoastSeoFieldManager {
     $is_default_meta_title = !empty($form_after_build['field_meta_tags']['widget'][0]['basic']['title']['#default_value']) ? TRUE : FALSE;
     $is_default_keyword = !empty($form_after_build['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value']) ? TRUE : FALSE;
     $is_default_meta_description = !empty($form_after_build['field_meta_tags']['widget'][0]['basic']['description']['#default_value']) ? TRUE : FALSE;
-    $is_default_body = !empty($form_after_build['body']['widget'][0]['#default_value']) ? TRUE : FALSE;
+    $body_exists = !empty($body_element['#default_value']) ? TRUE : FALSE;
 
     // The path default value.
     // @todo Should be completed once pathauto has been released for Drupal 8.
@@ -243,7 +260,7 @@ class YoastSeoFieldManager {
       'meta_title' => $is_default_meta_title ? $form_after_build['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
       'keyword' => $is_default_keyword ? $form_after_build['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
       'meta_description' => $is_default_meta_description ? $form_after_build['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
-      'body' => $is_default_body ? $form_after_build['body']['widget'][0]['#default_value'] : '',
+      'body' => $body_exists ? $body_element['#default_value'] : '',
       'path' => $path,
     ];
 
@@ -260,7 +277,7 @@ class YoastSeoFieldManager {
     ];
 
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['seo_title_overwritten'] = $is_default_meta_title;
-    $form_after_build['#attached']['drupalSettings']['yoast_seo']['text_format'] = $form_after_build['body']['widget'][0]['#format'];
+    $form_after_build['#attached']['drupalSettings']['yoast_seo']['text_format'] = $body_format;
 
     // Form config.
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['form_id'] = $form_after_build['#id'];
@@ -278,14 +295,16 @@ class YoastSeoFieldManager {
    *   Form.
    */
   public function addSnippetEditorMarkup($form) {
+    $yoast_settings = $form['#yoast_settings'];
+    $body_field = isset($yoast_settings['body']) ? $yoast_settings['body'] : '';
     $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
     $output = $yoast_seo_manager->getSnippetEditorMarkup();
+    $body_weight = isset($form[$body_field]['#weight']) ? $form[$body_field]['#weight'] : 20;
 
     // Add rendered template to the form, where we want the snippet.
     $this->formSet($form, 'field_yoast_seo.widget.0.yoast_seo.snippet_analysis', [
-      '#weight' => $form['body']['#weight'] + 1,
+      '#weight' => $body_weight + 1,
       '#markup' => $output,
-
     ]);
 
     return $form;
