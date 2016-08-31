@@ -338,9 +338,13 @@ class YoastSeoManager {
     $default = $rules['default'];
     unset($rules['default']);
 
-    foreach ($rules as $rule_max_score => $rule_status) {
-      if ($score <= $rule_max_score) {
-        return $rule_status;
+    foreach ($rules as $status => $status_rules) {
+      $min_max_isset = isset($status_rules['min']) && isset($status_rules['max']);
+      if (isset($status_rules['equal']) && $status_rules['equal'] == $score) {
+        return $status;
+      }
+      elseif ($min_max_isset && $score > $status_rules['min'] && $score <= $status_rules['max']) {
+        return $status;
       }
     }
 

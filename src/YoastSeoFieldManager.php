@@ -34,7 +34,6 @@ class YoastSeoFieldManager {
     'tokens' => [
       '[current-page:title]' => 'title',
       '[node:title]' => 'title',
-      '[current-page:body]' => 'body',
       '[current-page:summary]' => 'summary',
       '[node:summary]' => 'summary',
     ],
@@ -225,19 +224,21 @@ class YoastSeoFieldManager {
     $this->fieldsConfiguration['paths'][$body_field] = $body_field . '.widget.0.value';
     $this->fieldsConfiguration['fields'][] = $body_field;
     $this->fieldsConfiguration['tokens']['[node:' . $body_field . ']'] = $body_field;
-
+    $this->fieldsConfiguration['tokens']['[current-page:' . $body_field . ']'] = $body_field;
     $body_format = isset($body_element['#format']) ? $body_element['#format'] : '';
 
     // Fields requested.
     // Attach settings in drupalSettings for each required field.
     foreach ($this->fieldsConfiguration['fields'] as $field_name) {
       $field_id = $this->formGet($form_after_build, $this->fieldsConfiguration['paths'][$field_name] . '.#id');
-      $form_after_build['#attached']['drupalSettings']['yoast_seo']['fields'][$field_name] = $field_id;
+      if($field_name == $body_field)
+        $form_after_build['#attached']['drupalSettings']['yoast_seo']['fields']['body'] = $field_id;
+      else
+        $form_after_build['#attached']['drupalSettings']['yoast_seo']['fields'][$field_name] = $field_id;
     }
-
     // Attach settings for the tokens.
-    foreach ($this->fieldsConfiguration['tokens'] as $field_name => $token) {
-      $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens'][$field_name] = $token;
+    foreach ($this->fieldsConfiguration['tokens'] as $token => $field_name) {
+      $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens'][$token] = $field_name;
     }
     // Other tokens commonly used.
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['tokens']['[site:name]'] = \Drupal::config('system.site')->get('name');
@@ -260,7 +261,7 @@ class YoastSeoFieldManager {
       'meta_title' => $is_default_meta_title ? $form_after_build['field_meta_tags']['widget'][0]['basic']['title']['#default_value'] : '',
       'keyword' => $is_default_keyword ? $form_after_build['field_yoast_seo']['widget'][0]['yoast_seo']['focus_keyword']['#default_value'] : '',
       'meta_description' => $is_default_meta_description ? $form_after_build['field_meta_tags']['widget'][0]['basic']['description']['#default_value'] : '',
-      'body' => $body_exists ? $body_element['#default_value'] : '',
+       $body_field => $body_exists ? $body_element['#default_value'] : '',
       'path' => $path,
     ];
 

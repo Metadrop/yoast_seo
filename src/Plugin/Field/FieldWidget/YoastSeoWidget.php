@@ -131,7 +131,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       '#open' => TRUE,
       '#attached' => array(
         'library' => array(
-          'yoast_seo/yoast_seo.edit_node',
+          'yoast_seo/yoast_seo_core',
           'yoast_seo/yoast_seo_admin',
         ),
       ),
