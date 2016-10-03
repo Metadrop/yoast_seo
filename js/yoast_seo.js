@@ -5,9 +5,13 @@
  */
 (function ($) {
   Drupal.yoast_seo = Drupal.yoast_seo || {};
-
+  Drupal.yoast_seo_node_new = false;
+  
   Drupal.behaviors.yoast_seo = {
     attach: function (context, settings) {
+      if(settings.path && settings.path.currentPath.indexOf('node/add') != -1){
+        Drupal.yoast_seo_node_new = true;
+      }
       // Making sure we actually have data.
       if (typeof settings.yoast_seo != 'undefined') {
         var yoast_settings = settings.yoast_seo;
@@ -62,7 +66,6 @@
           // Create a new Yoast SEO instance.
           if (typeof YoastSEO != "undefined") {
             var DrupalSource = new YoastSEO_DrupalSource(YoastSEO.analyzerArgs);
-
             // Declaring the callback functions, for now we bind DrupalSource.
             YoastSEO.analyzerArgs.callbacks = {
               getData: DrupalSource.getData.bind(DrupalSource),
@@ -280,6 +283,23 @@ YoastSEO_DrupalSource.prototype.renewData = function (ev) {
       $this.triggerEvent(YoastSEO.app.config.snippetFields.title);
     }, 3000);
   }
+  
+  //If node is new we could use new typed title for js tokens  
+  if (ev.target.id == this.config.fields.nodeTitle && Drupal.yoast_seo_node_new) {
+    var metatagTitle =  document.getElementById(this.config.fields.title).value;
+    //If node is new replace token title with value from input title
+    //@todo: Review logic for better implement and remove hard 
+    //[current-page:title]
+    if(metatagTitle.indexOf('[current-page:title]') != -1){
+      metatagTitle = metatagTitle.replace('[current-page:title]', ev.target.value);
+    }
+    //[node:title]
+    if(metatagTitle.indexOf('[node:title]') != -1){
+      metatagTitle = metatagTitle.replace('[node:title]', ev.target.value);
+    }
+    document.getElementById(this.config.snippetFields.title).value = this.tokenReplace(metatagTitle);
+    this.triggerEvent(this.config.snippetFields.title);
+  }
 
   if (ev.target.id == this.config.fields.title) {
     document.getElementById(this.config.snippetFields.title).value = this.tokenReplace(ev.target.value);
@@ -356,7 +376,7 @@ YoastSEO_DrupalSource.prototype.tokenReplace = function (value) {
     tokenRegex = /(\[[^\]]*:[^\]]*\])/g,
     match = value.match(tokenRegex),
     tokensNotFound = [];
-
+ 
   // If the value contains tokens.
   if (match != null) {
     // Replace all the tokens by their relative value.
@@ -413,6 +433,6 @@ YoastSEO_DrupalSource.prototype.tokenReplace = function (value) {
       });
     }
   }
-
+  
   return value;
 };
