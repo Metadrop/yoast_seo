@@ -13,7 +13,7 @@ function yoast_seo_drush_command() {
   // Command yoastseo-prepare-uninstall
   // prepares the module to be uninstalled.
   $items['yoastseo-prepare-uninstall'] = array(
-    'description' => "Prepare uninstalling Realtime SEO. Remove fields and data.",
+    'description' => "Prepare uninstalling Real-time SEO. Remove fields and data.",
     'aliases' => array('ypu'),
   );
 

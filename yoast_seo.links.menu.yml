@@ -1,6 +1,6 @@
 yoast_seo.admin:
-  title: 'Realtime SEO Admin Settings'
-  description: 'Configure Realtime SEO for Drupal settings'
+  title: 'Real-time SEO Admin Settings'
+  description: 'Configure Real-time SEO for Drupal settings'
   parent: system.admin_config_development
   route_name: yoast_seo.settings
   weight: 100

@@ -10,7 +10,7 @@ use Drupal\Core\Field\FieldItemListInterface;
  *
  * @FieldFormatter(
  *    id = "yoastseo_formatter",
- *    label = @Translation("RealtimeSeo formatter"),
+ *    label = @Translation("Real-timeSeo formatter"),
  *    field_types = {
  *      "yoast_seo",
  *    }

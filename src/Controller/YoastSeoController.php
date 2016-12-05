@@ -129,8 +129,8 @@ class YoastSeoController extends ControllerBase {
                                 ->getForm('Drupal\yoast_seo\Form\YoastSeoConfigForm');
     $form['yoast_seo'] = [
       '#type' => 'details',
-      '#title' => 'Configure Realtime SEO by bundles',
-      '#description' => 'Select the bundles Realtime SEO will be enabled for',
+      '#title' => 'Configure Real-time SEO by bundles',
+      '#description' => 'Select the bundles Real-time SEO will be enabled for',
       '#markup' => render($config_form),
       '#open' => TRUE,
     ];
