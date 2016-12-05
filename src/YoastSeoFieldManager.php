@@ -211,7 +211,7 @@ class YoastSeoFieldManager {
       $body_element = $form_after_build[$body_field]['widget'][0];
     }
     else {
-      return;
+      return $form_after_build;
     }
 
     // Provide preview for [node:summary] even if there is no summary.
