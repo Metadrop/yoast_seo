@@ -21,5 +21,3 @@ Before uninstalling Real-time SEO for Drupal 8, you need to
 prepare the module to be uninstalled.
 To do so, execute this drush command in your console, at the drupal root :
 drush ypu
-
-

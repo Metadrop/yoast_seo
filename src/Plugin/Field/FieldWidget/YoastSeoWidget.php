@@ -2,7 +2,6 @@
 
 namespace Drupal\yoast_seo\Plugin\Field\FieldWidget;
 
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -25,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
-   /**
+  /**
    * The entity field manager.
    *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
@@ -121,7 +120,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $form['#yoast_settings'] = $this->getSettings();
 
     // Create the form element.

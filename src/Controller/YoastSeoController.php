@@ -4,10 +4,8 @@ namespace Drupal\yoast_seo\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
-use Drupal\metatag\MetatagToken;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\yoast_seo_premimum;
 
 /**
  * YoastSeoController.

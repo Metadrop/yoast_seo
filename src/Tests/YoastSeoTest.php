@@ -70,6 +70,7 @@ class YoastSeoTest extends WebTestBase {
     json_decode($this->drupalPostForm(NULL, $edit, t('Save')));
     $this->assertFieldChecked('edit-node-page');
   }
+
   /**
    * Disable Yoast SEO for a given bundle.
    */

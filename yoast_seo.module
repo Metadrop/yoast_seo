@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @file
  * Contains yoast_seo.module.
  */
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -48,7 +50,7 @@ function yoast_seo_form_node_afterbuild($form, FormStateInterface $form_state) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter() for 'field_storage_config_edit_form'.
+ * Implements hook_form_FORM_ID_alter().
  */
 function yoast_seo_form_field_storage_config_edit_form_alter(&$form, FormStateInterface $form_state) {
   if ($form_state->getFormObject()->getEntity()->getType() == 'yoast_seo') {
@@ -64,11 +66,13 @@ function yoast_seo_form_field_storage_config_edit_form_alter(&$form, FormStateIn
 function yoast_seo_entity_field_access($operation, $field_definition, $account, $items = NULL) {
   if ($field_definition->getName() == 'field_yoast_seo') {
     return AccessResult::forbiddenIf(
-      ! ( $account->hasPermission('use yoast seo') || $account->hasPermission('administer yoast seo') )
-      || ! ( $account->hasPermission('create url aliases') || $account->hasPermission('administer url aliases') )
-      // Such edit meta tags permission doesn't exist anymore, and administer meta tags is too restrictive.
+      !($account->hasPermission('use yoast seo') || $account->hasPermission('administer yoast seo'))
+      || !($account->hasPermission('create url aliases') || $account->hasPermission('administer url aliases'))
+      // Such edit meta tags permission doesn't exist anymore, and administer
+      // meta tags is too restrictive.
       // Wait or changes.
-      // || ! ( $account->hasPermission('edit meta tags') || $account->hasPermission('administer meta tags') )
+      // || ! ( $account->hasPermission('edit meta tags') ||
+      // $account->hasPermission('administer meta tags') )
     )->cachePerPermissions();
   }
 
@@ -125,7 +129,7 @@ function yoast_seo_theme() {
  *
  * @ingroup entity_crud
  */
-function yoast_seo_entity_view_display_alter(\Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, array $context) {
+function yoast_seo_entity_view_display_alter(EntityViewDisplayInterface $display, array $context) {
   // Leave Yoast field labels out of the display.
   if ($context['entity_type'] == 'node' && $context['view_mode'] == 'full') {
     foreach ($display->getComponents() as $name => $options) {

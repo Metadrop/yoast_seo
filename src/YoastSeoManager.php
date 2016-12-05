@@ -4,7 +4,6 @@ namespace Drupal\yoast_seo;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use \Drupal\views\Views;
-use Drupal\Core\Url;
 use \Drupal\Component\Utility\Html;
 use \Symfony\Component\Yaml\Yaml;
 
@@ -24,6 +23,7 @@ class YoastSeoManager {
 
   /**
    * Target elements for Javascript.
+   *
    * @var array
    */
   public static $jsTargets = [
@@ -44,8 +44,8 @@ class YoastSeoManager {
     $this->yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
 
     // Populate js target ids.
-    foreach(self::$jsTargets as $js_target_name => $js_target_id) {
-      if (! preg_match('/^js/', $js_target_id)) {
+    foreach (self::$jsTargets as $js_target_name => $js_target_id) {
+      if (!preg_match('/^js/', $js_target_id)) {
         self::$jsTargets[$js_target_name] = Html::getUniqueId($js_target_id);
       }
     }
@@ -196,14 +196,14 @@ class YoastSeoManager {
   /**
    * Set configuration for js target elements.
    *
-   * @param array elt
+   * @param array $elt
    *   The element on which to attach the configuration.
    *
    * @return array
    *   The same element passed, with the new configuration attached.
    */
   public function setTargetsConfiguration(&$elt) {
-    foreach(self::$jsTargets as $js_target_name => $js_target_id) {
+    foreach (self::$jsTargets as $js_target_name => $js_target_id) {
       $elt['#attached']['drupalSettings']['yoast_seo']['targets'][$js_target_name] = $js_target_id;
     }
     return $elt;
@@ -215,9 +215,9 @@ class YoastSeoManager {
    * Set
    * - language
    * - options (analyzer, snippet_preview)
-   * - base_root
+   * - base_root.
    *
-   * @param array elt
+   * @param array $elt
    *   The element on which to attach the configuration.
    *
    * @return array
@@ -245,7 +245,7 @@ class YoastSeoManager {
   /**
    * Set configuration for score to status rules.
    *
-   * @param array elt
+   * @param array $elt
    *   The element on which to attach the configuration.
    *
    * @return array
@@ -258,11 +258,11 @@ class YoastSeoManager {
     return $elt;
   }
 
-
   /**
    * Get configuration from Yaml file.
    *
    * @return mixed
+   *    Configuration details will be returned.
    */
   public function getConfiguration() {
     $conf = Yaml::parse(
@@ -277,6 +277,7 @@ class YoastSeoManager {
    * Get rules to convert a score into a status, from the config file.
    *
    * @return mixed
+   *    Score to status rules will be returned.
    */
   public function getScoreToStatusRules() {
     $score_to_status_rules = $this->getConfiguration()['score_to_status_rules'];
@@ -305,7 +306,7 @@ class YoastSeoManager {
    * Get Markup for the overall score.
    *
    * @param int $score
-   *   the default score to display
+   *   The default score to display.
    *
    * @return string
    *   HTML Markup of the overall score.
