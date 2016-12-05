@@ -11,9 +11,9 @@ use Drupal\Core\TypedData\DataDefinition;
  *
  * @FieldType(
  *   id = "yoast_seo",
- *   label = @Translation("Yoast SEO status & focused keywords"),
+ *   label = @Translation("Realtime SEO status & focused keywords"),
  *   module = "yoast_seo",
- *   description = @Translation("The Yoast SEO status in points and the focused keywords."),
+ *   description = @Translation("The Realtime SEO status in points and the focused keywords."),
  *   default_widget = "yoast_seo_widget",
  *   default_formatter = "string"
  * )

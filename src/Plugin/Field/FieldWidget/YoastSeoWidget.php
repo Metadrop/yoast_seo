@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @FieldWidget(
  *   id = "yoast_seo_widget",
- *   label = @Translation("Yoast SEO form"),
+ *   label = @Translation("Realtime SEO form"),
  *   field_types = {
  *     "yoast_seo"
  *   }
@@ -127,7 +127,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     // Create the form element.
     $element['yoast_seo'] = array(
       '#type' => 'details',
-      '#title' => t('Yoast SEO for drupal'),
+      '#title' => t('Realtime SEO for drupal'),
       '#open' => TRUE,
       '#attached' => array(
         'library' => array(
@@ -146,7 +146,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
 
     $element['yoast_seo']['status'] = array(
       '#type' => 'hidden',
-      '#title' => t('Yoast SEO status'),
+      '#title' => t('Realtime SEO status'),
       '#default_value' => isset($items[$delta]->status) ? $items[$delta]->status : NULL,
       '#description' => t("The SEO status in points."),
     );

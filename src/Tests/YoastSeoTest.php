@@ -110,14 +110,14 @@ class YoastSeoTest extends WebTestBase {
     // And I am adding an Entity Test content.
     $this->drupalGet('node/add/page');
     // Then I should see the Yoast SEO section active.
-    $this->assertText('Yoast SEO for drupal');
+    $this->assertText('Realtime SEO for drupal');
 
     // When I disable Yoast SEO for the page bundle.
     $this->disableYoastSeo('node', 'page');
     // And I am adding an Entity Test content.
     $this->drupalGet('node/add/page');
     // Then I should not see the Yoast SEO section active.
-    $this->assertNoText('Yoast SEO for drupal');
+    $this->assertNoText('Realtime SEO for drupal');
   }
 
 }

@@ -1,8 +1,8 @@
 administer yoast seo:
-  title: 'Administer Yoast SEO for Drupal'
+  title: 'Administer Realtime SEO for Drupal'
   description: 'Control the main settings pages and configure the settings per content types.'
   restrict access: TRUE
 
 use yoast seo:
-  title: 'Use Yoast SEO for Drupal'
-  description: 'Modify Yoast SEO for Drupal configuration per individual nodes.'
+  title: 'Use Realtime SEO for Drupal'
+  description: 'Modify Realtime SEO for Drupal configuration per individual nodes.'

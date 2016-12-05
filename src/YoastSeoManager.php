@@ -73,7 +73,7 @@ class YoastSeoManager {
     $yoast_fields = [
       'field_yoast_seo' => array(
         'field_name' => 'field_yoast_seo',
-        'field_label' => 'Yoast SEO',
+        'field_label' => 'Realtime SEO',
         'storage_type' => 'yoast_seo',
         'translatable' => TRUE,
       ),

@@ -1,23 +1,23 @@
 
-HOW TO INSTALL YOAST SEO
+HOW TO INSTALL Realtime SEO
 ------------------------
-To install Yoast SEO for Drupal 8, proceed same as for any other module.
+To install Realtime SEO for Drupal 8, proceed same as for any other module.
 As an admin, you can go to the Extend section and upload the module, or install
 it from the url.
-You can find Yoast SEO at this url : https://www.drupal.org/project/yoast_seo
+You can find Realtime SEO at this url : https://www.drupal.org/project/yoast_seo
 
 You can also install it from drush : drush en yoast_seo -y
 
 DEPENDENCIES
 ------------
-Yoast SEO depends on the module MetaTag :
+Realtime SEO depends on the module MetaTag :
 https://www.drupal.org/project/metatag
 
-You will need to install it before you can install Yoast SEO.
+You will need to install it before you can install Realtime SEO.
 
-HOW TO UNINSTALL YOAST SEO
+HOW TO UNINSTALL Realtime SEO
 --------------------------
-Before uninstalling Yoast SEO for Drupal 8, you need to
+Before uninstalling Realtime SEO for Drupal 8, you need to
 prepare the module to be uninstalled.
 To do so, execute this drush command in your console, at the drupal root :
 drush ypu
