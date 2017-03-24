@@ -103,7 +103,7 @@ class YoastSeoController extends ControllerBase {
         'You can configure and override the Metatag title & description default settings at the @url.',
         [
           '@url' => \Drupal::l(
-            t('Metatag configuration page'),
+            $this->t('Metatag configuration page'),
             Url::fromRoute('entity.metatag_defaults.collection')
           ),
         ]
@@ -111,12 +111,12 @@ class YoastSeoController extends ControllerBase {
     }
     else {
       $metatag_description
-        = t('You currently do not have the permission to administer Metatag.');
+        = $this->t('You currently do not have the permission to administer Metatag.');
     }
 
     $form['metatag'] = [
       '#type' => 'details',
-      '#title' => t('Configure Metatag default templates'),
+      '#title' => $this->t('Configure Metatag default templates'),
       '#markup' => $metatag_description,
       '#open' => TRUE,
     ];
