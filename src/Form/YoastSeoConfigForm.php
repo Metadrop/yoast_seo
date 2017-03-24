@@ -151,7 +151,6 @@ class YoastSeoConfigForm extends FormBase {
     // @todo Should be the same than the ones supported by the metatag module.
     return [
       'node' => 'Node',
-      // 'taxonomy_term' => 'Taxonomy term',.
     ];
   }
 
