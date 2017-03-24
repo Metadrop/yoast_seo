@@ -37,7 +37,7 @@ class YoastSeoConfigForm extends FormBase {
       // enable/disable Yoast SEO for supported bundles.
       $form[$entity_type] = array(
         '#type' => 'checkboxes',
-        '#title' => $this->t('@label', array('@label' => $entity_label)),
+        '#title' => t('@label', array('@label' => $entity_label)),
         '#options' => $options,
         '#required' => FALSE,
         '#default_value' => $enabled_bundles,
@@ -48,7 +48,7 @@ class YoastSeoConfigForm extends FormBase {
     $form['actions']           = array('#type' => 'actions');
     $form['actions']['submit'] = array(
       '#type' => 'submit',
-      '#value' => $this->t('Save'),
+      '#value' => t('Save'),
     );
 
     return $form;

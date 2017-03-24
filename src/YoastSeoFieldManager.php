@@ -271,9 +271,9 @@ class YoastSeoFieldManager {
 
     // Placeholders.
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['placeholder_text'] = [
-      'snippetTitle' => $this->t('Please click here to alter your page meta title'),
-      'snippetMeta' => $this->t('Please click here and alter your page meta description.'),
-      'snippetCite' => $this->t('/example-post'),
+      'snippetTitle' => t('Please click here to alter your page meta title'),
+      'snippetMeta' => t('Please click here and alter your page meta description.'),
+      'snippetCite' => t('/example-post'),
     ];
 
     $form_after_build['#attached']['drupalSettings']['yoast_seo']['seo_title_overwritten'] = $is_default_meta_title;
