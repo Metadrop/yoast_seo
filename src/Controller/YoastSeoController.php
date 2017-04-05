@@ -64,11 +64,11 @@ class YoastSeoController extends ControllerBase {
       // Inform the user about altering the XML Sitemap configuration on the
       // module configuration page if he has access to do so.
       if (\Drupal::currentUser()->hasPermission('administer xmlsitemap')) {
-        $xmlsitemap_description = t(
+        $xmlsitemap_description = $this->t(
           'You can configure the XML Sitemap settings at the @url.',
           [
             '@url' => \Drupal::l(
-              t('XML Sitemap configuration page'),
+              $this->t('XML Sitemap configuration page'),
               Url::fromRoute('xmlsitemap.admin_search')
             ),
           ]
@@ -76,13 +76,13 @@ class YoastSeoController extends ControllerBase {
       }
       else {
         $xmlsitemap_description
-          = t('You do not have the permission to administer XML Sitemap.');
+          = $this->t('You do not have the permission to administer XML Sitemap.');
       }
     }
     else {
       // XML Sitemap is not enabled, inform the user he should think about
       // installing and enabling it.
-      $xmlsitemap_description = t(
+      $xmlsitemap_description = $this->t(
         'You currently do not have XML Sitemap enabled. We strongly recommend you to install XML Sitemap. You can download the module from <a href="@project-page-url">@project-page-url</a>.',
         ['@project-page-url' => 'https://www.drupal.org/project/xmlsitemap']
       );
@@ -90,7 +90,7 @@ class YoastSeoController extends ControllerBase {
 
     $form['xmlsitemap'] = [
       '#type' => 'details',
-      '#title' => t('XML Sitemap'),
+      '#title' => $this->t('XML Sitemap'),
       '#markup' => $xmlsitemap_description,
       '#open' => TRUE,
     ];
@@ -99,11 +99,11 @@ class YoastSeoController extends ControllerBase {
     // configuration page if he has access to do so.
     // We do not check if the module is enabled since it is our dependency.
     if (\Drupal::currentUser()->hasPermission('administer meta tags')) {
-      $metatag_description = t(
+      $metatag_description = $this->t(
         'You can configure and override the Metatag title & description default settings at the @url.',
         [
           '@url' => \Drupal::l(
-            t('Metatag configuration page'),
+            $this->t('Metatag configuration page'),
             Url::fromRoute('entity.metatag_defaults.collection')
           ),
         ]
@@ -111,12 +111,12 @@ class YoastSeoController extends ControllerBase {
     }
     else {
       $metatag_description
-        = t('You currently do not have the permission to administer Metatag.');
+        = $this->t('You currently do not have the permission to administer Metatag.');
     }
 
     $form['metatag'] = [
       '#type' => 'details',
-      '#title' => t('Configure Metatag default templates'),
+      '#title' => $this->t('Configure Metatag default templates'),
       '#markup' => $metatag_description,
       '#open' => TRUE,
     ];

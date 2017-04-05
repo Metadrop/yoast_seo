@@ -77,7 +77,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
   public function settingsSummary() {
     $summary = [];
 
-    $summary[] = t('Body: @body', ['@body' => $this->getSetting('body')]);
+    $summary[] = $this->t('Body: @body', ['@body' => $this->getSetting('body')]);
 
     return $summary;
   }
@@ -107,7 +107,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
 
     $element['body'] = [
       '#type' => 'select',
-      '#title' => t('Body'),
+      '#title' => $this->t('Body'),
       '#required' => TRUE,
       '#description' => $this->t('Select a field which is used as the body field.'),
       '#options' => $text_fields,
@@ -126,7 +126,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     // Create the form element.
     $element['yoast_seo'] = array(
       '#type' => 'details',
-      '#title' => t('Real-time SEO for drupal'),
+      '#title' => $this->t('Real-time SEO for drupal'),
       '#open' => TRUE,
       '#attached' => array(
         'library' => array(
@@ -138,16 +138,16 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
 
     $element['yoast_seo']['focus_keyword'] = array(
       '#type' => 'textfield',
-      '#title' => t('Focus keyword'),
+      '#title' => $this->t('Focus keyword'),
       '#default_value' => isset($items[$delta]->focus_keyword) ? $items[$delta]->focus_keyword : NULL,
-      '#description' => t("Pick the main keyword or keyphrase that this post/page is about."),
+      '#description' => $this->t("Pick the main keyword or keyphrase that this post/page is about."),
     );
 
     $element['yoast_seo']['status'] = array(
       '#type' => 'hidden',
-      '#title' => t('Real-time SEO status'),
+      '#title' => $this->t('Real-time SEO status'),
       '#default_value' => isset($items[$delta]->status) ? $items[$delta]->status : NULL,
-      '#description' => t("The SEO status in points."),
+      '#description' => $this->t("The SEO status in points."),
     );
 
     return $element;
