@@ -127,6 +127,7 @@ YoastSEO_DrupalSource = function (args) {
   this.config = args;
   this.refObj = {};
   this.analyzerData = {};
+  this.tokensRemote = {};
 };
 
 /**
