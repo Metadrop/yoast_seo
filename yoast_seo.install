@@ -56,13 +56,8 @@ function yoast_seo_update_8001() {
     }
   }
 
-  do {
-    field_purge_batch(1000);
-    $properties = array(
-      'deleted' => TRUE,
-      'include_deleted' => TRUE,
-    );
-    $fields = entity_load_multiple_by_properties('field_config', $properties);
-  } while ($fields);
-
+  // Fields have been marked as deleted. Attempt to delete them straight away.
+  // Anything that's missed now will be cleaned up by cron later.
+  $limit = \Drupal::config('field.settings')->get('purge_batch_size');
+  field_purge_batch($limit);
 }
