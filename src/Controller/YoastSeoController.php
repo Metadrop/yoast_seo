@@ -59,8 +59,17 @@ class YoastSeoController extends ControllerBase {
   public function settings() {
     $form = [];
 
-    // Check if XML Sitemap is installed and enabled.
-    if (\Drupal::moduleHandler()->moduleExists('xmlsitemap')) {
+    $xmlsitemap_enabled = \Drupal::moduleHandler()->moduleExists('xmlsitemap');
+    $simple_sitemap_enabled = \Drupal::moduleHandler()->moduleExists('simple_sitemap');
+
+    // Check if a sitemap module is installed and enabled.
+    if ($xmlsitemap_enabled && $simple_sitemap_enabled) {
+      // Discourage users from enabling both sitemap modules as they
+      // might interfere.
+      $xmlsitemap_description
+        = $this->t('It looks like you have both the XML Sitemap and Simple XML Sitemap module enabled. Please uninstall one of them as they could interfere with each other.');
+    }
+    elseif ($xmlsitemap_enabled) {
       // Inform the user about altering the XML Sitemap configuration on the
       // module configuration page if he has access to do so.
       if (\Drupal::currentUser()->hasPermission('administer xmlsitemap')) {
@@ -68,7 +77,7 @@ class YoastSeoController extends ControllerBase {
           'You can configure the XML Sitemap settings at the @url.',
           [
             '@url' => \Drupal::l(
-              $this->t('XML Sitemap configuration page'),
+              $this->t('configuration page'),
               Url::fromRoute('xmlsitemap.admin_search')
             ),
           ]
@@ -76,21 +85,45 @@ class YoastSeoController extends ControllerBase {
       }
       else {
         $xmlsitemap_description
-          = $this->t('You do not have the permission to administer XML Sitemap.');
+          = $this->t('You do not have the permission to administer the XML Sitemap.');
+      }
+    }
+    elseif (\Drupal::moduleHandler()->moduleExists('simple_sitemap')) {
+      // Inform the user about altering the XML Sitemap configuration on the
+      // module configuration page if he has access to do so.
+      if (\Drupal::currentUser()->hasPermission('administer simple_sitemap')) {
+        $xmlsitemap_description = $this->t(
+          'You can configure the Simple XML Sitemap settings at the @url.',
+          [
+            '@url' => \Drupal::l(
+              $this->t('configuration page'),
+              Url::fromRoute('simple_sitemap.settings')
+            ),
+          ]
+        );
+      }
+      else {
+        $xmlsitemap_description
+          = $this->t('You do not have the permission to administer the Simple XML Sitemap.');
       }
     }
     else {
       // XML Sitemap is not enabled, inform the user he should think about
       // installing and enabling it.
       $xmlsitemap_description = $this->t(
-        'You currently do not have XML Sitemap enabled. We strongly recommend you to install XML Sitemap. You can download the module from <a href="@project-page-url">@project-page-url</a>.',
-        ['@project-page-url' => 'https://www.drupal.org/project/xmlsitemap']
-      );
+        'You currently do not have a sitemap module enabled. We strongly recommend you to install a sitemap module. You can download the <a href="@project1-url">@project1-name</a> or <a href="@project2-url">@project2-name</a> module to use as sitemap generator.',
+        [
+          '@project1-url' => 'https://www.drupal.org/project/simple_sitemap',
+          '@project1-name' => 'Simple Sitemap',
+          '@project2-url' => 'https://www.drupal.org/project/xmlsitemap',
+          '@project2-name' => 'XML Sitemap',
+        ]
+       );
     }
 
     $form['xmlsitemap'] = [
       '#type' => 'details',
-      '#title' => $this->t('XML Sitemap'),
+      '#title' => $this->t('Sitemap'),
       '#markup' => $xmlsitemap_description,
       '#open' => TRUE,
     ];
@@ -123,8 +156,8 @@ class YoastSeoController extends ControllerBase {
 
     // Add to the page the Yoast SEO form which allows the administrator
     // to enable/disable Yoast SEO by bundles.
-    $config_form       = \Drupal::formBuilder()
-                                ->getForm('Drupal\yoast_seo\Form\YoastSeoConfigForm');
+    $config_form = \Drupal::formBuilder()
+      ->getForm('Drupal\yoast_seo\Form\YoastSeoConfigForm');
     $form['yoast_seo'] = [
       '#type' => 'details',
       '#title' => 'Configure Real-time SEO by bundles',
