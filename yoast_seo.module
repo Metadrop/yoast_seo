@@ -8,7 +8,6 @@
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\BubbleableMetadata;
 
 /**
  * Implements hook_form_FORM_ID_alter() for node_form().
@@ -139,27 +138,4 @@ function yoast_seo_entity_view_display_alter(EntityViewDisplayInterface $display
       }
     }
   }
-}
-
-/**
- * Implements hook_token_info_alter().
- */
-
-function yoast_seo_token_info_alter(&$info) {
-  $info['tokens']['node-field_yoast_seo']['focus_keyword'] = array (
-    'name' => t('Yoast SEO: Focus Keyword'),
-    'description' => t('Yoast SEO Focus Keyword for the node'),
-  );
-  $info['tokens']['node-field_yoast_seo']['status'] = array (
-    'name' => t('Yoast SEO: Status'),
-    'description' => t('Yoast SEO Status for the node'),
-  );
-  $info['tokens']['term-field_yoast_seo']['focus_keyword'] = array (
-    'name' => t('Yoast SEO: Focus Keyword'),
-    'description' => t('Yoast SEO Focus Keyword for the term'),
-  );
-  $info['tokens']['term-field_yoast_seo']['status'] = array (
-    'name' => t('Yoast SEO: Status'),
-    'description' => t('Yoast SEO Status for the term'),
-  );
 }
