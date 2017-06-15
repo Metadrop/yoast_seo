@@ -23,29 +23,38 @@ class YoastSeoItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function mainPropertyName() {
+    return 'status';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
-    return array(
-      'columns' => array(
-        'status' => array(
+    return [
+      'columns' => [
+        'status' => [
           'type' => 'varchar',
           'length' => 256,
           'not null' => FALSE,
-        ),
-        'focus_keyword' => array(
+        ],
+        'focus_keyword' => [
           'type' => 'varchar',
           'length' => 256,
           'not null' => FALSE,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['status']        = DataDefinition::create('string');
-    $properties['focus_keyword'] = DataDefinition::create('string');
+    $properties['status'] = DataDefinition::create('string')
+      ->setLabel(t('Status'));
+    $properties['focus_keyword'] = DataDefinition::create('string')
+      ->setLabel(t('Focus Keyword'));
 
     return $properties;
   }
