@@ -6,113 +6,117 @@
 (function ($) {
   Drupal.yoast_seo = Drupal.yoast_seo || {};
   Drupal.yoast_seo_node_new = false;
-  
+
   Drupal.behaviors.yoast_seo = {
     attach: function (context, settings) {
-      if(settings.path && settings.path.currentPath.indexOf('node/add') != -1){
+      if (typeof settings.yoast_seo === 'undefined') {
+        throw "No settings specified for the YoastSEO analysis library."
+      }
+
+      if (typeof YoastSEO === 'undefined') {
+        $('#' + settings.yoast_seo.targets.output).html('<p><strong>' + Drupal.t('It looks like something went wrong when we tried to load the Yoast SEO content analysis library. Please check it the module is installed correctly.') + '</strong></p>');
+        return;
+      }
+
+      var App = YoastSEO.App;
+
+      if(settings.path && settings.path.currentPath.indexOf('node/add') !== -1){
         Drupal.yoast_seo_node_new = true;
       }
-      // Making sure we actually have data.
-      if (typeof settings.yoast_seo != 'undefined') {
-        var yoast_settings = settings.yoast_seo;
-        // Making sure we only initiate Yoast SEO once.
-        $('body', context).once('yoast_seo').each(function () {
-          YoastSEO.analyzerArgs = {
-            source: YoastSEO_DrupalSource,
-            analyzer: yoast_settings.analyzer,
-            snippetPreview: yoast_settings.snippet_preview,
-            elementTarget: [yoast_settings.wrapper_target_id],
-            typeDelay: 300,
-            typeDelayStep: 100,
-            maxTypeDelay: 1500,
-            dynamicDelay: true,
-            multiKeyword: false,
-            tokens: yoast_settings.tokens,
-            targets: {
-              output: yoast_settings.targets.output_target_id,
-              overall: yoast_settings.targets.overall_score_target_id,
-              snippet: yoast_settings.targets.snippet_target_id
-            },
-            snippetFields: {
-              title: "snippet-editor-title",
-              url: "snippet-editor-slug",
-              meta: "snippet-editor-meta-description"
-            },
-            sampleText: {
-              baseUrl: yoast_settings.base_root + '/',
-              title: yoast_settings.default_text.meta_title,
-              meta: yoast_settings.default_text.meta_description,
-              keyword: yoast_settings.default_text.keyword,
-              text: yoast_settings.default_text.body
-            },
-            fields: {
-              keyword: yoast_settings.fields.focus_keyword,
-              title: yoast_settings.fields.meta_title,
-              nodeTitle: yoast_settings.fields.title,
-              meta: yoast_settings.fields.meta_description,
-              text: yoast_settings.fields.body,
-              url: yoast_settings.fields.path,
-              summary: yoast_settings.fields.summary
-            },
-            placeholderText: {
-              title: yoast_settings.placeholder_text.snippetTitle,
-              description: yoast_settings.placeholder_text.snippetMeta,
-              url: yoast_settings.placeholder_text.snippetCite
-            },
-            SEOTitleOverwritten: yoast_settings.seo_title_overwritten,
-            scoreElement: yoast_settings.fields.seo_status,
-            baseRoot: yoast_settings.base_root
-          };
-          // Create a new Yoast SEO instance.
-          if (typeof YoastSEO != "undefined") {
-            var DrupalSource = new YoastSEO_DrupalSource(YoastSEO.analyzerArgs);
-            // Declaring the callback functions, for now we bind DrupalSource.
-            YoastSEO.analyzerArgs.callbacks = {
-              getData: DrupalSource.getData.bind(DrupalSource),
-              bindElementEvents: DrupalSource.bindElementEvents.bind(DrupalSource),
-              saveSnippetData: DrupalSource.saveSnippetData.bind(DrupalSource),
-              saveScores: DrupalSource.saveScores.bind(DrupalSource)
-            };
 
-            // Make it global.
-            window.YoastSEO.app = new YoastSEO.App(YoastSEO.analyzerArgs);
+      var yoast_settings = settings.yoast_seo;
+      // Making sure we only initiate Yoast SEO once.
+      $('body', context).once('yoast_seo').each(function () {
+        YoastSEO.analyzerArgs = {
+          source: YoastSEO_DrupalSource,
+          analyzer: yoast_settings.analyzer,
+          snippetPreview: yoast_settings.snippet_preview,
+          elementTarget: [yoast_settings.wrapper_target_id],
+          typeDelay: 300,
+          typeDelayStep: 100,
+          maxTypeDelay: 1500,
+          dynamicDelay: true,
+          multiKeyword: false,
+          tokens: yoast_settings.tokens,
+          targets: {
+            output: yoast_settings.targets.output_target_id,
+            overall: yoast_settings.targets.overall_score_target_id,
+            snippet: yoast_settings.targets.snippet_target_id
+          },
+          // snippetFields: {
+          //   title: "snippet-editor-title",
+          //   url: "snippet-editor-slug",
+          //   meta: "snippet-editor-meta-description"
+          // },
+          sampleText: {
+            baseUrl: yoast_settings.base_root + '/',
+            title: yoast_settings.default_text.meta_title,
+            meta: yoast_settings.default_text.meta_description,
+            keyword: yoast_settings.default_text.keyword,
+            text: yoast_settings.default_text.body
+          },
+          fields: {
+            keyword: yoast_settings.fields.focus_keyword,
+            title: yoast_settings.fields.meta_title,
+            nodeTitle: yoast_settings.fields.title,
+            meta: yoast_settings.fields.meta_description,
+            text: yoast_settings.fields.body,
+            url: yoast_settings.fields.path,
+            summary: yoast_settings.fields.summary
+          },
+          placeholderText: {
+            title: yoast_settings.placeholder_text.snippetTitle,
+            description: yoast_settings.placeholder_text.snippetMeta,
+            url: yoast_settings.placeholder_text.snippetCite
+          },
+          SEOTitleOverwritten: yoast_settings.seo_title_overwritten,
+          scoreElement: yoast_settings.fields.seo_status,
+          baseRoot: yoast_settings.base_root
+        };
 
-            // Parse the input from snippet preview fields to their corresponding metatag and path fields
-            DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title);
-            DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.url, YoastSEO.analyzerArgs.fields.url);
-            DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.meta, YoastSEO.analyzerArgs.fields.meta);
 
-            // No enter on contenteditable fields.
-            $("#snippet_title, #snippet_cite, #snippet_meta").keypress(function (e) {
-              if (e.keyCode == 13) {
-                e.preventDefault();
+        var DrupalSource = new YoastSEO_DrupalSource(YoastSEO.analyzerArgs);
+        // Declaring the callback functions, for now we bind DrupalSource.
+        YoastSEO.analyzerArgs.callbacks = {
+          getData: DrupalSource.getData.bind(DrupalSource),
+          bindElementEvents: DrupalSource.bindElementEvents.bind(DrupalSource),
+          saveSnippetData: DrupalSource.saveSnippetData.bind(DrupalSource),
+          saveScores: DrupalSource.saveScores.bind(DrupalSource)
+        };
+
+        // Make it global.
+        window.YoastSEO.app = new App(YoastSEO.analyzerArgs);
+
+        // Parse the input from snippet preview fields to their corresponding metatag and path fields
+        // DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title);
+        // DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.url, YoastSEO.analyzerArgs.fields.url);
+        // DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.meta, YoastSEO.analyzerArgs.fields.meta);
+
+        // No enter on contenteditable fields.
+        // $("#snippet_title, #snippet_cite, #snippet_meta").keypress(function (e) {
+        //   if (e.keyCode === 13) {
+        //     e.preventDefault();
+        //   }
+        // });
+
+        if (typeof CKEDITOR !== "undefined") {
+          CKEDITOR.on('instanceReady', function (ev) {
+            var editor = ev.editor;
+            // Check if this the instance we want to track.
+            if (typeof YoastSEO.analyzerArgs.fields.text !== 'undefined') {
+              if (editor.name == YoastSEO.analyzerArgs.fields.text) {
+                editor.on('change', function () {
+                  // Let CKEditor handle updating the linked text element.
+                  editor.updateElement();
+                  // Dispatch input event so Yoast SEO knows something changed!
+                  DrupalSource.triggerEvent(editor.name);
+                });
               }
-            });
-
-            if (typeof CKEDITOR !== "undefined") {
-              CKEDITOR.on('instanceReady', function (ev) {
-                var editor = ev.editor;
-                // Check if this the instance we want to track.
-                if (typeof YoastSEO.analyzerArgs.fields.text != 'undefined') {
-                  if (editor.name == YoastSEO.analyzerArgs.fields.text) {
-                    editor.on('change', function () {
-                      // Let CKEditor handle updating the linked text element.
-                      editor.updateElement();
-                      // Dispatch input event so Yoast SEO knows something changed!
-                      DrupalSource.triggerEvent(editor.name);
-                    });
-                  }
-                }
-              });
             }
-          }
-          else {
-            $('#' + settings.yoast_seo.targets.output).html('<p><strong>' + Drupal.t('It looks like something went wrong when we tried to load the Yoast SEO content analysis library. Please check it the module is installed correctly.') + '</strong></p>');
-          }
-        });
-      } else {
-        throw 'YoastSEO settings are not defined';
-      }
+          });
+        }
+
+      });
     }
   }
 })(jQuery);
@@ -189,7 +193,7 @@ YoastSEO_DrupalSource.prototype.getDataFromInput = function (field) {
     var output = [];
     for (var text_field in this.config.fields[field]) {
       if (
-        typeof this.config.fields[field][text_field] != 'undefined'
+        typeof this.config.fields[field][text_field] !== 'undefined'
         && document.getElementById(this.config.fields[field][text_field])
         && document.getElementById(this.config.fields[field][text_field]).value != ''
       ) {
@@ -284,7 +288,7 @@ YoastSEO_DrupalSource.prototype.renewData = function (ev) {
       $this.triggerEvent(YoastSEO.app.config.snippetFields.title);
     }, 3000);
   }
-  
+
   //If node is new we could use new typed title for js tokens  
   if (ev.target.id == this.config.fields.nodeTitle && Drupal.yoast_seo_node_new) {
     var metatagTitle =  document.getElementById(this.config.fields.title).value;
@@ -377,7 +381,7 @@ YoastSEO_DrupalSource.prototype.tokenReplace = function (value) {
     tokenRegex = /(\[[^\]]*:[^\]]*\])/g,
     match = value.match(tokenRegex),
     tokensNotFound = [];
- 
+
   // If the value contains tokens.
   if (match != null) {
     // Replace all the tokens by their relative value.
@@ -434,6 +438,6 @@ YoastSEO_DrupalSource.prototype.tokenReplace = function (value) {
       });
     }
   }
-  
+
   return value;
 };
