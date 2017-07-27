@@ -1,7 +1,8 @@
 /**
- * JavaScript file that handles initializing and firing the Yoast
- * js-text-analysis library.
- * Support YoastSEO.js v1.2.2.
+ * JavaScript file that handles initializing and firing the RealTime SEO
+ * analysis library.
+ *
+ * Support goalgorilla/YoastSEO.js v2.0.0.
  */
 (function ($) {
   Drupal.yoast_seo = Drupal.yoast_seo || {};
@@ -13,79 +14,20 @@
         throw "No settings specified for the YoastSEO analysis library."
       }
 
-      if (typeof YoastSEO === 'undefined') {
-        $('#' + settings.yoast_seo.targets.output).html('<p><strong>' + Drupal.t('It looks like something went wrong when we tried to load the Yoast SEO content analysis library. Please check it the module is installed correctly.') + '</strong></p>');
-        return;
-      }
-
-      var App = YoastSEO.App;
-
+      // TODO: This should be set on the server side to make it work for all entity types.
       if(settings.path && settings.path.currentPath.indexOf('node/add') !== -1){
-        Drupal.yoast_seo_node_new = true;
+        settings.yoast_seo.is_new = true;
       }
 
-      var yoast_settings = settings.yoast_seo;
+      $('body', context).once('realtime-seo').each(function () {
+        var orchestrator = new Orchestrator(settings.yoast_seo);
+      });
+
       // Making sure we only initiate Yoast SEO once.
-      $('body', context).once('yoast_seo').each(function () {
-        YoastSEO.analyzerArgs = {
-          source: YoastSEO_DrupalSource,
-          analyzer: yoast_settings.analyzer,
-          snippetPreview: yoast_settings.snippet_preview,
-          elementTarget: [yoast_settings.wrapper_target_id],
-          typeDelay: 300,
-          typeDelayStep: 100,
-          maxTypeDelay: 1500,
-          dynamicDelay: true,
-          multiKeyword: false,
-          tokens: yoast_settings.tokens,
-          targets: {
-            output: yoast_settings.targets.output_target_id,
-            overall: yoast_settings.targets.overall_score_target_id,
-            snippet: yoast_settings.targets.snippet_target_id
-          },
-          // snippetFields: {
-          //   title: "snippet-editor-title",
-          //   url: "snippet-editor-slug",
-          //   meta: "snippet-editor-meta-description"
-          // },
-          sampleText: {
-            baseUrl: yoast_settings.base_root + '/',
-            title: yoast_settings.default_text.meta_title,
-            meta: yoast_settings.default_text.meta_description,
-            keyword: yoast_settings.default_text.keyword,
-            text: yoast_settings.default_text.body
-          },
-          fields: {
-            keyword: yoast_settings.fields.focus_keyword,
-            title: yoast_settings.fields.meta_title,
-            nodeTitle: yoast_settings.fields.title,
-            meta: yoast_settings.fields.meta_description,
-            text: yoast_settings.fields.body,
-            url: yoast_settings.fields.path,
-            summary: yoast_settings.fields.summary
-          },
-          placeholderText: {
-            title: yoast_settings.placeholder_text.snippetTitle,
-            description: yoast_settings.placeholder_text.snippetMeta,
-            url: yoast_settings.placeholder_text.snippetCite
-          },
-          SEOTitleOverwritten: yoast_settings.seo_title_overwritten,
-          scoreElement: yoast_settings.fields.seo_status,
-          baseRoot: yoast_settings.base_root
-        };
-
-
-        var DrupalSource = new YoastSEO_DrupalSource(YoastSEO.analyzerArgs);
-        // Declaring the callback functions, for now we bind DrupalSource.
-        YoastSEO.analyzerArgs.callbacks = {
-          getData: DrupalSource.getData.bind(DrupalSource),
-          bindElementEvents: DrupalSource.bindElementEvents.bind(DrupalSource),
-          saveSnippetData: DrupalSource.saveSnippetData.bind(DrupalSource),
-          saveScores: DrupalSource.saveScores.bind(DrupalSource)
-        };
+      // $('body', context).once('yoast_seo').each(function () {
 
         // Make it global.
-        window.YoastSEO.app = new App(YoastSEO.analyzerArgs);
+        // window.RealTimeSEO.app = new App(analyzerArgs);
 
         // Parse the input from snippet preview fields to their corresponding metatag and path fields
         // DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title);
@@ -99,26 +41,138 @@
         //   }
         // });
 
-        if (typeof CKEDITOR !== "undefined") {
-          CKEDITOR.on('instanceReady', function (ev) {
-            var editor = ev.editor;
-            // Check if this the instance we want to track.
-            if (typeof YoastSEO.analyzerArgs.fields.text !== 'undefined') {
-              if (editor.name == YoastSEO.analyzerArgs.fields.text) {
-                editor.on('change', function () {
-                  // Let CKEditor handle updating the linked text element.
-                  editor.updateElement();
-                  // Dispatch input event so Yoast SEO knows something changed!
-                  DrupalSource.triggerEvent(editor.name);
-                });
-              }
-            }
-          });
-        }
+        // if (typeof CKEDITOR !== "undefined") {
+        //   CKEDITOR.on('instanceReady', function (ev) {
+        //     var editor = ev.editor;
+        //     // Check if this the instance we want to track.
+        //     if (typeof YoastSEO.analyzerArgs.fields.text !== 'undefined') {
+        //       if (editor.name == YoastSEO.analyzerArgs.fields.text) {
+        //         editor.on('change', function () {
+        //           // Let CKEditor handle updating the linked text element.
+        //           editor.updateElement();
+        //           // Dispatch input event so Yoast SEO knows something changed!
+        //           DrupalSource.triggerEvent(editor.name);
+        //         });
+        //       }
+        //     }
+        //   });
+        // }
 
-      });
+      // });
     }
+  };
+
+  function verifyRequirements(config) {
+    if (typeof config.targets !== "object") {
+      throw "`targets` is a required Orchestrator argument, `targets` is not an object.";
+    }
+
+    if (typeof RealTimeSEO === 'undefined') {
+      $('#' + config.targets.output).html('<p><strong>' + Drupal.t('It looks like something went wrong when we tried to load the Real-Time SEO content analysis library. Please check it the module is installed correctly.') + '</strong></p>');
+      throw "RealTimeSEO is not defined. Is the library attached?";
+    }
+
   }
+
+  /**
+   * Couples Drupal with the RealTimeSEO implementation.
+   *
+   * @constructor
+   */
+  var Orchestrator = function (config) {
+
+    verifyRequirements(config);
+
+    this.config = config;
+
+    this.configureCallbacks();
+
+    this.initializeApp();
+  };
+
+  /**
+   * Set up the callbacks required by our analyzer library.
+   */
+  Orchestrator.prototype.configureCallbacks = function () {
+    var defaultCallbacks = {
+      getData: this.getData.bind(this),
+      saveScores: this.saveScores.bind(this),
+      saveContentScore: this.saveContentScore.bind(this)
+    };
+
+    // If any callbacks were set in config already, they will take precedence.
+    this.config.callbacks = Object.assign(defaultCallbacks, this.config.callbacks);
+  };
+
+  /**
+   * Creates and launches our analyzer library.
+   */
+  Orchestrator.prototype.initializeApp = function () {
+    if (typeof this.app !== "undefined" ) {
+      return;
+    }
+
+    this.app = new RealTimeSEO.App(this.config);
+  };
+
+  /**
+   * This is the most important part of our part of the equation.
+   *
+   * We talk to Drupal to provide all the data that the YoastSEO.js library
+   * needs to do the analysis.
+   *
+   * @returns analyzerData
+   */
+  Orchestrator.prototype.getData = function () {
+    // Default data in here.
+    data = {
+      keyword: this.getDataFromInput("keyword"),
+      meta: this.getDataFromInput("meta"),
+      snippetMeta: this.getDataFromInput("meta"),
+      text: this.getDataFromInput("text"),
+      pageTitle: this.getDataFromInput("title"),
+      snippetTitle: this.getDataFromInput("title"),
+      baseUrl: this.config.baseRoot,
+      url: this.config.baseRoot + this.getDataFromInput("url"),
+      snippetCite: this.getDataFromInput("url")
+    };
+
+    console.log("Data retrieved", data);
+
+    return data;
+  };
+
+  // Temporary function to keep things working.
+  Orchestrator.prototype.getDataFromInput = function (f) {
+    return 'static';
+  }
+
+
+  /**
+   * Sets the SEO score in the hidden element.
+   * @param score
+   */
+  Orchestrator.prototype.saveScores = function (score) {
+    console.log("Saving score ", score);
+
+    var rating = 0;
+    if (typeof score === "number" && score > 0) {
+      rating = ( score / 10 );
+    }
+
+    document.getElementById(this.config.targets.overall).getElementsByClassName("score_value")[0].innerHTML = this.scoreRating(rating);
+    document.querySelector('[data-drupal-selector="' + this.config.scoreElement + '"]').setAttribute('value', rating);
+  };
+
+  /**
+   * Sets the content score in the hidden element.
+   * @param score
+   */
+  Orchestrator.prototype.saveContentScore = function (score) {
+    console.log("Saving content score ", score);
+  };
+
+
 })(jQuery);
 
 /**
@@ -182,6 +236,8 @@ YoastSEO_DrupalSource.prototype.getData = function () {
     url: this.config.baseRoot + this.getDataFromInput("url"),
     snippetCite: this.getDataFromInput("url")
   };
+
+  console.log("Data retrieved", data);
 
   return data;
 };
@@ -364,6 +420,8 @@ YoastSEO_DrupalSource.prototype.scoreRating = function (rating) {
  * @param score
  */
 YoastSEO_DrupalSource.prototype.saveScores = function (score) {
+  console.log("Saving score ", score);
+
   var rating = 0;
   if (typeof score == "number" && score > 0) {
     rating = ( score / 10 );
@@ -372,6 +430,15 @@ YoastSEO_DrupalSource.prototype.saveScores = function (score) {
   document.getElementById(this.config.targets.overall).getElementsByClassName("score_value")[0].innerHTML = this.scoreRating(rating);
   document.querySelector('[data-drupal-selector="' + this.config.scoreElement + '"]').setAttribute('value', rating);
 };
+
+/**
+ * Sets the SEO score in the hidden element.
+ * @param score
+ */
+YoastSEO_DrupalSource.prototype.saveContentScore = function (score) {
+  console.log("Saving content score ", score);
+};
+
 
 /**
  * Replace tokens.
