@@ -41,22 +41,18 @@
         //   }
         // });
 
-        // if (typeof CKEDITOR !== "undefined") {
-        //   CKEDITOR.on('instanceReady', function (ev) {
-        //     var editor = ev.editor;
-        //     // Check if this the instance we want to track.
-        //     if (typeof YoastSEO.analyzerArgs.fields.text !== 'undefined') {
-        //       if (editor.name == YoastSEO.analyzerArgs.fields.text) {
-        //         editor.on('change', function () {
-        //           // Let CKEditor handle updating the linked text element.
-        //           editor.updateElement();
-        //           // Dispatch input event so Yoast SEO knows something changed!
-        //           DrupalSource.triggerEvent(editor.name);
-        //         });
-        //       }
-        //     }
-        //   });
-        // }
+        if (typeof CKEDITOR !== "undefined") {
+          CKEDITOR.on('instanceReady', function (ev) {
+            var editor = ev.editor;
+            // Check if this the instance we want to track.
+                editor.on('change', function () {
+                  // Let CKEditor handle updating the linked text element.
+                  editor.updateElement();
+                  // Dispatch input event so Yoast SEO knows something changed!
+                  // DrupalSource.triggerEvent(editor.name);
+                });
+          });
+        }
 
       // });
     }
@@ -174,6 +170,72 @@
 
 
 })(jQuery);
+
+function submit_form() {
+  var $form = jQuery('.node-form');
+  // We only send non-empty form elements. Any missing elements will be caught
+  // by validation but this ensures we don't get errors for required children of
+  // optional elements (such as alt attribute for images).
+  var postData = $form.find(':input[value!=\'\']:not(.js-hide.form-submit)').serialize();
+  $form.ajaxSubmit({
+    url: '/yoast_seo/preview',
+      data : {
+        yoast_seo_preview: {
+          path: drupalSettings.path.currentPath,
+          action: $form.attr('action'),
+          method: $form.attr('method')
+        },
+        // target: {
+        // },
+        // form_data: postData
+      },
+    success:function(data, status, xhr)
+    {
+      if(status == "success")
+      {
+        console.log(data);
+        // Do something on page
+      }
+      else
+      {
+        console.log("Failed")
+        // Do something on page
+      }
+    }
+  });
+  // jQuery.ajax({
+  //   url: '/yoast_seo/preview',
+  //   beforeSend: function (request)
+  //   {
+  //     request.setRequestHeader('Content-Type', 'text/html;   charset=utf-8');
+  //   },
+  //   type: "POST",
+  //   data : {
+  //     path: drupalSettings.path.currentPath,
+  //     target: {
+  //       action: $form.attr('action'),
+  //       method: $form.attr('method')
+  //     },
+  //     form_data: postData
+  //   },
+  //   success:function(data, status, xhr)
+  //   {
+  //     if(status == "success")
+  //     {
+  //       console.log(data);
+  //       // Do something on page
+  //     }
+  //     else
+  //     {
+  //       console.log("Failed")
+  //       // Do something on page
+  //     }
+  //   }
+  // });
+
+  console.log(postData);
+  console.log("Yes");
+}
 
 /**
  * Inputgenerator generates a form for use as input.

@@ -5,3 +5,6 @@ services:
   yoast_seo.field_manager:
     class: Drupal\yoast_seo\YoastSeoFieldManager
     arguments: []
+  yoast_seo.entity_previewer:
+    class: Drupal\yoast_seo\EntityPreviewer
+    arguments: ['@entity_type.manager', '@renderer', '@metatag.manager']
