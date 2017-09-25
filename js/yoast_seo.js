@@ -5,67 +5,87 @@
  * Support goalgorilla/YoastSEO.js v2.0.0.
  */
 (function ($) {
+  'use strict';
+
   Drupal.yoast_seo = Drupal.yoast_seo || {};
   Drupal.yoast_seo_node_new = false;
 
   Drupal.behaviors.yoast_seo = {
     attach: function (context, settings) {
       if (typeof settings.yoast_seo === 'undefined') {
-        throw "No settings specified for the YoastSEO analysis library."
+        throw 'No settings specified for the YoastSEO analysis library.';
       }
 
       // TODO: This should be set on the server side to make it work for all entity types.
-      if(settings.path && settings.path.currentPath.indexOf('node/add') !== -1){
+      if (settings.path && settings.path.currentPath.indexOf('node/add') !== -1) {
         settings.yoast_seo.is_new = true;
       }
 
       $('body', context).once('realtime-seo').each(function () {
-        var orchestrator = new Orchestrator(settings.yoast_seo);
+        // TODO: This fails if there are multiple forms.
+        var $form = $('form').first();
+
+        console.log($form);
+
+        window.orchestrator = new Orchestrator($form, settings.yoast_seo);
       });
 
-      // Making sure we only initiate Yoast SEO once.
-      // $('body', context).once('yoast_seo').each(function () {
+      console.log(settings.yoast_seo);
 
-        // Make it global.
-        // window.RealTimeSEO.app = new App(analyzerArgs);
-
-        // Parse the input from snippet preview fields to their corresponding metatag and path fields
-        // DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title);
-        // DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.url, YoastSEO.analyzerArgs.fields.url);
-        // DrupalSource.parseSnippetData(YoastSEO.analyzerArgs.snippetFields.meta, YoastSEO.analyzerArgs.fields.meta);
-
-        // No enter on contenteditable fields.
-        // $("#snippet_title, #snippet_cite, #snippet_meta").keypress(function (e) {
-        //   if (e.keyCode === 13) {
-        //     e.preventDefault();
-        //   }
-        // });
-
-        if (typeof CKEDITOR !== "undefined") {
-          CKEDITOR.on('instanceReady', function (ev) {
-            var editor = ev.editor;
-            // Check if this the instance we want to track.
-                editor.on('change', function () {
-                  // Let CKEditor handle updating the linked text element.
-                  editor.updateElement();
-                  // Dispatch input event so Yoast SEO knows something changed!
-                  // DrupalSource.triggerEvent(editor.name);
-                });
-          });
-        }
-
-      // });
+      // Update the text fields behind the CKEditor when it changes.
+      // TODO: Incorporate this with the update event binder.
+      if (typeof CKEDITOR !== "undefined") {
+        CKEDITOR.on('instanceReady', function (ev) {
+          var editor = ev.editor;
+          // Check if this the instance we want to track.
+          // if (typeof YoastSEO.analyzerArgs.fields.text != 'undefined') {
+          //   if (editor.name == YoastSEO.analyzerArgs.fields.text) {
+              editor.on('change', function () {
+                // Let CKEditor handle updating the linked text element.
+                editor.updateElement();
+                // Dispatch input event so Yoast SEO knows something changed!
+                // DrupalSource.triggerEvent(editor.name);
+              });
+            // }
+          // }
+        });
+      }
     }
   };
 
   function verifyRequirements(config) {
-    if (typeof config.targets !== "object") {
-      throw "`targets` is a required Orchestrator argument, `targets` is not an object.";
+    // Make a string.endsWidth method available if its not supported.
+    if (!String.prototype.endsWith) {
+      String.prototype.endsWith = function (searchStr, Position) {
+        // This works much better than >= because
+        // it compensates for NaN:
+        if (!(Position < this.length))
+          Position = this.length;
+        else
+          Position |= 0; // round position
+        return this.substr(Position - searchStr.length,
+          searchStr.length) === searchStr;
+      };
     }
+
+    if (typeof config.targets !== 'object') {
+      throw '`targets` is a required Orchestrator argument, `targets` is not an object.';
+    }
+    else {
+      // Turn {name}_target_id into {name}: target_id.
+      for (var key in config.targets) {
+        if (key.endsWith('target_id')) {
+          var target = key.substr(0, key.length - '_target_id'.length);
+          config.targets[target] = config.targets[key];
+          delete config.targets[key];
+        }
+      }
+    }
+
 
     if (typeof RealTimeSEO === 'undefined') {
       $('#' + config.targets.output).html('<p><strong>' + Drupal.t('It looks like something went wrong when we tried to load the Real-Time SEO content analysis library. Please check it the module is installed correctly.') + '</strong></p>');
-      throw "RealTimeSEO is not defined. Is the library attached?";
+      throw 'RealTimeSEO is not defined. Is the library attached?';
     }
 
   }
@@ -73,12 +93,18 @@
   /**
    * Couples Drupal with the RealTimeSEO implementation.
    *
+   * @param $form
+   *   A jQuery selector reference to the form that we are analysing.
+   * @param config
+   *   The configuration for this orchestrator.
+   *
    * @constructor
    */
-  var Orchestrator = function (config) {
+  var Orchestrator = function ($form, config) {
 
     verifyRequirements(config);
 
+    this.$form = $form;
     this.config = config;
 
     this.configureCallbacks();
@@ -104,60 +130,201 @@
    * Creates and launches our analyzer library.
    */
   Orchestrator.prototype.initializeApp = function () {
-    if (typeof this.app !== "undefined" ) {
+    // Ensure this has no effect if called twice.
+    if (typeof this.app !== 'undefined') {
       return;
     }
+
+    var self = this;
+
+    // Set up our event listener for normal form elements
+    this.$form.change(this.handleChange.bind(this));
+
+    // Set up our event listener for CKEditor instances if any.
+    // We do this in a setTimeout to allow CKEDITOR to load.
+    setTimeout(function () {
+      if (typeof CKEDITOR !== 'undefined') {
+        for (var i in CKEDITOR.instances) {
+          CKEDITOR.instances[i].on('blur', self.handleBlur.bind(self));
+        }
+      }
+    }, 200);
+
+    console.log("Setting default data");
+    // Default data.
+    this.data = {
+      meta: '',
+      metaTitle: '',
+      locale: 'en_US',
+      keyword: jQuery('[data-drupal-selector=' + this.config.fields.focus_keyword + ']').val()
+    };
+
+    // We update what data we have available so that this.data is always
+    // initialised.
+    this.refreshData();
 
     this.app = new RealTimeSEO.App(this.config);
   };
 
   /**
+   * Handles a change on the form. If our keyword was changed we just rerun
+   * the analysis. In all other cases we schedule a reload of our data.
+   */
+  Orchestrator.prototype.handleChange = function (event) {
+    var $target = $(event.target);
+
+    if ($target.attr('data-drupal-selector') === this.config.fields.focus_keyword) {
+      // Update the keyword and re-analyze.
+      this.setData({ keyword: $target.val() });
+      this.analyze();
+      return;
+    }
+
+    this.scheduleUpdate();
+  };
+
+  /**
+   * Handles the blur of a CKEditor field. We just rerun the analysis.
+   */
+  Orchestrator.prototype.handleBlur = function (event) {
+    this.scheduleUpdate();
+  };
+
+  /**
+   * Schedules an update in a short moment. Will undo any previously scheduled
+   * updates to avoid excessive HTTP requests.
+   */
+  Orchestrator.prototype.scheduleUpdate = function () {
+    if (this.update_timeout) {
+      clearTimeout(this.update_timeout);
+      this.update_timeout = false;
+    }
+
+    var self = this;
+    this.update_timeout = setTimeout(function () {
+      self.update_timeout = false;
+      self.refreshData(true);
+    }, 500);
+  };
+
+  /**
+   * Tells the library to retrieve its data and runs the analyzer.
+   */
+  Orchestrator.prototype.analyze = function () {
+    this.app.getData();
+    this.app.runAnalyzer();
+  };
+
+
+  /**
+   * Sends a request to our Drupal endpoint to refresh our local data.
+   *
    * This is the most important part of our part of the equation.
    *
    * We talk to Drupal to provide all the data that the YoastSEO.js library
    * needs to do the analysis.
+   */
+  Orchestrator.prototype.refreshData = function (analyze) {
+    if (typeof analyze === 'undefined') {
+      analyze = false;
+    }
+
+    var self = this;
+
+    console.log("Refreshing data");
+    this.$form.ajaxSubmit({
+      // TODO: This endpoint probably shouldn't be static.
+      url: '/yoast_seo/preview',
+      data: {
+        yoast_seo_preview: {
+          path: drupalSettings.path.currentPath,
+          action: this.$form.attr('action'),
+          method: this.$form.attr('method')
+        }
+      },
+      success: function (data) {
+        self.setData(data);
+        self.analyze();
+      },
+      error: function (jqXHR, status, error) {
+        console.log('Failed to refresh data', error);
+      }
+    });
+  };
+
+  /**
+   * Provides a method to set the data that we provide to the Real Time SEO
+   * library for analysis.
    *
-   * @returns analyzerData
+   * Can be used as a callback to our Drupal analysis endpoint.
+   *
+   * @param data
+   */
+  Orchestrator.prototype.setData = function (data) {
+    console.log('Setting data', data);
+
+    // We merge the data so we can selectively overwrite things.
+    this.data = Object.assign({}, this.data, data);
+
+    this.updatePreview();
+  };
+
+  /**
+   * This is used as a callback in the Real Time SEO library to provide the data
+   * that is needed for analysis.
+   *
+   * @return analyzerData
    */
   Orchestrator.prototype.getData = function () {
-    // Default data in here.
-    data = {
-      keyword: this.getDataFromInput("keyword"),
-      meta: this.getDataFromInput("meta"),
-      snippetMeta: this.getDataFromInput("meta"),
-      text: this.getDataFromInput("text"),
-      pageTitle: this.getDataFromInput("title"),
-      snippetTitle: this.getDataFromInput("title"),
-      baseUrl: this.config.baseRoot,
-      url: this.config.baseRoot + this.getDataFromInput("url"),
-      snippetCite: this.getDataFromInput("url")
-    };
+    console.log('Data requested', this.data);
 
-    console.log("Data retrieved", data);
-
-    return data;
+    return this.data;
   };
 
   // Temporary function to keep things working.
   Orchestrator.prototype.getDataFromInput = function (f) {
     return 'static';
-  }
-
+  };
 
   /**
    * Sets the SEO score in the hidden element.
    * @param score
    */
   Orchestrator.prototype.saveScores = function (score) {
-    console.log("Saving score ", score);
+    console.log('Saving score ', score);
 
     var rating = 0;
-    if (typeof score === "number" && score > 0) {
+    if (typeof score === 'number' && score > 0) {
       rating = ( score / 10 );
     }
 
-    document.getElementById(this.config.targets.overall).getElementsByClassName("score_value")[0].innerHTML = this.scoreRating(rating);
-    document.querySelector('[data-drupal-selector="' + this.config.scoreElement + '"]').setAttribute('value', rating);
+    document.getElementById(this.config.targets.overall_score).getElementsByClassName('score_value')[0].innerHTML = this.scoreToRating(rating);
+    document.querySelector('[data-drupal-selector="' + this.config.fields.seo_status + '"]').setAttribute('value', rating);
+  };
+
+  /**
+   * retuns a string that is used as a CSS class, based on the numeric score
+   *
+   * @param score
+   * @returns rating
+   */
+  Orchestrator.prototype.scoreToRating = function (score) {
+    var rating;
+
+    if (score === 0) {
+      rating = 'na';
+    }
+    else if (score <= 4) {
+      rating = 'bad';
+    }
+    else if (score > 4 && score <= 7) {
+      rating = 'ok';
+    }
+    else if (score > 7) {
+      rating = 'good';
+    }
+
+    return Drupal.t('SEO: <strong>' + rating + '</strong>');
   };
 
   /**
@@ -165,77 +332,32 @@
    * @param score
    */
   Orchestrator.prototype.saveContentScore = function (score) {
-    console.log("Saving content score ", score);
+    console.log('Saving content score ', score);
   };
 
+  /**
+   * Updates the preview with the newest snippet.
+   */
+  Orchestrator.prototype.updatePreview = function () {
+    var html =
+      '<section class="snippet-editor__preview">' +
+        '<div class="snippet_container snippet-editor__container" id="title_container">' +
+          '<span class="title" id="snippet_title">' + this.data.metaTitle + '</span>' +
+          '<span class="title" id="snippet_sitename"></span>' +
+        '</div>' +
+        '<div class="snippet_container snippet-editor__container" id="url_container">' +
+          '<cite class="url urlBase" id="snippet_citeBase">yoast-seo7.dev/</cite>' +
+          '<cite class="url" id="snippet_cite">example-post/</cite>' +
+        '</div>' +
+        '<div class="snippet_container snippet-editor__container" id="meta_container">' +
+          '<span class="desc desc-default" id="snippet_meta">' + this.data.meta + '</span>' +
+        '</div>' +
+      '</section>';
+
+    document.getElementById(this.config.targets.snippet).innerHTML = html;
+  };
 
 })(jQuery);
-
-function submit_form() {
-  var $form = jQuery('.node-form');
-  // We only send non-empty form elements. Any missing elements will be caught
-  // by validation but this ensures we don't get errors for required children of
-  // optional elements (such as alt attribute for images).
-  var postData = $form.find(':input[value!=\'\']:not(.js-hide.form-submit)').serialize();
-  $form.ajaxSubmit({
-    url: '/yoast_seo/preview',
-      data : {
-        yoast_seo_preview: {
-          path: drupalSettings.path.currentPath,
-          action: $form.attr('action'),
-          method: $form.attr('method')
-        },
-        // target: {
-        // },
-        // form_data: postData
-      },
-    success:function(data, status, xhr)
-    {
-      if(status == "success")
-      {
-        console.log(data);
-        // Do something on page
-      }
-      else
-      {
-        console.log("Failed")
-        // Do something on page
-      }
-    }
-  });
-  // jQuery.ajax({
-  //   url: '/yoast_seo/preview',
-  //   beforeSend: function (request)
-  //   {
-  //     request.setRequestHeader('Content-Type', 'text/html;   charset=utf-8');
-  //   },
-  //   type: "POST",
-  //   data : {
-  //     path: drupalSettings.path.currentPath,
-  //     target: {
-  //       action: $form.attr('action'),
-  //       method: $form.attr('method')
-  //     },
-  //     form_data: postData
-  //   },
-  //   success:function(data, status, xhr)
-  //   {
-  //     if(status == "success")
-  //     {
-  //       console.log(data);
-  //       // Do something on page
-  //     }
-  //     else
-  //     {
-  //       console.log("Failed")
-  //       // Do something on page
-  //     }
-  //   }
-  // });
-
-  console.log(postData);
-  console.log("Yes");
-}
 
 /**
  * Inputgenerator generates a form for use as input.
@@ -255,13 +377,13 @@ YoastSEO_DrupalSource = function (args) {
  * @param field
  */
 YoastSEO_DrupalSource.prototype.triggerEvent = function (field) {
-  if ("createEvent" in document) {
-    var ev = document.createEvent("HTMLEvents");
-    ev.initEvent("input", false, true);
+  if ('createEvent' in document) {
+    var ev = document.createEvent('HTMLEvents');
+    ev.initEvent('input', false, true);
     document.getElementById(field).dispatchEvent(ev);
   }
   else {
-    document.getElementById(field).fireEvent("input");
+    document.getElementById(field).fireEvent('input');
   }
 };
 
@@ -274,10 +396,10 @@ YoastSEO_DrupalSource.prototype.parseSnippetData = function (source, target) {
   var listener = function (ev) {
     // textContent support for FF and if both innerText and textContent are
     // undefined we use an empty string.
-    document.getElementById(target).value = (ev.target.value || "");
+    document.getElementById(target).value = (ev.target.value || '');
     this.triggerEvent(target);
   }.bind(this);
-  document.getElementById(source).addEventListener("blur", listener);
+  document.getElementById(source).addEventListener('blur', listener);
 };
 
 
@@ -288,18 +410,18 @@ YoastSEO_DrupalSource.prototype.parseSnippetData = function (source, target) {
 YoastSEO_DrupalSource.prototype.getData = function () {
   // Default data in here.
   data = {
-    keyword: this.getDataFromInput("keyword"),
-    meta: this.getDataFromInput("meta"),
-    snippetMeta: this.getDataFromInput("meta"),
-    text: this.getDataFromInput("text"),
-    pageTitle: this.getDataFromInput("title"),
-    snippetTitle: this.getDataFromInput("title"),
+    keyword: this.getDataFromInput('keyword'),
+    meta: this.getDataFromInput('meta'),
+    snippetMeta: this.getDataFromInput('meta'),
+    text: this.getDataFromInput('text'),
+    pageTitle: this.getDataFromInput('title'),
+    snippetTitle: this.getDataFromInput('title'),
     baseUrl: this.config.baseRoot,
-    url: this.config.baseRoot + this.getDataFromInput("url"),
-    snippetCite: this.getDataFromInput("url")
+    url: this.config.baseRoot + this.getDataFromInput('url'),
+    snippetCite: this.getDataFromInput('url')
   };
 
-  console.log("Data retrieved", data);
+  console.log('Data retrieved', data);
 
   return data;
 };
@@ -318,7 +440,7 @@ YoastSEO_DrupalSource.prototype.getDataFromInput = function (field) {
         output.push(document.getElementById(this.config.fields[field][text_field]).value);
       }
     }
-    value = output.join("\n");
+    value = output.join('\n');
   } else {
     value = document.getElementById(this.config.fields[field]).value;
   }
@@ -332,15 +454,15 @@ YoastSEO_DrupalSource.prototype.getDataFromInput = function (field) {
  */
 YoastSEO_DrupalSource.prototype.updateRawData = function () {
   var data = {
-    keyword: this.getDataFromInput("keyword"),
-    meta: this.getDataFromInput("meta"),
-    snippetMeta: this.getDataFromInput("meta"),
-    text: this.getDataFromInput("text"),
-    nodeTitle: this.getDataFromInput("nodeTitle"),
-    pageTitle: this.getDataFromInput("title"),
+    keyword: this.getDataFromInput('keyword'),
+    meta: this.getDataFromInput('meta'),
+    snippetMeta: this.getDataFromInput('meta'),
+    text: this.getDataFromInput('text'),
+    nodeTitle: this.getDataFromInput('nodeTitle'),
+    pageTitle: this.getDataFromInput('title'),
     baseUrl: this.config.baseRoot,
-    url: this.config.baseRoot + '/' + this.getDataFromInput("url"),
-    snippetCite: this.getDataFromInput("url")
+    url: this.config.baseRoot + '/' + this.getDataFromInput('url'),
+    snippetCite: this.getDataFromInput('url')
   };
 
   if (!this.config.SEOTitleOverwritten) {
@@ -380,13 +502,13 @@ YoastSEO_DrupalSource.prototype.inputElementEventBinder = function () {
       for (var text_field in this.config.fields[field]) {
         if (typeof this.config.fields[field][text_field] != 'undefined' && document.getElementById(this.config.fields[field][text_field])) {
           document.getElementById(this.config.fields[field][text_field]).__refObj = this;
-          document.getElementById(this.config.fields[field][text_field]).addEventListener("input", this.renewData.bind(this));
+          document.getElementById(this.config.fields[field][text_field]).addEventListener('input', this.renewData.bind(this));
         }
       }
     }
     if (typeof this.config.fields[field] != 'undefined' && document.getElementById(this.config.fields[field])) {
       document.getElementById(this.config.fields[field]).__refObj = this;
-      document.getElementById(this.config.fields[field]).addEventListener("input", this.renewData.bind(this));
+      document.getElementById(this.config.fields[field]).addEventListener('input', this.renewData.bind(this));
     }
   }
 };
@@ -455,26 +577,26 @@ YoastSEO_DrupalSource.prototype.saveSnippetData = function (ev) {
  * @param score
  * @returns output
  */
-YoastSEO_DrupalSource.prototype.scoreRating = function (rating) {
+YoastSEO_DrupalSource.prototype.scoreToRating = function (rating) {
   var scoreRate;
 
   if (rating <= 4) {
-    scoreRate = "bad";
+    scoreRate = 'bad';
   }
 
   if (rating > 4 && rating <= 7) {
-    scoreRate = "ok";
+    scoreRate = 'ok';
   }
 
   if (rating > 7) {
-    scoreRate = "good";
+    scoreRate = 'good';
   }
 
   if (rating == 0) {
-    scoreRate = "na";
+    scoreRate = 'na';
   }
 
-  return Drupal.t("SEO: <strong>" + scoreRate + "</strong>");
+  return Drupal.t('SEO: <strong>' + scoreRate + '</strong>');
 };
 
 /**
@@ -482,14 +604,14 @@ YoastSEO_DrupalSource.prototype.scoreRating = function (rating) {
  * @param score
  */
 YoastSEO_DrupalSource.prototype.saveScores = function (score) {
-  console.log("Saving score ", score);
+  console.log('Saving score ', score);
 
   var rating = 0;
-  if (typeof score == "number" && score > 0) {
+  if (typeof score == 'number' && score > 0) {
     rating = ( score / 10 );
   }
 
-  document.getElementById(this.config.targets.overall).getElementsByClassName("score_value")[0].innerHTML = this.scoreRating(rating);
+  document.getElementById(this.config.targets.overall).getElementsByClassName('score_value')[0].innerHTML = this.scoreToRating(rating);
   document.querySelector('[data-drupal-selector="' + this.config.scoreElement + '"]').setAttribute('value', rating);
 };
 
@@ -498,7 +620,7 @@ YoastSEO_DrupalSource.prototype.saveScores = function (score) {
  * @param score
  */
 YoastSEO_DrupalSource.prototype.saveContentScore = function (score) {
-  console.log("Saving content score ", score);
+  console.log('Saving content score ', score);
 };
 
 

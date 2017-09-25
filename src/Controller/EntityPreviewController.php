@@ -136,6 +136,11 @@ class EntityPreviewController extends ControllerBase {
     $entity->in_preview = TRUE;
     $preview_data = \Drupal::service('yoast_seo.entity_previewer')->createEntityPreview($entity);
 
+    // If the entity doesn't supply a URL yet then we set one from the alias field.
+    if (empty($preview_data['url'])) {
+      $preview_data['url'] = $form_data['path'][0]['alias'];
+    }
+
     return new JsonResponse($preview_data);
   }
 

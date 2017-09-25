@@ -28,17 +28,32 @@ class EntityPreviewer {
     $html = $this->renderEntity($entity);
 
     $tags = $this->metatagManager->tagsFromEntityWithDefaults($entity);
-    $tags = $this->metatagManager->generateRawElements($tags, $entity);
+    $data = $this->metatagManager->generateRawElements($tags, $entity);
 
     // Turn our tag renderable into a key => value array.
-    foreach ($tags as $name => $tag) {
-      $tags[$name] = $tag['#attributes']['content'];
+    foreach ($data as $name => $tag) {
+      $data[$name] = $tag['#attributes']['content'];
+    }
+    // Translate some fields that have different names between metatag module
+    // and the Yoast library.
+    foreach ($this->getFieldMappings() as $source => $target) {
+      if (isset($data[$source])) {
+        $data[$target] = $data[$source];
+//        unset($data[$source]);
+      }
     }
 
-    $data = [
-      "tags" => $tags,
-      "html" => $html->__toString(),
-    ];
+    // Add some other fields.
+    $data['title'] = $entity->label();
+    $data['url'] = '';
+
+    // An entity must be saved before it has a URL.
+    if (!$entity->isNew()) {
+      $data['url'] = $entity->toUrl()->toString();
+    }
+
+    // Add our HTML as analyzable text (Yoast will sanitize).
+    $data['text'] = $html->__toString();
 
     return $data;
   }
@@ -50,4 +65,18 @@ class EntityPreviewer {
     $render_array = $view_builder->view($entity, 'full');
     return $this->renderer->renderRoot($render_array);
   }
+
+  /**
+   * Returns an array of mappings where metatag field names differ from Yoast
+   * expected names.
+   *
+   * @return array
+   */
+  protected function getFieldMappings() {
+    return [
+      'title' => 'metaTitle',
+      'description' => 'meta',
+    ];
+  }
+
 }
