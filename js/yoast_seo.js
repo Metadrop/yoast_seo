@@ -267,6 +267,11 @@
     this.data = Object.assign({}, this.data, data);
 
     this.updatePreview();
+
+    // Some things are composed of others.
+    this.data.titleWidth = document.getElementById('snippet_title').offsetWidth;
+    this.data.permalink = this.config.base_root + this.data.url;
+    // console.log(this.data.titleWidth);
   };
 
   /**
@@ -339,15 +344,24 @@
    * Updates the preview with the newest snippet.
    */
   Orchestrator.prototype.updatePreview = function () {
+    var emphasized_title = this.data.metaTitle;
+
+    if (this.data.keyword) {
+      var keyword_pos = this.data.metaTitle.toLowerCase().indexOf(this.data.keyword.toLowerCase());
+      console.log("keyword pos", keyword_pos);
+      var keyword_length = this.data.keyword.length;
+      emphasized_title = this.data.metaTitle.substr(0, keyword_pos) + '<strong>' + this.data.metaTitle.substr(keyword_pos, keyword_length) + '</strong>' + this.data.metaTitle.substr(keyword_pos + keyword_length);
+    }
+
     var html =
       '<section class="snippet-editor__preview">' +
         '<div class="snippet_container snippet-editor__container" id="title_container">' +
-          '<span class="title" id="snippet_title">' + this.data.metaTitle + '</span>' +
+          '<span class="title" id="snippet_title">' + emphasized_title + '</span>' +
           '<span class="title" id="snippet_sitename"></span>' +
         '</div>' +
         '<div class="snippet_container snippet-editor__container" id="url_container">' +
-          '<cite class="url urlBase" id="snippet_citeBase">yoast-seo7.dev/</cite>' +
-          '<cite class="url" id="snippet_cite">example-post/</cite>' +
+          '<cite class="url urlBase" id="snippet_citeBase">' + this.config.base_root + '</cite>' +
+          '<cite class="url" id="snippet_cite">' + this.data.url + '</cite>' +
         '</div>' +
         '<div class="snippet_container snippet-editor__container" id="meta_container">' +
           '<span class="desc desc-default" id="snippet_meta">' + this.data.meta + '</span>' +

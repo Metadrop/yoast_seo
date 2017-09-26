@@ -170,7 +170,7 @@
 
 .snippet_container .title {
   color: #1e0fbe;
-  display: block;
+  display: inline;
   overflow: hidden;
   text-overflow: ellipsis;
   text-decoration: none;
