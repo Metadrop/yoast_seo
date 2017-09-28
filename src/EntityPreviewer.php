@@ -14,6 +14,7 @@ use Drupal\user\EntityOwnerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Provides a preview renderer for entities.
@@ -25,24 +26,56 @@ class EntityPreviewer {
   protected $entityTypeManager;
   protected $renderer;
   protected $metatagManager;
+  protected $router;
 
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, MetatagManagerInterface $metatag_manager) {
+  /**
+   * Constructs a new EntityPreviewer.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   A Drupal Entity renderer.
+   * @param \Drupal\metatag\MetatagManagerInterface $metatag_manager
+   *   The service for retrieving metatag data.
+   * @param \Symfony\Component\Routing\RouterInterface $router
+   *   A non-access checking router.
+   */
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    RendererInterface $renderer,
+    MetatagManagerInterface $metatag_manager,
+    RouterInterface $router
+  ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->renderer = $renderer;
     $this->metatagManager = $metatag_manager;
+    $this->router = $router;
   }
 
-  public function entityFromFormSubmission($action, $method, $form_data) {
-    /** @var \Symfony\Cmf\Component\Routing\ChainRouter $router */
-    $router = \Drupal::service('router.no_access_checks');
-
+  /**
+   * Construct an entity from a virtual form submission.
+   *
+   * Takes the action and method of a form with a form_data array to simulate
+   * the form submission and returns the entity constructed from the form data.
+   *
+   * @param string $action
+   *   The path to which the form would normally be submitted.
+   * @param string $method
+   *   The method by which to submit the form (POST or GET).
+   * @param array $form_data
+   *   An array containing the form fields with their values.
+   *
+   * @return \Drupal\Core\Entity\Entity
+   *   The constructed entity.
+   */
+  public function entityFromFormSubmission($action, $method, array $form_data) {
     $form_request = Request::create($action, $method, $form_data);
 
     // Push our form request on the stack so it's used by the form builder.
     \Drupal::requestStack()->push($form_request);
 
     try {
-      $match = $router->matchRequest($form_request);
+      $match = $this->router->matchRequest($form_request);
     }
     catch (\Exception $e) {
       throw new NotFoundHttpException('Could not find the entity route.');
@@ -67,7 +100,7 @@ class EntityPreviewer {
 
         $operation = explode('.', $match['_route'])[1];
 
-        $storage = $this->entityTypeManager()->getStorage($type);
+        $storage = $this->entityTypeManager->getStorage($type);
 
         // Set the bundle name where needed.
         $type_key = $storage->getEntityType()->get('entity_keys')['bundle'];
@@ -95,6 +128,17 @@ class EntityPreviewer {
     return $entity;
   }
 
+  /**
+   * Takes an entity, renders it and adds the metatag values.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to retrieve preview data for.
+   *
+   * @return array
+   *   An array containing the metatag values. Additionally the url is added if
+   *   available under the `url` key and `text` contains a representation of the
+   *   rendered HTML.
+   */
   public function createEntityPreview(EntityInterface $entity) {
     $entity->in_preview = TRUE;
 
@@ -131,6 +175,15 @@ class EntityPreviewer {
     return $data;
   }
 
+  /**
+   * Takes an entity and renders it.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to render.
+   *
+   * @return \Drupal\Component\Render\MarkupInterface
+   *   The markup that represents the rendered entity.
+   */
   public function renderEntity(EntityInterface $entity) {
     $type = $entity->getEntityTypeId();
     $view_builder = $this->entityTypeManager->getViewBuilder($type);
@@ -149,7 +202,7 @@ class EntityPreviewer {
    * @param \Drupal\Core\Entity\EntityInterface $temp_entity
    *   A temporary entity that is used to gather information
    *   like entity type and bundle.
-   * @param null $operation
+   * @param string|null $operation
    *   The operation that the submitted form performs on the entity. Required
    *   to select the correct form display mode and map submitted fields to those
    *   available in the form.
@@ -157,7 +210,7 @@ class EntityPreviewer {
    * @return \Drupal\Core\Entity\Entity
    *   An entity that contains the values from the submitted form.
    */
-  protected function getUpdatedEntity($temp_entity, $operation = NULL) {
+  protected function getUpdatedEntity(EntityInterface $temp_entity, $operation = NULL) {
     $form_handlers = $temp_entity->getEntityType()->get('handlers')['form'];
 
     if (empty($operation) || !isset($form_handlers[$operation])) {
@@ -166,7 +219,7 @@ class EntityPreviewer {
 
     $form_state = new FormState();
 
-    $form_object = \Drupal::entityTypeManager()->getFormObject($temp_entity->getEntityTypeId(), $operation);
+    $form_object = $this->entityTypeManager->getFormObject($temp_entity->getEntityTypeId(), $operation);
     $form_object->setEntity($temp_entity);
 
     /** @var \Drupal\Core\Form\FormBuilder $form_builder */
@@ -185,7 +238,7 @@ class EntityPreviewer {
 
     // Support ownable entities that might not yet have an owner.
     if ($entity instanceof EntityOwnerInterface && empty($entity->getOwner())) {
-      $owner = User::load($this->currentUser()->id());
+      $owner = User::load(\Drupal::currentUser()->id());
       $entity->setOwner($owner);
     }
 
@@ -193,10 +246,11 @@ class EntityPreviewer {
   }
 
   /**
-   * Returns an array of mappings where metatag field names differ from Yoast
-   * expected names.
+   * Returns an array of mappings from metatag to Yoast.
    *
    * @return array
+   *   The array containing keys that correspond to metatag names and values
+   *   that map to the yoast expected names.
    */
   protected function getFieldMappings() {
     return [

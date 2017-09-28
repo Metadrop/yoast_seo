@@ -7,4 +7,4 @@ services:
     arguments: []
   yoast_seo.entity_previewer:
     class: Drupal\yoast_seo\EntityPreviewer
-    arguments: ['@entity_type.manager', '@renderer', '@metatag.manager']
+    arguments: ['@entity_type.manager', '@renderer', '@metatag.manager', '@router.no_access_checks']
