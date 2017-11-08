@@ -147,11 +147,11 @@
       keyword: jQuery('[data-drupal-selector=' + this.config.fields.focus_keyword + ']').val()
     };
 
-    // We update what data we have available so that this.data is always
-    // initialised.
-    this.refreshData();
-
     this.app = new RealTimeSEO.App(this.config);
+
+    // We update what data we have available so that this.data is always
+    // initialised. We also run the initializer to review existing entities.
+    this.refreshData(!this.config.is_new);
   };
 
   /**
