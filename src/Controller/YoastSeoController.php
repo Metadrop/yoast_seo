@@ -59,6 +59,18 @@ class YoastSeoController extends ControllerBase {
   public function settings() {
     $form = [];
 
+    // Add to the page the Yoast SEO form which allows the administrator
+    // to enable/disable Yoast SEO by bundles.
+    $config_form = \Drupal::formBuilder()
+      ->getForm('Drupal\yoast_seo\Form\YoastSeoConfigForm');
+    $form['yoast_seo'] = [
+      '#type' => 'details',
+      '#title' => 'Configure Real-time SEO by bundles',
+      '#description' => 'Select the bundles Real-time SEO will be enabled for',
+      '#markup' => render($config_form),
+      '#open' => TRUE,
+    ];
+
     $xmlsitemap_enabled = \Drupal::moduleHandler()->moduleExists('xmlsitemap');
     $simple_sitemap_enabled = \Drupal::moduleHandler()->moduleExists('simple_sitemap');
 
@@ -151,18 +163,6 @@ class YoastSeoController extends ControllerBase {
       '#type' => 'details',
       '#title' => $this->t('Configure Metatag default templates'),
       '#markup' => $metatag_description,
-      '#open' => TRUE,
-    ];
-
-    // Add to the page the Yoast SEO form which allows the administrator
-    // to enable/disable Yoast SEO by bundles.
-    $config_form = \Drupal::formBuilder()
-      ->getForm('Drupal\yoast_seo\Form\YoastSeoConfigForm');
-    $form['yoast_seo'] = [
-      '#type' => 'details',
-      '#title' => 'Configure Real-time SEO by bundles',
-      '#description' => 'Select the bundles Real-time SEO will be enabled for',
-      '#markup' => render($config_form),
       '#open' => TRUE,
     ];
 
