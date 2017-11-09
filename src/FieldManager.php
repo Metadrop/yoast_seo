@@ -2,7 +2,10 @@
 
 namespace Drupal\yoast_seo;
 
-use \Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Class FieldManager.
@@ -12,96 +15,105 @@ use \Drupal\Component\Utility\NestedArray;
 class FieldManager {
 
   /**
-   * Metatag logging channel.
+   * Attach a field to a target entity type.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
-   */
-  protected $logger;
-
-  /**
-   * Constructor for YoastSeoFieldManager.
-   */
-  public function __construct() {
-    $this->entity_manager = \Drupal::entityManager();
-  }
-
-  /**
-   * Attach a field to a target content type.
-   *
-   * @param string $entity_type
+   * @param string $entity_type_id
    *   Entity type. Example 'node'.
    * @param string $bundle
    *   Bundle type.
    * @param mixed $field
    *   Field.
    */
-  public function attachField($entity_type, $bundle, $field) {
+  public function attachField($entity_type_id, $bundle, $field) {
     // Retrieve the yoast seo field attached to the target entity.
-    $field_storage_config = $this->entity_manager->getStorage('field_storage_config')
-                                               ->load($entity_type . '.' . $field['field_name']);
+    $field_storage = $this->findOrCreateStorageConfig($entity_type_id, $field);
 
-    // If the field hasn't been attached yet to the target entity, attach it.
-    if (is_null($field_storage_config)) {
-      $this->entity_manager->getStorage('field_storage_config')
-                           ->create([
-                             'field_name' => $field['field_name'],
-                             'entity_type' => $entity_type,
-                             'type' => $field['storage_type'],
-                             'translatable' => $field['translatable'],
-                           ])
-                           ->save();
-    }
+    $field['field_storage'] = $field_storage;
+    $field['bundle'] = $bundle;
 
-    // Retrieve the yoast seo field attached to the target content type.
-    $fields_config = \Drupal::service('entity_field.manager')
-                            ->getFieldDefinitions($entity_type, $bundle);
-
-    // If the field hasn't been attached yet to the content type, attach it.
-    if (!isset($fields_config[$field['field_name']])) {
-
-      $field_values = [
-        'field_name' => $field['field_name'],
-        'entity_type' => $entity_type,
-        'bundle' => $bundle,
-        'label' => $field['field_label'],
-        'translatable' => $field['translatable'],
-      ];
-      $this->entity_manager->getStorage('field_config')
-                           ->create($field_values)
-                           ->save();
-
-      entity_get_form_display($entity_type, $bundle, 'default')
-        ->setComponent($field['field_name'], array())
-        ->save();
-      entity_get_display($entity_type, $bundle, 'default')
-        ->setComponent($field['field_name'], array())
-        ->save();
-    }
+    $this->createFieldIfNotExists($entity_type_id, $field);
   }
 
   /**
    * Detach a field from a target content type.
    *
-   * @param string $entity_type
+   * @param string $entity_type_id
    *   Entity type.
    * @param string $bundle
    *   Bundle.
    * @param string $field_name
    *   Field name.
    */
-  public function detachField($entity_type, $bundle, $field_name) {
-    $fields_config = \Drupal::service('entity_field.manager')
-                            ->getFieldDefinitions($entity_type, $bundle);
+  public function detachField($entity_type_id, $bundle, $field_name) {
+    $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
 
-    if (isset($fields_config[$field_name])) {
-      $fields_config[$field_name]->delete();
+    if (!is_null($field)) {
+      $field->delete();
+    }
+  }
+
+  /**
+   * Finds or creates storage configuration for a given entity and field.
+   *
+   * This will load a FieldStorageConfig entity if one exists. If it doesn't
+   * yet exist then one will be created.
+   *
+   * @param string $entity_type_id
+   *   The entity type for which to get the field storage configuration.
+   * @param array $field
+   *   A field storage configuration to find or create.
+   *
+   * @return \Drupal\field\Entity\FieldStorageConfig
+   *   The found or created FieldStorageConfig entity.
+   */
+  protected function findOrCreateStorageConfig($entity_type_id, array $field) {
+    $storage = FieldStorageConfig::loadByName($entity_type_id, $field['field_name']);
+
+    if (is_null($storage)) {
+      $field['entity_type'] = $entity_type_id;
+
+      $storage = FieldStorageConfig::create($field);
+
+      $storage->save();
+    }
+
+    return $storage;
+  }
+
+  /**
+   * Creates the field config for an entity if it doesn't already exist.
+   *
+   * @param string $entity_type_id
+   *   The entity type for which to create the field.
+   * @param array $field_config
+   *   The field configuration with the bundle that defines the field.
+   */
+  protected function createFieldIfNotExists($entity_type_id, array $field_config) {
+    $bundle = $field_config['bundle'];
+    $field_name = $field_config['field_name'];
+    $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
+
+    if (is_null($field)) {
+      // Create the field for this bundle.
+      $field = FieldConfig::create($field_config);
+
+      $field->save();
+
+      // Set up form and view displays.
+      EntityFormDisplay::load($entity_type_id . '.' . $bundle . '.default')
+        ->setComponent($field_name, [])
+        ->save();
+
+      EntityViewDisplay::load($entity_type_id . '.' . $bundle . '.default')
+        ->setComponent($field_name, [])
+        ->save();
     }
   }
 
   /**
    * Check if a field has been already attached to a bundle.
    *
-   * @param string $entity_type
+   * @param string $entity_type_id
    *   Entity type.
    * @param string $bundle
    *   Bundle.
@@ -111,12 +123,9 @@ class FieldManager {
    * @return bool
    *   Whether it is attached or not.
    */
-  public function isAttached($entity_type, $bundle, $field_name) {
-    $fields_config = \Drupal::service('entity_field.manager')
-                            ->getFieldDefinitions($entity_type, $bundle);
-
-    return isset($fields_config[$field_name]);
+  public function isAttached($entity_type_id, $bundle, $field_name) {
+    $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
+    return is_null($field);
   }
-
 
 }
