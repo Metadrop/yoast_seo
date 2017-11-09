@@ -9,9 +9,8 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\yoast_seo\YoastSeoManager;
+use Drupal\yoast_seo\SeoManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Advanced widget for yoast_seo field.
@@ -35,6 +34,8 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
 
   /**
    * Instance of YoastSeoManager service.
+   *
+   * @var \Drupal\yoast_seo\SeoManager
    */
   protected $yoastSeoManager;
 
@@ -68,10 +69,9 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityFieldManagerInterface $entity_field_manager, YoastSeoManager $manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityFieldManagerInterface $entity_field_manager, SeoManager $manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-//    $this->entityFieldManager = $entity_field_manager;
-//    $this->yoastSeoManager = $manager;
+    $this->yoastSeoManager = $manager;
   }
 
   /**
@@ -81,17 +81,17 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     $form['#yoast_settings'] = $this->getSettings();
 
     // Create the form element.
-    $element['yoast_seo'] = array(
+    $element['yoast_seo'] = [
       '#type' => 'details',
       '#title' => $this->t('Real-time SEO for drupal'),
       '#open' => TRUE,
-      '#attached' => array(
-        'library' => array(
+      '#attached' => [
+        'library' => [
           'yoast_seo/yoast_seo_core',
           'yoast_seo/yoast_seo_admin',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     $element['yoast_seo']['focus_keyword'] = [
       '#id' => Html::getUniqueId('yoast_seo-' . $delta . '-focus_keyword'),
@@ -152,10 +152,10 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
    */
   protected function getJavaScriptConfiguration() {
     global $base_root;
-    $score_to_status_rules = $this->getConfiguration()['score_to_status_rules'];
+    $score_to_status_rules = $this->yoastSeoManager->getConfiguration()['score_to_status_rules'];
 
-    // TODO: Use dependency injection for language manager
-    // TODO: Translate to something usable by YoastSEO.js
+    // TODO: Use dependency injection for language manager.
+    // TODO: Translate to something usable by YoastSEO.js.
     $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
     $configuration = [
@@ -167,58 +167,12 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       'score_status' => $score_to_status_rules,
     ];
 
-    // Set up the names of the text outputs
+    // Set up the names of the text outputs.
     foreach (self::$jsTargets as $js_target_name => $js_target_id) {
       $configuration['targets'][$js_target_name] = $js_target_id;
     }
 
     return $configuration;
-  }
-
-
-  /**
-   * Get configuration from Yaml file.
-   *
-   * @return mixed
-   *    Configuration details will be returned.
-   *
-   * @TODO: Turn this into proper Drupal configuration!
-   */
-  public function getConfiguration() {
-    $conf = Yaml::parse(
-      file_get_contents(
-        drupal_get_path('module', 'yoast_seo') . '/config/yoast_seo.yml'
-      )
-    );
-    return $conf;
-  }
-
-  /**
-   * Get the status for a given score.
-   *
-   * @param int $score
-   *   Score in points.
-   *
-   * @return string
-   *   Status corresponding to the score.
-   * TODO: Move this back to something like an SEO Assessor.
-   */
-  public function getScoreStatus($score) {
-    $rules = $this->getConfiguration()['score_to_status_rules'];
-    $default = $rules['default'];
-    unset($rules['default']);
-
-    foreach ($rules as $status => $status_rules) {
-      $min_max_isset = isset($status_rules['min']) && isset($status_rules['max']);
-      if (isset($status_rules['equal']) && $status_rules['equal'] == $score) {
-        return $status;
-      }
-      elseif ($min_max_isset && $score > $status_rules['min'] && $score <= $status_rules['max']) {
-        return $status;
-      }
-    }
-
-    return $default;
   }
 
 }

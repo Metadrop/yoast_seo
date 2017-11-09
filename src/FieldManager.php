@@ -15,6 +15,51 @@ use Drupal\field\Entity\FieldStorageConfig;
 class FieldManager {
 
   /**
+   * The field definitions that are required for this module.
+   *
+   * @return array
+   *   The field definitions required for this module to work for an entity.
+   */
+  public function getFieldDefinitions() {
+    return [
+      'field_yoast_seo' => [
+        'field_name' => 'field_yoast_seo',
+        'field_label' => 'Real-time SEO',
+        'storage_type' => 'yoast_seo',
+        'translatable' => TRUE,
+      ],
+    ];
+  }
+
+  /**
+   * Attach the yoast seo fields to a target content type.
+   *
+   * @param string $entity_type
+   *   Bundle.
+   * @param string $bundle
+   *   Entity type.
+   */
+  public function attachSeoFields($entity_type, $bundle) {
+    foreach ($this->getFieldDefinitions() as $field) {
+      $this->attachField($entity_type, $bundle, $field);
+    }
+  }
+
+  /**
+   * Delete the yoast seo fields from a target content type.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $bundle
+   *   Bundle.
+   */
+  public function detachSeoFields($entity_type, $bundle) {
+    foreach ($this->getFieldDefinitions() as $field_name => $field) {
+      $this->detachField($entity_type, $bundle, $field_name);
+    }
+  }
+
+  /**
    * Attach a field to a target entity type.
    *
    * @param string $entity_type_id
