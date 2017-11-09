@@ -3,6 +3,11 @@
     "description": "Adds Real-time SEO page analysis and configuration.",
     "type": "drupal-module",
     "license": "GPL-2.0+",
+    "homepage": "http://drupal.org/project/yoast_seo",
+    "support": {
+        "issues": "http://drupal.org/project/yoast_seo",
+        "source": "http://cgit.drupalcode.org/yoast_seo"
+    },
     "repositories": [
         {
             "type": "composer",
