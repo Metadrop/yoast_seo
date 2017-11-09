@@ -34,14 +34,14 @@ yoast_seo_view:
       css/yoast_seo.css: {}
 
 analytics_core:
-  remote: https://github.com/goalgorilla/YoastSEO.js
-  version: 1.2.2
+  remote: https://github.com/goalgorilla/RTSEO.js
+  version: 2.0.0
   license:
     name: GPL-3.0
-    url: https://github.com/goalgorilla/YoastSEO.js/blob/master/LICENSE
+    url: https://github.com/goalgorilla/RTSEO.js/blob/master/LICENSE
     gpl-compatible: true
   js:
-    /libraries/YoastSEO.js/dist/rtseo.js: {}
+    /libraries/rtseo.js/dist/rtseo.js: {}
   css:
     theme:
-      /libraries/YoastSEO.js/dist/yoast-seo.min.css: {}
+      /libraries/rtseo.js/dist/rtseo.min.css: {}
