@@ -10,46 +10,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Implements hook_form_FORM_ID_alter() for node_form().
- */
-function yoast_seo_form_node_form_alter(&$form, &$form_state, $form_id) {
-  if (isset($form['#after_build']) && !empty($form['#after_build'])) {
-    $form['#after_build'][] = 'yoast_seo_form_node_afterbuild';
-  }
-  else {
-    $form['#after_build'] = ['yoast_seo_form_node_afterbuild'];
-  }
-}
-
-/**
- * After build function.
- *
- * Reads the form, and deduct associated yoastseo configuration from it.
- *
- * @param array $form
- *   The form array.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
- *   The form state array.
- *
- * @return mixed
- *   The modified form.
- */
-function yoast_seo_form_node_afterbuild($form, FormStateInterface $form_state) {
-  if (isset($form['field_yoast_seo'])) {
-    $yoast_seo_manager = \Drupal::service('yoast_seo.manager');
-    $yoast_seo_field_manager = \Drupal::service('yoast_seo.field_manager');
-    $form = $yoast_seo_manager->setGeneralConfiguration($form);
-    $form = $yoast_seo_field_manager->setFieldsConfiguration($form);
-    $form = $yoast_seo_manager->setTargetsConfiguration($form);
-    $form = $yoast_seo_manager->setScoreToStatusRulesConfiguration($form);
-    $form = $yoast_seo_field_manager->addSnippetEditorMarkup($form);
-    $form = $yoast_seo_field_manager->addOverallScoreMarkup($form, $form_state);
-  }
-
-  return $form;
-}
-
-/**
  * Implements hook_form_FORM_ID_alter().
  */
 function yoast_seo_form_field_storage_config_edit_form_alter(&$form, FormStateInterface $form_state) {

@@ -54,6 +54,7 @@ class EntityPreviewController extends ControllerBase {
       throw new BadRequestHttpException("Missing form_id");
     }
 
+    /** @var \Drupal\yoast_seo\EntityPreviewer $entity_previewer */
     $entity_previewer = \Drupal::service('yoast_seo.entity_previewer');
 
     $entity = $entity_previewer->entityFromFormSubmission($preview_context['action'], $preview_context['method'], $form_data);

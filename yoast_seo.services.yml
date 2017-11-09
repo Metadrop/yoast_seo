@@ -3,7 +3,7 @@ services:
     class: Drupal\yoast_seo\YoastSeoManager
     arguments: ['@module_handler']
   yoast_seo.field_manager:
-    class: Drupal\yoast_seo\YoastSeoFieldManager
+    class: Drupal\yoast_seo\FieldManager
     arguments: []
   yoast_seo.entity_previewer:
     class: Drupal\yoast_seo\EntityPreviewer

@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @package Drupal\metatag\Form
  */
-class YoastSeoConfigForm extends FormBase {
+class ConfigForm extends FormBase {
 
   /**
    * {@inheritdoc}
