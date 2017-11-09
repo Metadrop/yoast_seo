@@ -104,7 +104,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     $element['yoast_seo']['overall_score'] = [
       '#theme' => 'overall_score',
       '#overall_score_target_id' => self::$jsTargets['overall_score_target_id'],
-      '#overall_score' => $this->getScoreStatus(isset($items[$delta]->status) ? $items[$delta]->status : 0),
+      '#overall_score' => $this->yoastSeoManager->getScoreStatus(isset($items[$delta]->status) ? $items[$delta]->status : 0),
     ];
 
     $element['yoast_seo']['status'] = [

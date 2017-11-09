@@ -3,6 +3,7 @@
 namespace Drupal\yoast_seo;
 
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class SeoManager.
