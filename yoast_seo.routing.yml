@@ -9,7 +9,7 @@ yoast_seo.tokens:
 yoast_seo.settings:
   path: 'admin/config/yoast_seo'
   defaults:
-    _title: 'Real-time SEO settings'
+    _title: 'Real-time SEO'
     _controller: '\Drupal\yoast_seo\Controller\YoastSeoController::settings'
   requirements:
     _permission: 'administer yoast seo'
