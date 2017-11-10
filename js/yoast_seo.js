@@ -16,11 +16,6 @@
         throw 'No settings specified for the YoastSEO analysis library.';
       }
 
-      // TODO: This should be set on the server side to make it work for all entity types.
-      if (settings.path && settings.path.currentPath.indexOf('node/add') !== -1) {
-        settings.yoast_seo.is_new = true;
-      }
-
       $('body', context).once('realtime-seo').each(function () {
         // TODO: This fails if there are multiple forms.
         var $form = $('form').first();

@@ -4,6 +4,7 @@ namespace Drupal\yoast_seo\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -123,12 +124,23 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       '#output_target_id' => self::$jsTargets['output_target_id'],
     ];
 
-    $js_confg = $this->getJavaScriptConfiguration();
+    $js_config = $this->getJavaScriptConfiguration();
 
-    $js_confg['fields']['focus_keyword'] = $element['yoast_seo']['focus_keyword']['#id'];
-    $js_confg['fields']['seo_status'] = $element['yoast_seo']['status']['#id'];
+    $js_config['fields']['focus_keyword'] = $element['yoast_seo']['focus_keyword']['#id'];
+    $js_config['fields']['seo_status'] = $element['yoast_seo']['status']['#id'];
 
-    $element['#attached']['drupalSettings']['yoast_seo'] = $js_confg;
+    $form_object = $form_state->getFormObject();
+
+    if ($form_object instanceof EntityForm) {
+      $js_config['is_new'] = $form_object->getEntity()->isNew();
+    }
+    else {
+      // If we aren't working with an entity we assume whatever we are working
+      // with is new.
+      $js_config['is_new'] = TRUE;
+    }
+
+    $element['#attached']['drupalSettings']['yoast_seo'] = $js_config;
 
     return $element;
   }
