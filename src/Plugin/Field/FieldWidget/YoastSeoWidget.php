@@ -10,6 +10,7 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Url;
 use Drupal\yoast_seo\SeoManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -177,6 +178,8 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       'base_root' => $base_root,
       // Set up score to indiciator word rules.
       'score_status' => $score_to_status_rules,
+      // Set up our analysis endpoint.
+      'analysis_endpoint' => Url::fromRoute('yoast_seo.entity_preview')->toString(),
     ];
 
     // Set up the names of the text outputs.

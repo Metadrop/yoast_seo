@@ -215,8 +215,7 @@
     var self = this;
 
     this.$form.ajaxSubmit({
-      // TODO: This endpoint probably shouldn't be static.
-      url: '/yoast_seo/preview',
+      url: this.config.analysis_endpoint,
       data: {
         yoast_seo_preview: {
           path: drupalSettings.path.currentPath,
