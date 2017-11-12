@@ -107,9 +107,10 @@ class SeoManager {
    */
   public function getEnabledBundles(array $entity_types = NULL) {
     $entities = $this->getEntityBundles($entity_types);
-    $field_name = $this->fieldManager->getFieldDefinitions()[0];
+    // TODO: Clean up the next line.
+    $field_name = array_keys($this->fieldManager->getFieldDefinitions())[0];
 
-    foreach ($entities as $entity_type => $bundles) {
+    foreach ($entities as $entity_type => &$bundles) {
       foreach ($bundles as $bundle_id => $bundle_label) {
         if (!$this->fieldManager->isAttached($entity_type, $bundle_id, $field_name)) {
           unset($bundles[$bundle_id]);

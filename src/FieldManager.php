@@ -170,7 +170,7 @@ class FieldManager {
    */
   public function isAttached($entity_type_id, $bundle, $field_name) {
     $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
-    return is_null($field);
+    return !is_null($field);
   }
 
 }

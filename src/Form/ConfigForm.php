@@ -70,7 +70,7 @@ class ConfigForm extends FormBase {
         '#title' => $this->t('@label', ['@label' => $entity_label]),
         '#options' => $supported_bundles[$entity_type],
         '#required' => FALSE,
-        '#default_value' => $enabled_bundles[$entity_type],
+        '#default_value' => array_keys($enabled_bundles[$entity_type]),
       ];
     }
 
@@ -106,9 +106,9 @@ class ConfigForm extends FormBase {
     // TODO: Try and simplify the below logic.
     foreach ($entity_types as $entity_type_id => $entity_type_label) {
       // Get the available bundles Yoast SEO supports.
-      $bundles = $this->seoManager->getEntityBundles($entity_type_id);
+      $bundles = $this->seoManager->getEntityBundles([$entity_type_id])[$entity_type_id];
       // Get the bundles Yoast SEO has been enabled for.
-      $enabled_bundles = $this->seoManager->getEnabledBundles($entity_type_id);
+      $enabled_bundles = array_keys($this->seoManager->getEnabledBundles([$entity_type_id])[$entity_type_id]);
 
       // Foreach available bundles.
       foreach ($bundles as $bundle_id => $bundle_label) {
