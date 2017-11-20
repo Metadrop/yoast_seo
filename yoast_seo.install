@@ -4,3 +4,22 @@
  * @file
  * Install, update, and uninstall functions for the Real-Time SEO module.
  */
+
+use Drupal\views\Views;
+
+/**
+ * Remove the SEO status from the content overview.
+ */
+function yoast_seo_update_8201() {
+  $content_view = Views::getView('content');
+
+  if ($content_view) {
+    $display_id = 'page_1';
+
+    $handlers = $content_view->getHandlers('field', $display_id);
+    if (isset($handlers['field_yoast_seo'])) {
+      $content_view->removeHandler($display_id, 'field', 'field_yoast_seo');
+      $content_view->save();
+    }
+  }
+}
