@@ -326,7 +326,10 @@
     if (this.data.keyword) {
       var keyword_pos = this.data.metaTitle.toLowerCase().indexOf(this.data.keyword.toLowerCase());
       var keyword_length = this.data.keyword.length;
-      emphasized_title = this.data.metaTitle.substr(0, keyword_pos) + '<strong>' + this.data.metaTitle.substr(keyword_pos, keyword_length) + '</strong>' + this.data.metaTitle.substr(keyword_pos + keyword_length);
+
+      if (keyword_pos > -1 && keyword_length > 0) {
+        emphasized_title = this.data.metaTitle.substr(0, keyword_pos) + '<strong>' + this.data.metaTitle.substr(keyword_pos, keyword_length) + '</strong>' + this.data.metaTitle.substr(keyword_pos + keyword_length);
+      }
     }
 
     var html =
