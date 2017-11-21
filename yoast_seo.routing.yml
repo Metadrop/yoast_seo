@@ -14,4 +14,4 @@ yoast_seo.entity_preview:
   methods: ['POST']
 # TODO: Implement proper access checking here based on the entity
   requirements:
-    _access: 'TRUE'
+    _custom_access: '\Drupal\yoast_seo\Controller\EntityPreviewController::access'
