@@ -23,9 +23,10 @@ class FieldManager {
   public function getFieldDefinitions() {
     return [
       'field_yoast_seo' => [
+        'type' => 'yoast_seo',
         'field_name' => 'field_yoast_seo',
         'field_label' => 'Real-time SEO',
-        'storage_type' => 'yoast_seo',
+        'field_type' => 'yoast_seo',
         'translatable' => TRUE,
       ],
     ];
@@ -153,6 +154,23 @@ class FieldManager {
         ->setComponent($field_name, [])
         ->save();
     }
+  }
+
+  /**
+   * Check whether this module is enabled for a certain entity/bundle.
+   *
+   * @param string $entity_type_id
+   *   The entity to check.
+   * @param string $bundle
+   *   The bundle of the entity to check.
+   *
+   * @return bool
+   *   Whether SEO analysis is enabled.
+   */
+  public function isEnabledFor($entity_type_id, $bundle) {
+    // Simply check if one of our fields is attached.
+    $field_name = array_keys($this->getFieldDefinitions())[0];
+    return $this->isAttached($entity_type_id, $bundle, $field_name);
   }
 
   /**

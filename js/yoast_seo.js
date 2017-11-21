@@ -287,6 +287,8 @@
   /**
    * retuns a string that is used as a CSS class, based on the numeric score
    *
+   * TODO: This can probably be replaced by the seoAssessorPresentor which includes a presenter configuration that does this.
+   *
    * @param score
    * @returns rating
    */

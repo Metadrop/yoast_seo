@@ -70,7 +70,7 @@ class ConfigForm extends FormBase {
         '#title' => $this->t('@label', ['@label' => $entity_label]),
         '#options' => $supported_bundles[$entity_type],
         '#required' => FALSE,
-        '#default_value' => array_keys($enabled_bundles[$entity_type]),
+        '#default_value' => !empty($enabled_bundles[$entity_type]) ? array_keys($enabled_bundles[$entity_type]) : [],
       ];
     }
 
@@ -91,55 +91,30 @@ class ConfigForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Get the available entity types Yoast SEO supports.
-    $entity_types = $this->seoManager->getSupportedEntityTypes();
+    // Get the available entity/bundles that the module supports.
+    $entity_bundles = $this->seoManager->getEntityBundles();
     // Retrieve the form values.
     $values = $form_state->getValues();
 
-    // Fields to attach.
-    $to_attach = [];
-    // Fields to detach.
-    $to_detach = [];
-
-    // Foreach entity types Yoast SEO can be enable for, check the bundle the
-    // administrator wants to enable/disable Yoast SEO for.
-    // TODO: Try and simplify the below logic.
-    foreach ($entity_types as $entity_type_id => $entity_type_label) {
-      // Get the available bundles Yoast SEO supports.
-      $bundles = $this->seoManager->getEntityBundles([$entity_type_id])[$entity_type_id];
-      // Get the bundles Yoast SEO has been enabled for.
-      $enabled_bundles = array_keys($this->seoManager->getEnabledBundles([$entity_type_id])[$entity_type_id]);
-
-      // Foreach available bundles.
+    // Iterate over all supported entities.
+    foreach ($entity_bundles as $entity_type_id => $bundles) {
+      // Then over all bundles for that entity.
       foreach ($bundles as $bundle_id => $bundle_label) {
-        // Yoast SEO is required to be enabled for.
-        if (isset($values[$entity_type_id][$bundle_id])
-            && $values[$entity_type_id][$bundle_id] !== 0
-            && !in_array($bundle_id, $enabled_bundles)
-        ) {
-          $to_attach[$entity_type_id][] = $bundle_id;
+        // If this value was not in our form we skip it.
+        if (!isset($values[$entity_type_id][$bundle_id])) {
+          continue;
         }
-        // Yoast SEO is required to be disabled for.
-        elseif (isset($values[$entity_type_id][$bundle_id])
-                 && $values[$entity_type_id][$bundle_id] === 0
-                 && in_array($bundle_id, $enabled_bundles)
-        ) {
-          $to_detach[$entity_type_id][] = $bundle_id;
+
+        // If it's checked now but wasn't enabled, enable it.
+        if ($values[$entity_type_id][$bundle_id] !== 0
+          && !$this->fieldManager->isEnabledFor($entity_type_id, $bundle_id)) {
+          $this->fieldManager->attachSeoFields($entity_type_id, $bundle_id);
         }
-      }
-    }
-
-    // Attach fields to content types.
-    foreach ($to_attach as $entity_type_id => $bundles) {
-      foreach ($bundles as $bundle_id) {
-        $this->fieldManager->attachSeoFields($entity_type_id, $bundle_id);
-      }
-    }
-
-    // Detach fields from content types.
-    foreach ($to_detach as $entity_type_id => $bundles) {
-      foreach ($bundles as $bundle_id) {
-        $this->fieldManager->detachSeoFields($entity_type_id, $bundle_id);
+        // If it's not checked but it was enabled, disable it.
+        elseif ($values[$entity_type_id][$bundle_id] === 0
+          && $this->fieldManager->isEnabledFor($entity_type_id, $bundle_id)) {
+          $this->fieldManager->detachSeoFields($entity_type_id, $bundle_id);
+        }
       }
     }
 
