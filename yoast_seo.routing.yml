@@ -5,13 +5,3 @@ yoast_seo.settings:
     _controller: '\Drupal\yoast_seo\Controller\SettingsController::index'
   requirements:
     _permission: 'administer yoast seo'
-
-yoast_seo.entity_preview:
-  path: '/yoast_seo/preview'
-  defaults:
-    _title: 'Entity Preview'
-    _controller: '\Drupal\yoast_seo\Controller\EntityPreviewController::json'
-  methods: ['POST']
-# TODO: Implement proper access checking here based on the entity
-  requirements:
-    _custom_access: '\Drupal\yoast_seo\Controller\EntityPreviewController::access'

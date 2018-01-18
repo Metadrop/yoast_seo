@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @package Drupal\yoast_seo
  */
-class EntityPreviewer {
+class EntityAnalyser {
 
   protected $entityTypeManager;
   protected $renderer;
@@ -258,4 +258,5 @@ class EntityPreviewer {
       'description' => 'meta',
     ];
   }
+
 }

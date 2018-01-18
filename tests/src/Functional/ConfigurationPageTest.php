@@ -94,7 +94,7 @@ class ConfigurationPageTest extends BrowserTestBase {
     $this->assertTrue($checked, "Expected Real-Time SEO module to be enabled for 'Article'");
 
     // Check that the SEO analyzer shows up on the article add page.
-    $this->drupalGet('node/add/article');
+    $this->drupalGet('/node/add/article');
     $this->assertSession()->pageTextContains('Real-time SEO for drupal');
   }
 

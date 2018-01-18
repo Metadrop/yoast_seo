@@ -4,7 +4,6 @@ namespace Drupal\yoast_seo\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\yoast_seo\FieldManager;
 use Drupal\yoast_seo\SeoManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,18 +22,10 @@ class ConfigForm extends FormBase {
   protected $seoManager;
 
   /**
-   * The Field Manager service.
-   *
-   * @var \Drupal\yoast_seo\FieldManager
-   */
-  protected $fieldManager;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(SeoManager $seoManager, FieldManager $fieldManager) {
+  public function __construct(SeoManager $seoManager) {
     $this->seoManager = $seoManager;
-    $this->fieldManager = $fieldManager;
   }
 
   /**
@@ -42,8 +33,7 @@ class ConfigForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('yoast_seo.manager'),
-      $container->get('yoast_seo.field_manager')
+      $container->get('yoast_seo.manager')
     );
   }
 
@@ -107,13 +97,13 @@ class ConfigForm extends FormBase {
 
         // If it's checked now but wasn't enabled, enable it.
         if ($values[$entity_type_id][$bundle_id] !== 0
-          && !$this->fieldManager->isEnabledFor($entity_type_id, $bundle_id)) {
-          $this->fieldManager->attachSeoFields($entity_type_id, $bundle_id);
+          && !$this->seoManager->isEnabledFor($entity_type_id, $bundle_id)) {
+          $this->seoManager->enableFor($entity_type_id, $bundle_id);
         }
         // If it's not checked but it was enabled, disable it.
         elseif ($values[$entity_type_id][$bundle_id] === 0
-          && $this->fieldManager->isEnabledFor($entity_type_id, $bundle_id)) {
-          $this->fieldManager->detachSeoFields($entity_type_id, $bundle_id);
+          && $this->seoManager->isEnabledFor($entity_type_id, $bundle_id)) {
+          $this->seoManager->disableFor($entity_type_id, $bundle_id);
         }
       }
     }

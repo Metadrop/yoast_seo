@@ -3,15 +3,15 @@
 namespace Drupal\yoast_seo\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
 use Drupal\yoast_seo\SeoManager;
+use Drupal\yoast_seo\Form\AnalysisFormHandler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,11 +28,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity field manager.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityFieldManager;
+  protected $entityTypeManager;
 
   /**
    * Instance of YoastSeoManager service.
@@ -63,7 +63,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('entity_field.manager'),
+      $container->get('entity_type.manager'),
       $container->get('yoast_seo.manager')
     );
   }
@@ -71,8 +71,9 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityFieldManagerInterface $entity_field_manager, SeoManager $manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, SeoManager $manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+    $this->entityTypeManager = $entity_type_manager;
     $this->yoastSeoManager = $manager;
   }
 
@@ -143,6 +144,16 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
 
     $element['#attached']['drupalSettings']['yoast_seo'] = $js_config;
 
+    // Add analysis submit button.
+    $target_type = $this->fieldDefinition->getTargetEntityTypeId();
+    if ($this->entityTypeManager->hasHandler($target_type, 'yoast_seo_preview_form')) {
+      $form_handler = $this->entityTypeManager->getHandler($target_type, 'yoast_seo_preview_form');
+
+      if ($form_handler instanceof AnalysisFormHandler) {
+        $form_handler->addAnalysisSubmit($element['yoast_seo'], $form_state);
+      }
+    }
+
     return $element;
   }
 
@@ -178,8 +189,6 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       'base_root' => $base_root,
       // Set up score to indiciator word rules.
       'score_status' => $score_to_status_rules,
-      // Set up our analysis endpoint.
-      'analysis_endpoint' => Url::fromRoute('yoast_seo.entity_preview')->toString(),
     ];
 
     // Set up the names of the text outputs.

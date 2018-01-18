@@ -121,6 +121,12 @@
 
     var self = this;
 
+    // We listen to the `updateSeoData` event on the body which is called by Drupal AJAX
+    // after we send our form data up for analysis.
+    jQuery('body').on('updateSeoData', function (e, data) {
+      self.setData(data);
+    });
+
     // Set up our event listener for normal form elements
     this.$form.change(this.handleChange.bind(this));
 
@@ -146,7 +152,7 @@
 
     // We update what data we have available so that this.data is always
     // initialised. We also run the initializer to review existing entities.
-    this.refreshData(!this.config.is_new);
+    this.refreshData();
   };
 
   /**
@@ -159,7 +165,6 @@
     if ($target.attr('data-drupal-selector') === this.config.fields.focus_keyword) {
       // Update the keyword and re-analyze.
       this.setData({ keyword: $target.val() });
-      this.analyze();
       return;
     }
 
@@ -186,7 +191,7 @@
     var self = this;
     this.update_timeout = setTimeout(function () {
       self.update_timeout = false;
-      self.refreshData(true);
+      self.refreshData();
     }, 500);
   };
 
@@ -207,33 +212,9 @@
    * We talk to Drupal to provide all the data that the YoastSEO.js library
    * needs to do the analysis.
    */
-  Orchestrator.prototype.refreshData = function (analyze) {
-    if (typeof analyze === 'undefined') {
-      analyze = false;
-    }
-
-    var self = this;
-
-    this.$form.ajaxSubmit({
-      url: this.config.analysis_endpoint,
-      data: {
-        yoast_seo_preview: {
-          path: drupalSettings.path.currentPath,
-          action: this.$form.attr('action'),
-          method: this.$form.attr('method')
-        }
-      },
-      success: function (data) {
-        self.setData(data);
-        if (analyze) {
-          self.analyze();
-        }
-      },
-      error: function (jqXHR, status, error) {
-        // TODO: Implement error handling for this endpoint.
-        console.log('Failed to refresh data', error);
-      }
-    });
+  Orchestrator.prototype.refreshData = function () {
+    // Click the refresh data button to perform a Drupal AJAX submit.
+    this.$form.find('.yoast-seo-preview-submit-button').mousedown();
   };
 
   /**
@@ -253,6 +234,9 @@
     // Some things are composed of others.
     this.data.titleWidth = document.getElementById('snippet_title').offsetWidth;
     this.data.permalink = this.config.base_root + this.data.url;
+
+    // Our data has changed so we rerun the analyzer.
+    this.analyze();
   };
 
   /**
