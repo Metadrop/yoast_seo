@@ -15,7 +15,6 @@ yoast_seo_core:
       - core/jquery.form
       - core/drupal
       - core/drupalSettings
-      - ckeditor/drupal.ckeditor.admin
       - yoast_seo/analytics_core
   css:
     theme:
