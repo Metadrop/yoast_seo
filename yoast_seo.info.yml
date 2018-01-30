@@ -8,6 +8,8 @@ configure: yoast_seo.settings
 
 dependencies:
   - metatag
-  - node
   - path
   - views
+
+test_dependencies:
+  - node

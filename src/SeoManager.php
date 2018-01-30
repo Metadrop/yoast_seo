@@ -2,6 +2,7 @@
 
 namespace Drupal\yoast_seo;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -57,10 +58,19 @@ class SeoManager {
    *   A list of available entity types as $id => $label.
    */
   public function getSupportedEntityTypes() {
-    // @todo Should be the same than the ones supported by the metatag module.
-    return [
-      'node' => 'Node',
-    ];
+    $supportedEntityTypes = [];
+    foreach ($this->entityTypeManager->getDefinitions() as $definition) {
+      if ($definition->entityClassImplements(ContentEntityInterface::class)) {
+        $supportedEntityTypes[$definition->id()] = $definition->getLabel();
+      }
+    }
+
+    // TODO: Could be removed when d.o/project/drupal/issues/2880149 lands.
+    if (\Drupal::service('module_handler')->moduleExists('taxonomy')) {
+      $supportedEntityTypes['taxonomy_term'] = 'Term';
+    }
+
+    return $supportedEntityTypes;
   }
 
   /**

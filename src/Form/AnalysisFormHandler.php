@@ -45,7 +45,7 @@ class AnalysisFormHandler implements EntityHandlerInterface {
   }
 
   /**
-   * Ajax Callback for returning node preview to seo library.
+   * Ajax Callback for returning entity preview to seo library.
    *
    * @param array $form
    *   The complete form array.
