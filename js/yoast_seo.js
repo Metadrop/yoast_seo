@@ -27,11 +27,19 @@
       // TODO: Incorporate this with the update event binder.
       if (typeof CKEDITOR !== 'undefined') {
         CKEDITOR.on('instanceReady', function (ev) {
+          // The editor that is now ready.
           var editor = ev.editor;
-          editor.on('change', function () {
-            // Let CKEditor handle updating the linked text element.
-            editor.updateElement();
-          });
+
+          // Ensure we only attach the change event once.
+          if (!editor.yoast_seo_changed) {
+            editor.on('blur', function () {
+              // Let CKEditor handle updating the linked text element.
+              editor.updateElement();
+              // Tell our analyser data has changed.
+              window.orchestrator.scheduleUpdate();
+            });
+            editor.yoast_seo_changed = true;
+          }
         });
       }
     }
