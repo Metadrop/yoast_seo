@@ -4,8 +4,6 @@ namespace Drupal\yoast_seo\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * SettingsController.
@@ -22,18 +20,6 @@ class SettingsController extends ControllerBase {
    */
   public function index() {
     $form = [];
-
-    // Add to the page the Yoast SEO form which allows the administrator
-    // to enable/disable Yoast SEO by bundles.
-    $config_form = \Drupal::formBuilder()
-      ->getForm('Drupal\yoast_seo\Form\ConfigForm');
-    $form['yoast_seo'] = [
-      '#type' => 'details',
-      '#title' => 'Configure Real-time SEO by bundles',
-      '#description' => 'Select the bundles Real-time SEO will be enabled for',
-      '#markup' => render($config_form),
-      '#open' => TRUE,
-    ];
 
     $xmlsitemap_enabled = \Drupal::moduleHandler()->moduleExists('xmlsitemap');
     $simple_sitemap_enabled = \Drupal::moduleHandler()->moduleExists('simple_sitemap');

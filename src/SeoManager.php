@@ -2,7 +2,7 @@
 
 namespace Drupal\yoast_seo;
 
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -15,11 +15,11 @@ use Symfony\Component\Yaml\Yaml;
 class SeoManager {
 
   /**
-   * Real Time SEO Field Manager service.
+   * Entity Type Manager service.
    *
-   * @var \Drupal\yoast_seo\FieldManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $fieldManager;
+  protected $entityTypeManager;
 
   /**
    * Entity Type Bundle Info service.
@@ -29,158 +29,60 @@ class SeoManager {
   protected $entityTypeBundleInfo;
 
   /**
-   * Entity Type Manager service.
+   * Entity Field Manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
-  protected $entityTypeManager;
+  protected $entityFieldManager;
 
   /**
    * Constructor for YoastSeoManager.
    *
-   * @param \Drupal\yoast_seo\FieldManager $fieldManager
-   *   Real Time SEO Field Manager service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
-   *   Entity Type Bundle Info service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Entity Type Manager service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
+   *   Entity Type Bundle Info service.
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+   *   Entity Field Manager service.
    */
-  public function __construct(FieldManager $fieldManager, EntityTypeBundleInfoInterface $entityTypeBundleInfo, EntityTypeManagerInterface $entityTypeManager) {
-    $this->fieldManager = $fieldManager;
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $entityTypeBundleInfo, EntityFieldManagerInterface $entityFieldManager) {
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
     $this->entityTypeManager = $entityTypeManager;
+    $this->entityFieldManager = $entityFieldManager;
   }
 
   /**
-   * Returns an array of available entity types Yoast SEO can be enabled for.
+   * Returns an array of bundles that have a 'yoast_seo' field.
    *
    * @return array
-   *   A list of available entity types as $id => $label.
+   *   A nested array of entities and bundles. The outer array is keyed by
+   *   entity id. The inner array is keyed by bundle id and contains the bundle
+   *   label. If an entity has no bundles then the inner array is keyed by
+   *   entity id.
    */
-  public function getSupportedEntityTypes() {
-    $supportedEntityTypes = [];
-    foreach ($this->entityTypeManager->getDefinitions() as $definition) {
-      if ($definition->entityClassImplements(ContentEntityInterface::class)) {
-        $supportedEntityTypes[$definition->id()] = $definition->getLabel();
-      }
-    }
-
-    // TODO: Could be removed when d.o/project/drupal/issues/2880149 lands.
-    if (\Drupal::service('module_handler')->moduleExists('taxonomy')) {
-      $supportedEntityTypes['taxonomy_term'] = 'Term';
-    }
-
-    return $supportedEntityTypes;
-  }
-
-  /**
-   * Returns an array of available bundles this module can be enabled for.
-   *
-   * Loads the bundles for the given entity types or loads the bundles for all
-   * supported entities if no entity types are specified.
-   *
-   * @param array $entity_types
-   *   (optional) The entity types to return the bundles for.
-   *
-   * @return array
-   *   A list of available bundles in the form of:
-   *
-   *   $entity_type => [
-   *    $bundle => $label
-   *   ]
-   */
-  public function getEntityBundles(array $entity_types = NULL) {
-    if (is_null($entity_types)) {
-      $entity_types = array_keys($this->getSupportedEntityTypes());
-    }
-
+  public function getEnabledBundles() {
     $entities = [];
-    foreach ($entity_types as $entity_type) {
-      $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type);
+
+    /** @var \Drupal\Core\Entity\EntityTypeInterface $definition */
+    foreach ($this->entityTypeManager->getDefinitions() as $definition) {
+      $entity_id = $definition->id();
+      $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_id);
 
       foreach ($bundles as $bundle_id => $bundle_metadata) {
-        $bundles[$bundle_id] = $bundle_metadata['label'];
-      }
+        $bundle_label = $bundle_metadata['label'];
+        $field_definitions = $this->entityFieldManager->getFieldDefinitions($entity_id, $bundle_id);
 
-      if (!empty($bundles)) {
-        $entities[$entity_type] = $bundles;
-      }
-    }
+        if (!empty($field_definitions['yoast_seo'])) {
+          if (!isset($entities[$entity_id])) {
+            $entities[$entity_id] = [];
+          }
 
-    return $entities;
-  }
-
-  /**
-   * Returns an array of bundles this module has been enabled for.
-   *
-   * Returns the bundles for the given entity types or checks the bundles for
-   * all supported entities if no entity types are specified.
-   *
-   * @param array $entity_types
-   *   (optional) The entity types to check the bundles for.
-   *
-   * @return array
-   *   A list of enabled bundles in the form of:
-   *
-   *   $entity_type => [
-   *    $bundle => $label
-   *   ]
-   */
-  public function getEnabledBundles(array $entity_types = NULL) {
-    $entities = $this->getEntityBundles($entity_types);
-
-    foreach ($entities as $entity_type => &$bundles) {
-      foreach ($bundles as $bundle_id => $bundle_label) {
-        if (!$this->isEnabledFor($entity_type, $bundle_id)) {
-          unset($bundles[$bundle_id]);
+          $entities[$entity_id][$bundle_id] = $bundle_label;
         }
       }
-
-      if (empty($bundles)) {
-        unset($entities[$entity_type]);
-      }
     }
 
     return $entities;
-  }
-
-  /**
-   * Check whether this module is enabled for a certain entity/bundle.
-   *
-   * @param string $entity_type_id
-   *   The entity to check.
-   * @param string $bundle
-   *   The bundle of the entity to check.
-   *
-   * @return bool
-   *   Whether SEO analysis is enabled.
-   */
-  public function isEnabledFor($entity_type_id, $bundle) {
-    return $this->fieldManager->isEnabledFor($entity_type_id, $bundle);
-  }
-
-  /**
-   * Enable this module for a certain entity/bundle.
-   *
-   * @param string $entity_type_id
-   *   The entity to enable.
-   * @param string $bundle
-   *   The bundle of the entity to enable.
-   */
-  public function enableFor($entity_type_id, $bundle) {
-    $this->fieldManager->attachSeoFields($entity_type_id, $bundle);
-  }
-
-  /**
-   * Disable this module for a certain entity/bundle.
-   *
-   * @param string $entity_type_id
-   *   The entity to disable.
-   * @param string $bundle
-   *   The bundle of the entity to disable.
-   */
-  public function disableFor($entity_type_id, $bundle) {
-    $this->fieldManager->detachSeoFields($entity_type_id, $bundle);
   }
 
   /**

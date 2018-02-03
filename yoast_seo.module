@@ -5,9 +5,11 @@
  * Contains yoast_seo.module.
  */
 
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\yoast_seo\Form\AnalysisFormHandler;
 
 /**
@@ -24,8 +26,8 @@ function yoast_seo_form_field_storage_config_edit_form_alter(&$form, FormStateIn
 /**
  * Implements hook_field_access().
  */
-function yoast_seo_entity_field_access($operation, $field_definition, $account, $items = NULL) {
-  if ($field_definition->getName() == 'field_yoast_seo') {
+function yoast_seo_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  if ($field_definition->getType() == 'yoast_seo') {
     return AccessResult::forbiddenIf(
       !($account->hasPermission('use yoast seo') || $account->hasPermission('administer yoast seo'))
       || !($account->hasPermission('create url aliases') || $account->hasPermission('administer url aliases'))
@@ -88,35 +90,6 @@ function yoast_seo_entity_type_build(array &$entity_types) {
   foreach ($entity_types as &$entity_type) {
     if (!$entity_type->hasHandlerClass('yoast_seo_preview_form')) {
       $entity_type->setHandlerClass('yoast_seo_preview_form', AnalysisFormHandler::class);
-    }
-  }
-}
-
-/**
- * Alter the settings used for displaying an entity.
- *
- * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
- *   The entity view display that will be used to display the entity
- *   components.
- * @param array $context
- *   An associative array containing:
- *   - entity_type: The entity type, e.g., 'node' or 'user'.
- *   - bundle: The bundle, e.g., 'page' or 'article'.
- *   - view_mode: The view mode, e.g., 'full', 'teaser', etc.
- *
- * @ingroup entity_crud
- */
-function yoast_seo_entity_view_display_alter(EntityViewDisplayInterface $display, array $context) {
-  /* @var \Drupal\yoast_seo\SeoManager $seo_manager */
-  $seo_manager = \Drupal::service('yoast_seo.manager');
-  $supported_types = $seo_manager->getSupportedEntityTypes();
-
-  // Leave Yoast field labels out of the display.
-  if (!empty($supported_types[$context['entity_type']]) && $context['view_mode'] == 'full') {
-    foreach ($display->getComponents() as $name => $options) {
-      if ($name == 'field_yoast_seo') {
-        $display->removeComponent($name);
-      }
     }
   }
 }

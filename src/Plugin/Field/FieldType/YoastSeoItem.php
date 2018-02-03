@@ -15,7 +15,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   module = "yoast_seo",
  *   description = @Translation("The Real-time SEO status in points and the focused keywords."),
  *   default_widget = "yoast_seo_widget",
- *   default_formatter = "string"
+ *   default_formatter = "yoastseo_empty_formatter"
  * )
  */
 class YoastSeoItem extends FieldItemBase {
