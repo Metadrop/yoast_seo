@@ -144,10 +144,20 @@ class EntityAnalyser {
 
     $html = $this->renderEntity($entity);
 
-    $tags = $this->metatagManager->tagsFromEntityWithDefaults($entity);
-    $data = $this->metatagManager->generateRawElements($tags, $entity);
+    $metatags = $this->metatagManager->tagsFromEntityWithDefaults($entity);
 
-    // Turn our tag renderable into a key => value array.
+    // Trigger hook_metatags_alter().
+    // Allow modules to override tags or the entity used for token replacements.
+    // Also used to override editable titles and descriptions.
+    $context = [
+      'entity' => $entity,
+    ];
+    \Drupal::service('module_handler')->alter('metatags', $metatags, $context);
+
+    // Resolve the metatags from tokens into actual values.
+    $data = $this->metatagManager->generateRawElements($metatags, $entity);
+
+    // Turn our tag render array into a key => value array.
     foreach ($data as $name => $tag) {
       $data[$name] = $tag['#attributes']['content'];
     }

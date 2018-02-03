@@ -93,3 +93,50 @@ function yoast_seo_entity_type_build(array &$entity_types) {
     }
   }
 }
+
+/**
+ * Implements hook_metatags_alter().
+ *
+ * If an entity has values for the custom title or description fields then we
+ * use those values in place of the metatags defaults.
+ */
+function yoast_seo_metatags_alter(array &$metatags, array $context) {
+  // Without entity there is nothing for us to do.
+  if (empty($context['entity'])) {
+    return;
+  }
+
+  /** @var \Drupal\Core\Entity\EntityInterface $entity */
+  $entity = $context['entity'];
+
+  /** @var \Drupal\yoast_seo\SeoManager $seo_manager */
+  $seo_manager = \Drupal::service('yoast_seo.manager');
+
+  $entity_type = $entity->getEntityTypeId();
+  $bundle = $entity->bundle();
+
+  // Abort early if we're not enabled for this entity type.
+  if (!$seo_manager->isEnabledFor($entity_type, $bundle)) {
+    return;
+  }
+
+  $field = $entity->get('field_yoast_seo')->first();
+
+  // If the field has no value then we're done as well.
+  if (empty($field)) {
+    return;
+  }
+
+  $values = $field->getValue();
+
+  if ($seo_manager->isEditingEnabledFor($entity_type, $bundle, 'title') &&
+    !empty($values['title'])) {
+    $metatags['title'] = $values['title'];
+  }
+
+  if ($seo_manager->isEditingEnabledFor($entity_type, $bundle, 'description') &&
+    !empty($values['description'])) {
+    $metatags['description'] = $values['description'];
+  }
+
+}

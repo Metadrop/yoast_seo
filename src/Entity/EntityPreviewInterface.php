@@ -26,4 +26,5 @@ interface EntityPreviewInterface {
    *   The entity object.
    */
   public function getEntity();
+
 }

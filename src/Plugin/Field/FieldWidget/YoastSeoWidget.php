@@ -131,6 +131,18 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     $js_config['fields']['focus_keyword'] = $element['yoast_seo']['focus_keyword']['#id'];
     $js_config['fields']['seo_status'] = $element['yoast_seo']['status']['#id'];
 
+    // Add fields to store editable properties.
+    foreach (['title', 'description'] as $property) {
+      if ($this->getSetting('edit_' . $property)) {
+        $element['yoast_seo']['edit_' . $property] = [
+          '#id' => Html::getUniqueId('yoast_seo-' . $delta . '-' . $property),
+          '#type' => 'hidden',
+          '#default_value' => isset($items[$delta]->{$property}) ? $items[$delta]->{$property} : NULL,
+        ];
+        $js_config['fields']['edit_' . $property] = $element['yoast_seo']['edit_' . $property]['#id'];
+      }
+    }
+
     $form_object = $form_state->getFormObject();
 
     if ($form_object instanceof EntityForm) {
@@ -164,8 +176,60 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     foreach ($values as &$value) {
       $value['status']        = $value['yoast_seo']['status'];
       $value['focus_keyword'] = $value['yoast_seo']['focus_keyword'];
+      $value['title']         = $value['yoast_seo']['edit_title'];
+      $value['description']   = $value['yoast_seo']['edit_description'];
     }
     return $values;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'edit_title' => FALSE,
+      'edit_description' => FALSE,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $form = parent::settingsForm($form, $form_state);
+
+    $form['edit_title'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable title editing'),
+      '#description' => $this->t('When this is checked the page title will be editable through the Real-Time SEO widget.'),
+      '#default_value' => $this->getSetting('edit_title'),
+    ];
+
+    $form['edit_description'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable description editing'),
+      '#description' => $this->t('When this is checked the meta description will be editable through the Real-Time SEO widget.'),
+      '#default_value' => $this->getSetting('edit_description'),
+    ];
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+
+    if ($this->getSetting('edit_title')) {
+      $summary[] = 'Title editing enabled';
+    }
+
+    if ($this->getSetting('edit_description')) {
+      $summary[] = 'Description editing enabled';
+    }
+
+    return $summary;
   }
 
   /**
@@ -189,7 +253,13 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       'base_root' => $base_root,
       // Set up score to indiciator word rules.
       'score_status' => $score_to_status_rules,
+      // Possibly allow properties to be editable.
+      'enable_editing' => [],
     ];
+
+    foreach (['title', 'description'] as $property) {
+      $configuration['enable_editing'][$property] = $this->getSetting('edit_' . $property);
+    }
 
     // Set up the names of the text outputs.
     foreach (self::$jsTargets as $js_target_name => $js_target_id) {

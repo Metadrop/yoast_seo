@@ -130,6 +130,9 @@
     // Set up our event listener for normal form elements
     this.$form.change(this.handleChange.bind(this));
 
+    // Set up event handlers for editable properties.
+    this.$form.find('#yoast-snippet').once('yoast_seo-editable').focusout(this.handleBlur.bind(this));
+
     // Set up our event listener for CKEditor instances if any.
     // We do this in a setTimeout to allow CKEDITOR to load.
     setTimeout(function () {
@@ -175,6 +178,16 @@
    * Handles the blur of a CKEditor field. We just rerun the analysis.
    */
   Orchestrator.prototype.handleBlur = function (event) {
+    var $target = $(event.target);
+
+    // If one of the editable properties was edited, update the field values.
+    if ($target.is('.title.editable')) {
+      jQuery('[data-drupal-selector="' + this.config.fields.edit_title + '"').val($target.text());
+    }
+    else if ($target.is('.desc.editable')) {
+      jQuery('[data-drupal-selector="' + this.config.fields.edit_description + '"').val($target.text());
+    }
+
     this.scheduleUpdate();
   };
 
@@ -318,22 +331,39 @@
       }
     }
 
-    var html =
+    var title_class = 'title';
+    var title_editable = '';
+
+    if (this.config.enable_editing.title) {
+      title_class += ' editable';
+      title_editable = 'contenteditable="true"';
+    }
+
+    var desc_class = 'desc desc-default';
+    var desc_editable = '';
+
+    if (this.config.enable_editing.description) {
+      desc_class += ' editable';
+      desc_editable = 'contenteditable="true"';
+    }
+
+    document.getElementById(this.config.targets.snippet).innerHTML =
       '<section class="snippet-editor__preview">' +
         '<div class="snippet_container snippet-editor__container" id="title_container">' +
-          '<span class="title" id="snippet_title">' + emphasized_title + '</span>' +
-          '<span class="title" id="snippet_sitename"></span>' +
+          '<span class="' + title_class + '"' + title_editable + ' id="snippet_title">' +
+            emphasized_title +
+          '</span>' +
         '</div>' +
         '<div class="snippet_container snippet-editor__container" id="url_container">' +
           '<cite class="url urlBase" id="snippet_citeBase">' + this.config.base_root + '</cite>' +
           '<cite class="url" id="snippet_cite">' + this.data.url + '</cite>' +
         '</div>' +
         '<div class="snippet_container snippet-editor__container" id="meta_container">' +
-          '<span class="desc desc-default" id="snippet_meta">' + this.data.meta + '</span>' +
+          '<span class="' + desc_class + '"' + desc_editable + ' id="snippet_meta">' +
+            this.data.meta +
+          '</span>' +
         '</div>' +
       '</section>';
-
-    document.getElementById(this.config.targets.snippet).innerHTML = html;
   };
 
 })(jQuery);

@@ -1,0 +1,10 @@
+field.widget.settings.yoast_seo_widget:
+  type: mapping
+  label: 'Real-Time SEO Analysis widget settings'
+  mapping:
+    edit-title:
+      type: boolean
+      label: 'Title Editing'
+    edit-description:
+      type: boolean
+      label: 'Description Editing'
