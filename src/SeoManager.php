@@ -3,8 +3,10 @@
 namespace Drupal\yoast_seo;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -83,6 +85,33 @@ class SeoManager {
     }
 
     return $entities;
+  }
+
+  /**
+   * Returns the Real-Time SEO field of the entity.
+   *
+   * Returns the first field of the entity that is a Real-Time SEO field or
+   * null if none is found.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity for which to find the Real-Time SEO field.
+   *
+   * @return NULL|\Drupal\Core\Field\FieldItemListInterface
+   *   The field item list of the field or NULL if no RTSEO field was found.
+   */
+  public function getSeoField(FieldableEntityInterface $entity) {
+    $definitions = $entity->getFieldDefinitions();
+
+    // Find the first yoast_seo field on the entity.
+    foreach ($definitions as $definition) {
+      if ($definition->getType() === 'yoast_seo') {
+        return $entity->get($definition->getName());
+      }
+    }
+
+    // No field of yoast_seo type was found.
+    return NULL;
+
   }
 
   /**

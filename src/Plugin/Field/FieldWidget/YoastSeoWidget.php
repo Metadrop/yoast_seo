@@ -176,8 +176,8 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     foreach ($values as &$value) {
       $value['status']        = $value['yoast_seo']['status'];
       $value['focus_keyword'] = $value['yoast_seo']['focus_keyword'];
-      $value['title']         = $value['yoast_seo']['edit_title'];
-      $value['description']   = $value['yoast_seo']['edit_description'];
+      $value['title']         = ($this->getSetting('edit_title') ? $value['yoast_seo']['edit_title'] : null);
+      $value['description']   = ($this->getSetting('edit_description') ? $value['yoast_seo']['edit_description'] : null);
     }
     return $values;
   }
