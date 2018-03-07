@@ -159,7 +159,12 @@ class EntityAnalyser {
 
     // Turn our tag render array into a key => value array.
     foreach ($data as $name => $tag) {
-      $data[$name] = $tag['#attributes']['content'];
+      if (isset($tag['#attributes']['content'])) {
+        $data[$name] = $tag['#attributes']['content'];
+      }
+      elseif (isset($tag['#attributes']['href'])) {
+        $data[$name] = $tag['#attributes']['href'];
+      }
     }
     // Translate some fields that have different names between metatag module
     // and the Yoast library.
