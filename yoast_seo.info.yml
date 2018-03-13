@@ -10,6 +10,7 @@ dependencies:
   - metatag
   - path
   - views
+  - system (>=8.5.0)
 
 test_dependencies:
   - node
