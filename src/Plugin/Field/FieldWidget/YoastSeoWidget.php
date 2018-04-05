@@ -84,9 +84,8 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     $form['#yoast_settings'] = $this->getSettings();
 
     // Create the form element.
-    $element['yoast_seo'] = [
+    $element += [
       '#type' => 'details',
-      '#title' => $this->t('Real-time SEO for drupal'),
       '#open' => TRUE,
       '#attached' => [
         'library' => [
@@ -96,7 +95,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       ],
     ];
 
-    $element['yoast_seo']['focus_keyword'] = [
+    $element['focus_keyword'] = [
       '#id' => Html::getUniqueId('yoast_seo-' . $delta . '-focus_keyword'),
       '#type' => 'textfield',
       '#title' => $this->t('Focus keyword'),
@@ -104,13 +103,13 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       '#description' => $this->t("Pick the main keyword or keyphrase that this post/page is about."),
     ];
 
-    $element['yoast_seo']['overall_score'] = [
+    $element['overall_score'] = [
       '#theme' => 'overall_score',
       '#overall_score_target_id' => self::$jsTargets['overall_score_target_id'],
       '#overall_score' => $this->yoastSeoManager->getScoreStatus(isset($items[$delta]->status) ? $items[$delta]->status : 0),
     ];
 
-    $element['yoast_seo']['status'] = [
+    $element['status'] = [
       '#id' => Html::getUniqueId('yoast_seo-' . $delta . '-status'),
       '#type' => 'hidden',
       '#title' => $this->t('Real-time SEO status'),
@@ -119,7 +118,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     ];
 
     // Snippet.
-    $element['yoast_seo']['snippet_analysis'] = [
+    $element['snippet_analysis'] = [
       '#theme' => 'yoast_snippet',
       '#wrapper_target_id' => self::$jsTargets['wrapper_target_id'],
       '#snippet_target_id' => self::$jsTargets['snippet_target_id'],
@@ -128,18 +127,18 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
 
     $js_config = $this->getJavaScriptConfiguration();
 
-    $js_config['fields']['focus_keyword'] = $element['yoast_seo']['focus_keyword']['#id'];
-    $js_config['fields']['seo_status'] = $element['yoast_seo']['status']['#id'];
+    $js_config['fields']['focus_keyword'] = $element['focus_keyword']['#id'];
+    $js_config['fields']['seo_status'] = $element['status']['#id'];
 
     // Add fields to store editable properties.
     foreach (['title', 'description'] as $property) {
       if ($this->getSetting('edit_' . $property)) {
-        $element['yoast_seo']['edit_' . $property] = [
+        $element['edit_' . $property] = [
           '#id' => Html::getUniqueId('yoast_seo-' . $delta . '-' . $property),
           '#type' => 'hidden',
           '#default_value' => isset($items[$delta]->{$property}) ? $items[$delta]->{$property} : NULL,
         ];
-        $js_config['fields']['edit_' . $property] = $element['yoast_seo']['edit_' . $property]['#id'];
+        $js_config['fields']['edit_' . $property] = $element['edit_' . $property]['#id'];
       }
     }
 
@@ -162,7 +161,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       $form_handler = $this->entityTypeManager->getHandler($target_type, 'yoast_seo_preview_form');
 
       if ($form_handler instanceof AnalysisFormHandler) {
-        $form_handler->addAnalysisSubmit($element['yoast_seo'], $form_state);
+        $form_handler->addAnalysisSubmit($element, $form_state);
       }
     }
 
@@ -174,10 +173,8 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as &$value) {
-      $value['status']        = $value['yoast_seo']['status'];
-      $value['focus_keyword'] = $value['yoast_seo']['focus_keyword'];
-      $value['title']         = ($this->getSetting('edit_title') ? $value['yoast_seo']['edit_title'] : null);
-      $value['description']   = ($this->getSetting('edit_description') ? $value['yoast_seo']['edit_description'] : null);
+      $value['title']         = ($this->getSetting('edit_title') ? $value['edit_title'] : null);
+      $value['description']   = ($this->getSetting('edit_description') ? $value['edit_description'] : null);
     }
     return $values;
   }
