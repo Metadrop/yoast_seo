@@ -154,6 +154,8 @@ class EntityAnalyser {
     ];
     \Drupal::service('module_handler')->alter('metatags', $metatags, $context);
 
+    $this->replaceContextAwareTokens($metatags, $entity);
+
     // Resolve the metatags from tokens into actual values.
     $data = $this->metatagManager->generateRawElements($metatags, $entity);
 
@@ -258,6 +260,24 @@ class EntityAnalyser {
     }
 
     return $entity;
+  }
+
+  /**
+   * Replace context aware tokens in a metatags array.
+   *
+   * Replaces context aware tokens in a metatags with an entity specific
+   * version. This causes things like [current-page:title] to show the entity
+   * page title instead of the entity create/edit form title.
+   *
+   * @param array $metatags
+   *   The metatags array that contains the tokens.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to use as context
+   */
+  protected function replaceContextAwareTokens(array &$metatags, EntityInterface $entity) {
+    foreach ($metatags as $tag => $value) {
+      $metatags[$tag] = str_replace('[current-page:title]', $entity->getTitle(), $value);
+    }
   }
 
   /**
