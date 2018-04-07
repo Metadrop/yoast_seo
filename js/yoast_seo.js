@@ -290,30 +290,27 @@
   };
 
   /**
-   * retuns a string that is used as a CSS class, based on the numeric score
+   * Returns a string that indicates the score to the user.
    *
-   * TODO: This can probably be replaced by the seoAssessorPresentor which includes a presenter configuration that does this.
-   *
-   * @param score
-   * @returns rating
+   * @param score integer
+   * @returns integer
+   *   The human readable rating
    */
   Orchestrator.prototype.scoreToRating = function (score) {
-    var rating;
+    // Get the label thresholds from high to low.
+    var thresholds = Object.keys(this.config.score_rules).sort().reverse();
 
-    if (score === 0) {
-      rating = 'na';
-    }
-    else if (score <= 4) {
-      rating = 'bad';
-    }
-    else if (score > 4 && score <= 7) {
-      rating = 'ok';
-    }
-    else if (score > 7) {
-      rating = 'good';
+    console.log(thresholds);
+
+    for (var i in thresholds) {
+      var minimum = thresholds[i];
+      console.log(score, minimum);
+      if (score >= minimum) {
+        return this.config.score_rules[minimum];
+      }
     }
 
-    return Drupal.t('SEO: <strong>' + rating + '</strong>');
+    return Drupal.t('Unknown');
   };
 
   /**

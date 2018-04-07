@@ -39,7 +39,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
    *
    * @var \Drupal\yoast_seo\SeoManager
    */
-  protected $yoastSeoManager;
+  protected $seoManager;
 
   /**
    * Target elements for Javascript.
@@ -74,7 +74,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, SeoManager $manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->entityTypeManager = $entity_type_manager;
-    $this->yoastSeoManager = $manager;
+    $this->seoManager = $manager;
   }
 
   /**
@@ -106,7 +106,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
     $element['overall_score'] = [
       '#theme' => 'overall_score',
       '#overall_score_target_id' => self::$jsTargets['overall_score_target_id'],
-      '#overall_score' => $this->yoastSeoManager->getScoreStatus(isset($items[$delta]->status) ? $items[$delta]->status : 0),
+      '#overall_score' => $this->seoManager->getScoreStatus(isset($items[$delta]->status) ? $items[$delta]->status : 0),
     ];
 
     $element['status'] = [
@@ -237,7 +237,7 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
    */
   protected function getJavaScriptConfiguration() {
     global $base_root;
-    $score_to_status_rules = $this->yoastSeoManager->getConfiguration()['score_to_status_rules'];
+    $score_rules = $this->seoManager->getScoreRules();
 
     // TODO: Use dependency injection for language manager.
     // TODO: Translate to something usable by YoastSEO.js.
@@ -248,8 +248,8 @@ class YoastSeoWidget extends WidgetBase implements ContainerFactoryPluginInterfa
       'language' => $language,
       // Set the base for URL analysis.
       'base_root' => $base_root,
-      // Set up score to indiciator word rules.
-      'score_status' => $score_to_status_rules,
+      // Set up score to indicator word rules.
+      'score_rules' => $score_rules,
       // Possibly allow properties to be editable.
       'enable_editing' => [],
     ];

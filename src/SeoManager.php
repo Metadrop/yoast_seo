@@ -126,38 +126,30 @@ class SeoManager {
    *   Status corresponding to the score.
    */
   public function getScoreStatus($score) {
-    $rules = $this->getConfiguration()['score_to_status_rules'];
-    $default = $rules['default'];
-    unset($rules['default']);
+    $rules = $this->getScoreRules();
 
-    foreach ($rules as $status => $status_rules) {
-      $min_max_isset = isset($status_rules['min']) && isset($status_rules['max']);
-      if (isset($status_rules['equal']) && $status_rules['equal'] == $score) {
-        return $status;
-      }
-      elseif ($min_max_isset && $score > $status_rules['min'] && $score <= $status_rules['max']) {
-        return $status;
+    foreach ($rules as $minimum => $label) {
+      // As soon as our score is bigger than a rules threshold, use that label.
+      if ($score >= $minimum) {
+        return $label;
       }
     }
 
-    return $default;
+    return $this->t('Unknown');
   }
 
   /**
-   * Get configuration from Yaml file.
+   * Retrieves the score rules from configuration.
    *
-   * @return mixed
-   *   Configuration details will be returned.
-   *
-   * @TODO: Turn this into proper Drupal configuration!
+   * @return string[] rules
+   *   A list of labels indexed by the minimum score required. Ordered from high
+   *   to low.
    */
-  public function getConfiguration() {
-    $conf = Yaml::parse(
-      file_get_contents(
-        drupal_get_path('module', 'yoast_seo') . '/config/yoast_seo.yml'
-      )
-    );
-    return $conf;
-  }
+  public function getScoreRules() {
+    $rules = \Drupal::config('yoast_seo.settings')->get('score_rules');
 
+    // Ensure rules are sorted from high to low score.
+    ksort($rules);
+    return array_reverse($rules, true);
+  }
 }

@@ -69,3 +69,18 @@ function yoast_seo_update_8202() {
   }
 
 }
+
+/**
+ * Move score label configuration into module settings.
+ */
+function yoast_seo_update_8203() {
+  \Drupal::configFactory()
+    ->getEditable('yoast_seo.settings')
+    ->set('score_rules', [
+      0 => 'Not available',
+      8 => 'Good',
+      1 => 'Bad',
+      5 => 'Okay',
+    ])
+    ->save();
+}
