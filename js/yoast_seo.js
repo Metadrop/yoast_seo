@@ -234,8 +234,16 @@
    * needs to do the analysis.
    */
   Orchestrator.prototype.refreshData = function () {
-    // Click the refresh data button to perform a Drupal AJAX submit.
-    this.$form.find('.yoast-seo-preview-submit-button').mousedown();
+    // We use Drupal's AJAX progress indicator to check that we're not
+    // interfering with an already running AJAX request. If an AJAX request is
+    // already running then we reschedule the update.
+    if (!jQuery('.ajax-progress').length) {
+      // Click the refresh data button to perform a Drupal AJAX submit.
+      this.$form.find('.yoast-seo-preview-submit-button').mousedown();
+    }
+    else {
+      this.scheduleUpdate();
+    }
   };
 
   /**
