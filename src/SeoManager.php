@@ -3,11 +3,11 @@
 namespace Drupal\yoast_seo;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Symfony\Component\Yaml\Yaml;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Class SeoManager.
@@ -15,6 +15,8 @@ use Symfony\Component\Yaml\Yaml;
  * @package Drupal\yoast_seo
  */
 class SeoManager {
+
+  use StringTranslationTrait;
 
   /**
    * Entity Type Manager service.
@@ -47,10 +49,11 @@ class SeoManager {
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   Entity Field Manager service.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $entityTypeBundleInfo, EntityFieldManagerInterface $entityFieldManager) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $entityTypeBundleInfo, EntityFieldManagerInterface $entityFieldManager, TranslationInterface $stringTranslation) {
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
+    $this->stringTranslation = $stringTranslation;
   }
 
   /**
