@@ -68,6 +68,10 @@ class AnalysisFormHandler implements EntityHandlerInterface {
    *   The ajax response.
    */
   public function analysisSubmitAjax(array &$form, FormStateInterface $form_state) {
+
+    // Prevent firing accidental submissions from entity builder callbacks.
+    $form_state->setTemporaryValue('entity_validated', FALSE);
+
     $preview_entity = $form_state->getFormObject()->buildEntity($form, $form_state);
     $preview_entity->in_preview = TRUE;
 
