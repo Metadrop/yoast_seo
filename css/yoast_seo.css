@@ -75,6 +75,7 @@
 
 .snippet-editor__preview {
   padding: 15px 0;
+  font-family: arial, sans-serif;
 }
 
 .snippet-editor__preview .title.editable,
