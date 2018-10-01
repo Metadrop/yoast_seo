@@ -7,10 +7,10 @@ core: 8.x
 configure: yoast_seo.settings
 
 dependencies:
-  - metatag
-  - path
-  - views
-  - system (>=8.5.0)
+  - metatag:metatag
+  - drupal:path
+  - drupal:views
+  - drupal:system (>=8.5.0)
 
 test_dependencies:
-  - node
+  - drupal:node
