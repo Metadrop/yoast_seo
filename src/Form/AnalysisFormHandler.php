@@ -88,7 +88,7 @@ class AnalysisFormHandler implements EntityHandlerInterface {
     // rendered. Any new messages are from form validation. We don't want to
     // leak those to the user because they'll get them during normal submission
     // so we clear them here.
-    $this->messenger->all();
+    $this->messenger->deleteAll();
 
     $response = new AjaxResponse();
     $response->addCommand(new InvokeCommand('body', 'trigger', ['updateSeoData', $entity_data]));
