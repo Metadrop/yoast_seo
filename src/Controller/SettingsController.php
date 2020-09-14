@@ -4,6 +4,7 @@ namespace Drupal\yoast_seo\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * SettingsController.
@@ -38,10 +39,10 @@ class SettingsController extends ControllerBase {
         $xmlsitemap_description = $this->t(
           'You can configure the XML Sitemap settings at the @url.',
           [
-            '@url' => \Drupal::l(
+            '@url' => Link::fromTextAndUrl(
               $this->t('configuration page'),
               Url::fromRoute('xmlsitemap.admin_search')
-            ),
+            )->toString(),
           ]
         );
       }
@@ -57,10 +58,10 @@ class SettingsController extends ControllerBase {
         $xmlsitemap_description = $this->t(
           'You can configure the Simple XML Sitemap settings at the @url.',
           [
-            '@url' => \Drupal::l(
+            '@url' => Link::fromTextAndUrl(
               $this->t('configuration page'),
               Url::fromRoute('simple_sitemap.settings')
-            ),
+            )->toString(),
           ]
         );
       }
@@ -97,10 +98,10 @@ class SettingsController extends ControllerBase {
       $metatag_description = $this->t(
         'You can configure and override the Metatag title & description default settings at the @url.',
         [
-          '@url' => \Drupal::l(
+          '@url' => Link::fromTextAndUrl(
             $this->t('Metatag configuration page'),
             Url::fromRoute('entity.metatag_defaults.collection')
-          ),
+          )->toString(),
         ]
       );
     }

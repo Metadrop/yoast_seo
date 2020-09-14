@@ -10,6 +10,12 @@ use Drupal\Tests\BrowserTestBase;
  * @group yoast_seo_ui
  */
 class ConfigurationPageTest extends BrowserTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+  
   /**
    * Modules to enable.
    *
